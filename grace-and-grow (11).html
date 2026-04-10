@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Grace & Grow">
+<meta name="theme-color" content="#a55eea">
+<link rel="manifest" href="manifest.json">
+<title>Grace & Grow</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff8f0;--surface:#fff;--s2:#fef3e8;--coral:#ff6b6b;--coral-bg:#fff0f0;--orange:#ff9f43;--orange-bg:#fff5e6;--yellow:#ffd32a;--yellow-bg:#fffae0;--lime:#7bed9f;--lime-bg:#f0fff4;--teal:#00d2d3;--teal-bg:#e0fefe;--sky:#54a0ff;--sky-bg:#e8f3ff;--purple:#a55eea;--purple-bg:#f5eeff;--pink:#ff6b9d;--pink-bg:#fff0f7;--mint:#1dd1a1;--mint-bg:#e0faf4;--red:#ee5a24;--rose:#fd79a8;--rose-bg:#ffeef5;--text:#2d1b69;--text2:#6c5280;--text3:#a08cbe;--border:rgba(100,50,200,.12);--border2:rgba(100,50,200,.22);--serif:'Playfair Display',Georgia,serif;--sans:'Nunito',sans-serif;--r:18px;--r-sm:12px}
+[data-dark]{--bg:#0f0a1a;--surface:#1a1228;--s2:#241836;--text:#f0e8ff;--text2:#c0a8e8;--text3:#7a5fa0;--border:rgba(200,150,255,.12);--border2:rgba(200,150,255,.22);--coral-bg:#2a1020;--orange-bg:#2a1800;--yellow-bg:#1e1800;--lime-bg:#0a2015;--teal-bg:#081a1a;--sky-bg:#081428;--purple-bg:#180d2a;--pink-bg:#200b18;--mint-bg:#081a15;--rose-bg:#200818}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
+button,input,textarea,select{font-family:var(--sans)}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle at 15% 20%,rgba(255,107,107,.07) 0%,transparent 40%),radial-gradient(circle at 85% 10%,rgba(84,160,255,.09) 0%,transparent 35%),radial-gradient(circle at 70% 80%,rgba(165,94,234,.07) 0%,transparent 40%),radial-gradient(circle at 20% 85%,rgba(255,159,67,.08) 0%,transparent 35%);pointer-events:none;z-index:0}
+.app{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;position:relative;z-index:1}
+.topbar{padding:14px 18px 0;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:0 18px 100px}
+.content::-webkit-scrollbar{width:0}
+.navbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface);border-top:2px solid var(--border);display:flex;padding:8px 0 14px;z-index:100;box-shadow:0 -4px 24px rgba(100,50,200,.1)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;border:none;background:transparent;color:var(--text3);font-size:9px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--sans)}
+.nav-item.active{color:var(--purple)}
+.nav-item.active .nav-icon{transform:scale(1.2)}
+.nav-icon{font-size:20px;line-height:1;transition:transform .2s}
+.logo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.logo{font-family:var(--serif);font-size:24px;font-style:italic;background:linear-gradient(120deg,var(--coral),var(--purple),var(--sky));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header-right{display:flex;gap:8px;align-items:center}
+.mode-pill{display:flex;background:var(--s2);border-radius:30px;padding:3px;border:2px solid var(--border2)}
+.mode-btn{padding:5px 12px;border-radius:24px;border:none;font-size:11px;font-weight:800;cursor:pointer;transition:all .2s;background:transparent;color:var(--text3)}
+.mode-btn.active{background:linear-gradient(135deg,var(--purple),var(--pink));color:white;box-shadow:0 2px 8px rgba(165,94,234,.4)}
+.mode-btn.him.active{background:linear-gradient(135deg,var(--teal),var(--sky))}
+.icon-btn{width:34px;height:34px;border-radius:50%;border:2px solid var(--border2);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:transform .15s}
+.icon-btn:hover{transform:rotate(20deg)}
+/* Edit Modal */
+.edit-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;opacity:0;pointer-events:none;transition:opacity .25s}
+.edit-overlay.open{opacity:1;pointer-events:all}
+.edit-panel{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:480px;background:var(--surface);border-radius:22px 22px 0 0;z-index:501;transition:transform .3s cubic-bezier(.34,1.2,.64,1);max-height:88vh;display:flex;flex-direction:column}
+.edit-panel.open{transform:translateX(-50%) translateY(0)}
+.edit-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 4px;flex-shrink:0}
+.edit-header{display:flex;align-items:center;justify-content:space-between;padding:4px 18px 12px;flex-shrink:0;border-bottom:2px solid var(--border)}
+.edit-title{font-size:17px;font-weight:900;color:var(--text)}
+.edit-close{width:30px;height:30px;border-radius:50%;border:2px solid var(--border2);background:transparent;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2)}
+.edit-body{overflow-y:auto;padding:14px 18px 30px;flex:1}
+.edit-body::-webkit-scrollbar{width:0}
+.edit-section{margin-bottom:18px}
+.edit-section-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px}
+.edit-row{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+.edit-row input,.edit-row select{flex:1;border:2px solid var(--border2);border-radius:10px;padding:8px 11px;font-size:13px;font-weight:600;color:var(--text);background:var(--surface);outline:none}
+.edit-row input:focus,.edit-row select:focus{border-color:var(--purple)}
+.edit-del{width:28px;height:28px;border-radius:8px;border:none;background:var(--coral-bg);color:var(--coral);font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.edit-add{width:100%;padding:9px;border-radius:12px;border:2px dashed var(--border2);background:transparent;color:var(--purple);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--sans);margin-bottom:4px}
+.edit-save{width:100%;padding:12px;border-radius:30px;border:none;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--sans);box-shadow:0 4px 14px rgba(165,94,234,.4);margin-top:12px}
+.edit-tabs{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap}
+.edit-tab{padding:6px 13px;border-radius:20px;border:2px solid var(--border2);background:transparent;color:var(--text2);font-size:11px;font-weight:800;cursor:pointer;font-family:var(--sans)}
+.edit-tab.active{background:linear-gradient(135deg,var(--purple),var(--pink));color:white;border-color:transparent}
+.sl{font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;margin:16px 0 9px;display:flex;align-items:center;gap:8px}
+.sl::after{content:'';flex:1;height:2px;border-radius:1px;background:linear-gradient(90deg,var(--border2),transparent)}
+.card{background:var(--surface);border:2px solid var(--border);border-radius:var(--r);padding:15px;margin-bottom:11px;box-shadow:0 4px 16px rgba(100,50,200,.06);transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(100,50,200,.1)}
+.ct{font-size:15px;font-weight:800;color:var(--text);margin-bottom:11px}
+.card-coral{background:var(--coral-bg);border-color:rgba(255,107,107,.3)}
+.card-orange{background:var(--orange-bg);border-color:rgba(255,159,67,.3)}
+.card-lime{background:var(--lime-bg);border-color:rgba(123,237,159,.4)}
+.card-teal{background:var(--teal-bg);border-color:rgba(0,210,211,.3)}
+.card-sky{background:var(--sky-bg);border-color:rgba(84,160,255,.3)}
+.card-purple{background:var(--purple-bg);border-color:rgba(165,94,234,.3)}
+.card-pink{background:var(--pink-bg);border-color:rgba(255,107,157,.3)}
+.card-mint{background:var(--mint-bg);border-color:rgba(29,209,161,.3)}
+.card-yellow{background:var(--yellow-bg);border-color:rgba(255,211,42,.35)}
+.card-rose{background:var(--rose-bg);border-color:rgba(253,121,168,.3)}
+.verse-card{border-radius:var(--r);padding:18px;margin-bottom:13px;cursor:pointer;position:relative;overflow:hidden;background:linear-gradient(135deg,#667eea,#764ba2 50%,#f093fb);border:none;box-shadow:0 8px 28px rgba(102,126,234,.4);transition:transform .2s}
+.verse-card:hover{transform:translateY(-2px)}
+.verse-card::before{content:'✦';position:absolute;top:-10px;right:14px;font-size:60px;color:rgba(255,255,255,.13)}
+.vt{font-family:var(--serif);font-size:14px;color:white;line-height:1.75;font-style:italic;margin-bottom:8px}
+.vr{font-size:11px;font-weight:800;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:8px}
+.vtap{font-size:9px;opacity:.7;background:rgba(255,255,255,.2);padding:2px 7px;border-radius:8px}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800}
+.bher{background:linear-gradient(135deg,var(--purple),var(--pink));color:white}
+.bhis{background:linear-gradient(135deg,var(--teal),var(--sky));color:white}
+.bboth{background:linear-gradient(135deg,var(--orange),var(--yellow));color:#5a3800}
+.btn{padding:9px 18px;border-radius:30px;border:2px solid var(--border2);background:transparent;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn:hover{background:var(--s2);transform:translateY(-1px)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-full{width:100%;justify-content:center;display:flex;align-items:center;gap:6px}
+.btn-purple{background:linear-gradient(135deg,var(--purple),var(--pink));color:white;border:none;box-shadow:0 4px 12px rgba(165,94,234,.4)}
+.btn-purple:hover{box-shadow:0 6px 18px rgba(165,94,234,.55);transform:translateY(-2px)}
+.btn-teal{background:linear-gradient(135deg,var(--teal),var(--sky));color:white;border:none}
+.btn-mint{background:linear-gradient(135deg,var(--mint),var(--lime));color:white;border:none}
+.timer-block{background:linear-gradient(135deg,var(--purple-bg),var(--pink-bg));border-radius:var(--r-sm);padding:16px;border:2px solid rgba(165,94,234,.2);margin-top:11px}
+.tbig{font-size:48px;font-weight:900;text-align:center;line-height:1;margin-bottom:11px;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tctrl{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.ptrack{height:7px;background:rgba(165,94,234,.15);border-radius:4px;overflow:hidden;margin-bottom:12px}
+.pfill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--purple),var(--pink));transition:width .4s ease}
+.srow{display:flex;align-items:flex-start;gap:11px;padding:10px 0;border-bottom:2px dashed var(--border)}
+.srow:last-child{border-bottom:none}
+.snum{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:linear-gradient(135deg,var(--purple-bg),var(--pink-bg));color:var(--purple);border:2px solid rgba(165,94,234,.3);transition:all .2s}
+.snum.done{background:linear-gradient(135deg,var(--mint),var(--lime));color:white;border-color:transparent}
+.crow{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:2px dashed var(--border);cursor:pointer;transition:all .1s}
+.crow:last-child{border-bottom:none}
+.crow:hover{background:rgba(165,94,234,.04);margin:0 -5px;padding:9px 5px;border-radius:8px}
+.cbox{width:21px;height:21px;border-radius:7px;border:2.5px solid var(--border2);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;font-size:12px}
+.cbox.chk{background:linear-gradient(135deg,var(--purple),var(--pink));border-color:transparent;color:white}
+.clbl{font-size:13px;font-weight:600;color:var(--text);flex:1}
+.clbl.done{text-decoration:line-through;color:var(--text3)}
+.csub{font-size:11px;color:var(--text3);font-weight:600}
+.qgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:8px}
+.qtile{border-radius:var(--r);padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s}
+.qtile:hover{transform:translateY(-3px) scale(1.04)}
+.qicon{font-size:24px;margin-bottom:5px;display:block}
+.qlbl{font-size:10px;font-weight:800}
+.qt1{background:linear-gradient(135deg,#667eea,#764ba2);color:white;box-shadow:0 4px 12px rgba(102,126,234,.3)}
+.qt2{background:linear-gradient(135deg,#f093fb,#f5576c);color:white;box-shadow:0 4px 12px rgba(245,87,108,.25)}
+.qt3{background:linear-gradient(135deg,#fd7b41,#ffb347);color:white;box-shadow:0 4px 12px rgba(253,123,65,.25)}
+.qt4{background:linear-gradient(135deg,#11998e,#38ef7d);color:white;box-shadow:0 4px 12px rgba(17,153,142,.25)}
+.qt5{background:linear-gradient(135deg,#f953c6,#b91d73);color:white;box-shadow:0 4px 12px rgba(249,83,198,.3)}
+.qt6{background:linear-gradient(135deg,#4facfe,#00f2fe);color:white;box-shadow:0 4px 12px rgba(79,172,254,.25)}
+.qt7{background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:white;box-shadow:0 4px 12px rgba(238,90,36,.25)}
+.qt8{background:linear-gradient(135deg,#fd79a8,#6c5ce7);color:white;box-shadow:0 4px 12px rgba(108,92,231,.3)}
+.qt9{background:linear-gradient(135deg,#00b894,#00cec9);color:white;box-shadow:0 4px 12px rgba(0,184,148,.25)}
+.brow{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:2px dashed var(--border)}
+.brow:last-child{border-bottom:none}
+.bcat{font-size:12px;font-weight:700;color:var(--text);width:96px;flex-shrink:0}
+.bbar{flex:1;height:9px;background:var(--s2);border-radius:5px;overflow:hidden;border:1.5px solid var(--border)}
+.bfill{height:100%;border-radius:5px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.bamt{font-size:12px;font-weight:800;color:var(--text);width:55px;text-align:right}
+.str{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:11px}
+.sc{border-radius:var(--r-sm);padding:11px 7px;text-align:center;border:2px solid var(--border)}
+.sn{font-size:21px;font-weight:900}
+.slb{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-top:2px}
+.tabs{display:flex;gap:5px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+.tabs::-webkit-scrollbar{height:0}
+.tab{padding:6px 14px;border-radius:30px;border:2px solid var(--border2);background:transparent;color:var(--text2);font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:var(--sans);transition:all .15s;flex-shrink:0}
+.tab.active{background:linear-gradient(135deg,var(--purple),var(--pink));color:white;border-color:transparent;box-shadow:0 3px 9px rgba(165,94,234,.35)}
+textarea{width:100%;border:2px solid var(--border2);border-radius:var(--r-sm);padding:11px;font-family:var(--serif);font-size:14px;color:var(--text);background:var(--surface);resize:vertical;min-height:90px;outline:none;line-height:1.6;transition:border-color .2s}
+textarea:focus{border-color:var(--purple);box-shadow:0 0 0 4px rgba(165,94,234,.12)}
+input[type=text]{width:100%;border:2px solid var(--border2);border-radius:var(--r-sm);padding:9px 13px;font-size:13px;font-weight:600;color:var(--text);background:var(--surface);outline:none;transition:border-color .2s}
+input[type=text]:focus{border-color:var(--purple)}
+.add-row{display:flex;gap:8px;margin-bottom:11px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ps{display:none}.ps.active{display:block;animation:fadeUp .2s ease}
+@keyframes pop{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
+.clean-grid{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.clean-table{border-collapse:separate;border-spacing:2px;font-size:10px;font-weight:700;min-width:100%}
+.clean-table th{padding:5px 4px;border-radius:5px;color:white;text-align:center;font-size:9px;font-weight:900;text-transform:uppercase}
+.clean-table td{padding:6px 4px;border-radius:5px;vertical-align:top;min-width:52px}
+.day-sun{background:#ff6b6b}.day-mon{background:#ff9f43}.day-tue{background:#c8a800;color:white!important}
+.day-wed{background:#20bf6b}.day-thu{background:#54a0ff}.day-fri{background:#a55eea}.day-sat{background:#f953c6}
+.cell-sun{background:#fff0f0}.cell-mon{background:#fff5e6}.cell-tue{background:#fffae0}
+.cell-wed{background:#f0fff4}.cell-thu{background:#e8f3ff}.cell-fri{background:#f5eeff}.cell-sat{background:#fff0f7}
+.recipe-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--r-sm);padding:13px;margin-bottom:10px}
+.recipe-title{font-size:14px;font-weight:800;color:var(--text)}
+.recipe-chef{font-size:11px;color:var(--text2);font-weight:700;margin-top:2px}
+.recipe-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:800;flex-shrink:0}
+.rb-black{background:#2d1b69;color:white}
+.rb-cultural{background:linear-gradient(135deg,var(--orange),var(--yellow));color:#5a3800}
+.recipe-body{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:7px}
+.leftover-tip{background:linear-gradient(135deg,var(--mint-bg),var(--lime-bg));border-radius:8px;padding:8px;font-size:11px;color:var(--text2);font-weight:600;border-left:3px solid var(--mint)}
+.kid-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:2px dashed var(--border)}
+.kid-row:last-child{border-bottom:none}
+.kid-time{font-size:12px;font-weight:900;color:var(--purple);width:42px;flex-shrink:0}
+.kid-badge{font-size:10px;padding:2px 7px;border-radius:9px;font-weight:800}
+.kb-gym{background:#fff0f7;color:var(--pink)}
+.kb-dance{background:var(--purple-bg);color:var(--purple)}
+.kb-bath{background:var(--teal-bg);color:var(--teal)}
+.kb-bed{background:var(--sky-bg);color:var(--sky)}
+.kb-meal{background:var(--orange-bg);color:var(--orange)}
+.kb-free{background:var(--lime-bg);color:#20bf6b}
+.date-card{border-radius:var(--r-sm);padding:13px;margin-bottom:9px;cursor:pointer;transition:all .2s;border:2px solid var(--border);background:var(--surface)}
+.date-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(100,50,200,.1)}
+.cpill{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:800}
+.cfree{background:var(--lime-bg);color:#20bf6b}
+.clow{background:var(--teal-bg);color:var(--teal)}
+.cmid{background:var(--yellow-bg);color:#c0842a}
+.csplurge{background:var(--pink-bg);color:var(--pink)}
+.spicy-card{border-radius:var(--r-sm);padding:14px;margin-bottom:10px;position:relative;overflow:hidden}
+.spicy-her{background:linear-gradient(135deg,var(--purple-bg),var(--pink-bg));border:2px solid rgba(165,94,234,.25)}
+.spicy-him{background:linear-gradient(135deg,var(--rose-bg),var(--orange-bg));border:2px solid rgba(253,121,168,.3)}
+.spicy-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.spicy-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:4px}
+.spicy-desc{font-size:12px;color:var(--text2);line-height:1.55;font-weight:600}
+.ub{border-radius:var(--r);padding:16px;margin-bottom:11px;position:relative;overflow:hidden;border:none;background:linear-gradient(135deg,#f953c6,#b91d73);box-shadow:0 8px 24px rgba(249,83,198,.4);color:white}
+.ub::before{content:'👫🏾';position:absolute;right:-8px;top:-10px;font-size:65px;opacity:.18}
+.goal-card{border-radius:var(--r-sm);padding:14px;margin-bottom:9px;border:2px solid var(--border)}
+.gbar{height:9px;background:var(--s2);border-radius:5px;overflow:hidden;margin-bottom:5px;border:1.5px solid var(--border)}
+.gfill{height:100%;border-radius:5px}
+.bill-row{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:2px dashed var(--border)}
+.bill-row:last-child{border-bottom:none}
+.bill-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.spill{font-size:10px;padding:2px 8px;border-radius:9px;font-weight:800}
+.s-paid{background:var(--lime-bg);color:#20bf6b}
+.s-soon{background:var(--yellow-bg);color:#c0842a}
+.s-unpaid{background:var(--coral-bg);color:var(--coral)}
+.s-behind{background:#2d1b69;color:white}
+.journal-entry{border-radius:var(--r-sm);padding:13px;margin-bottom:9px;border-left:4px solid var(--purple);background:var(--purple-bg)}
+.jdate{font-size:11px;color:var(--purple);font-weight:800;margin-bottom:5px}
+.jtext{font-family:var(--serif);font-size:14px;color:var(--text);line-height:1.7;font-style:italic}
+.outing-card{border-radius:var(--r-sm);padding:13px;margin-bottom:9px;border:2px solid var(--border);cursor:pointer;transition:all .2s}
+.outing-card:hover{transform:translateY(-2px);box-shadow:0 5px 16px rgba(100,50,200,.1)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo-row">
+      <div class="logo">Grace &amp; Grow ✨</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--text3)">
+        <div id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:#ffd32a;transition:background .4s"></div>
+        <span id="sync-label">Connecting…</span>
+      </div>
+      <div class="header-right">
+        <div class="mode-pill">
+          <button class="mode-btn active" id="btn-you" onclick="setMode('you')">Her 🤎</button>
+          <button class="mode-btn him" id="btn-him" onclick="setMode('him')">His 🤎</button>
+        </div>
+        <div class="icon-btn" onclick="openEditPanel()" id="edit-btn" style="font-size:14px">✏️</div>
+        <div class="icon-btn" onclick="toggleDark()" id="dark-btn">🌙</div>
+      </div>
+    </div>
+  </div>
+  <div class="content" id="mc">
+    <div class="ps active" id="page-home">
+      <div class="verse-card" onclick="refreshVerse()">
+        <div class="vt" id="vt">"She is clothed with strength and dignity, and she laughs without fear of the future."</div>
+        <div class="vr">Proverbs 31:25&nbsp;<span class="vtap">tap to refresh ✨</span></div>
+      </div>
+      <div id="focus-zone"></div>
+      <div class="sl" style="color:var(--purple)">Quick access</div>
+      <div class="qgrid">
+        <div class="qtile qt1" onclick="goPage('bible')"><span class="qicon">📖</span><span class="qlbl">Bible</span></div>
+        <div class="qtile qt2" onclick="goPage('clean')"><span class="qicon">🧹</span><span class="qlbl">Clean</span></div>
+        <div class="qtile qt3" onclick="goPage('meals')"><span class="qicon">🥘</span><span class="qlbl">Meals</span></div>
+        <div class="qtile qt4" onclick="goPage('budget')"><span class="qicon">💰</span><span class="qlbl">Budget</span></div>
+        <div class="qtile qt5" onclick="goPage('dates')"><span class="qicon">👫🏾</span><span class="qlbl">Dates</span></div>
+        <div class="qtile qt6" onclick="goPage('journal')"><span class="qicon">🙏🏾</span><span class="qlbl">Prayer</span></div>
+        <div class="qtile qt7" onclick="goPage('kids')"><span class="qicon">👦🏾</span><span class="qlbl">Kids</span></div>
+        <div class="qtile qt8" onclick="goPage('spicy')"><span class="qicon">🔥</span><span class="qlbl">Spicy</span></div>
+        <div class="qtile qt9" onclick="goPage('outings')"><span class="qicon">🌟</span><span class="qlbl">Outings</span></div>
+      </div>
+      <div class="sl" style="color:var(--sky)">Bible today</div>
+      <div class="card card-purple" id="home-bible"></div>
+      <div class="sl" style="color:var(--coral)">Bills this week</div>
+      <div class="card card-coral" id="home-bills"></div>
+    </div>
+    <div class="ps" id="page-bible">
+      <div class="tabs" id="bible-main-tabs">
+        <div class="tab active" id="btab-plan" onclick="setBibleTab('plan')">📋 Plan</div>
+        <div class="tab" id="btab-read" onclick="setBibleTab('read')">📖 Read</div>
+      </div>
+      <div id="bible-plan-view">
+        <div class="card" style="background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:white;margin-bottom:13px"><div style="font-family:var(--serif);font-size:16px;font-style:italic;margin-bottom:5px;opacity:.9">Daily Scripture 📖</div><div style="font-size:24px;font-weight:900">Keep going! 🙌</div></div>
+        <div class="str"><div class="sc card-purple"><div class="sn" style="color:var(--purple)" id="streak-n">12</div><div class="slb">Streak</div></div><div class="sc card-teal"><div class="sn" style="color:var(--teal)" id="bible-dn">0</div><div class="slb">Today</div></div><div class="sc card-yellow"><div class="sn" id="plan-day-n">1</div><div class="slb">Day</div></div></div>
+        <div class="sl" style="color:var(--purple)">Today's readings</div>
+        <div class="card card-purple" id="bible-card"></div>
+        <div class="sl" style="color:var(--pink)">Couple devotional 💕</div>
+        <div class="card card-pink">
+          <div style="font-family:var(--serif);font-size:14px;color:var(--text);line-height:1.7;margin-bottom:11px;font-style:italic" id="devot-prompt"></div>
+          <div style="font-size:11px;color:var(--text3);font-weight:700;margin-bottom:12px" id="devot-source"></div>
+          <button class="btn btn-full" id="devot-btn" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:white;border:none" onclick="markDevotional()">We did this together ✓</button>
+        </div>
+      </div>
+      <div id="bible-read-view" style="display:none">
+        <div id="bible-reader-content"></div>
+      </div>
+    </div>
+    <div class="ps" id="page-clean"><div id="clean-content"></div></div>
+    <div class="ps" id="page-meals">
+      <div class="tabs" id="meal-tabs">
+        <div class="tab active" onclick="setMealTab('breakfast')">🌅 Breakfast</div>
+        <div class="tab" onclick="setMealTab('lunch')">☀️ Lunch</div>
+        <div class="tab" onclick="setMealTab('dinner')">🌙 Dinner</div>
+        <div class="tab" onclick="setMealTab('grocery')">🛒 Grocery</div>
+        <div class="tab" onclick="setMealTab('kids-food')">🍕 Kids</div>
+      </div>
+      <div id="meal-content"></div>
+    </div>
+    <div class="ps" id="page-budget">
+      <div class="tabs"><div class="tab active" id="btab-s" onclick="setBudgetTab('spending')">💸 Spending</div><div class="tab" id="btab-g" onclick="setBudgetTab('savings')">🎯 Goals</div><div class="tab" id="btab-b" onclick="setBudgetTab('bills')">📋 Bills</div></div>
+      <div id="budget-spending-view"></div><div id="budget-savings-view" style="display:none"></div><div id="budget-bills-view" style="display:none"></div>
+    </div>
+    <div class="ps" id="page-dates">
+      <div class="ub"><div style="font-size:11px;font-weight:900;opacity:.85;margin-bottom:3px">THIS FRIDAY 🗓</div><div style="font-family:var(--serif);font-size:19px;margin-bottom:3px">Backyard movie night 🎬</div><div style="font-size:12px;opacity:.85;font-weight:600">Kids in bed · Projector · Popcorn</div></div>
+      <div class="tabs"><div class="tab active" id="dtab-i" onclick="setDateTab('ideas')">✨ Ideas</div><div class="tab" id="dtab-p" onclick="setDateTab('planned')">📅 Planned</div><div class="tab" id="dtab-m" onclick="setDateTab('memories')">💖 Memories</div></div>
+      <div id="date-ideas-view"></div><div id="date-planned-view" style="display:none"></div><div id="date-memories-view" style="display:none"></div>
+    </div>
+    <div class="ps" id="page-kids">
+      <div class="tabs" id="kids-tabs"><div class="tab active" onclick="setKidsTab('today')">📅 Today</div><div class="tab" onclick="setKidsTab('weekly')">🗓 Weekly</div><div class="tab" onclick="setKidsTab('routines')">⏰ Routines</div></div>
+      <div id="kids-content"></div>
+    </div>
+    <div class="ps" id="page-tasks">
+      <div id="tasks-banner"></div><div class="str" id="tasks-stats"></div>
+      <div class="sl" style="color:var(--purple)">Today's tasks</div>
+      <div class="card card-purple" id="tasks-content"></div>
+      <div class="sl" style="color:var(--teal)">Add a task</div>
+      <div class="add-row"><input type="text" id="new-task" placeholder="Add something..." onkeydown="if(event.key==='Enter')addTask()"><button class="btn btn-purple btn-sm" onclick="addTask()">Add ✚</button></div>
+    </div>
+    <div class="ps" id="page-journal">
+      <div id="journal-banner"></div>
+      <div id="journal-write"></div>
+      <div class="sl" style="color:var(--sky)" id="journal-entries-label">Past entries</div>
+      <div id="journal-entries"></div>
+    </div>
+    <div class="ps" id="page-spicy">
+      <div class="card" style="background:linear-gradient(135deg,#fd79a8,#ee5a24);border:none;margin-bottom:13px;color:white"><div style="font-family:var(--serif);font-size:18px;font-style:italic;margin-bottom:3px">Intimacy Corner 🔥</div><div style="font-size:12px;opacity:.85;font-weight:600">Just for the two of you 💕</div></div>
+      <div class="tabs"><div class="tab active" id="stab-him" onclick="setSpicyTab('him')">💙 For Him</div><div class="tab" id="stab-her" onclick="setSpicyTab('her')">💜 For Her</div><div class="tab" id="stab-tog" onclick="setSpicyTab('together')">👫🏾 Together</div><div class="tab" id="stab-sug" onclick="setSpicyTab('suggest')">💌 Suggest</div></div>
+      <div id="spicy-content"></div>
+    </div>
+    <div class="ps" id="page-outings">
+      <div class="card" style="background:linear-gradient(135deg,#00b894,#00cec9);border:none;margin-bottom:13px;color:white"><div style="font-family:var(--serif);font-size:18px;font-style:italic;margin-bottom:3px">Family Outings 🌟</div><div style="font-size:12px;opacity:.85;font-weight:600">Making memories together</div></div>
+      <div class="tabs"><div class="tab active" id="otab-free" onclick="setOutingTab('free')">🆓 Free</div><div class="tab" id="otab-cheap" onclick="setOutingTab('cheap')">💚 Cheap</div><div class="tab" id="otab-splurge" onclick="setOutingTab('splurge')">✨ Splurge</div><div class="tab" id="otab-faith" onclick="setOutingTab('faith')">🙏🏾 Faith</div></div>
+      <div id="outings-content"></div>
+    </div>
+  </div>
+  <nav class="navbar">
+    <button class="nav-item active" id="nav-home" onclick="goPage('home')"><div class="nav-icon">🏠</div>Home</button>
+    <button class="nav-item" id="nav-meals" onclick="goPage('meals')"><div class="nav-icon">🥘</div>Meals</button>
+    <button class="nav-item" id="nav-kids" onclick="goPage('kids')"><div class="nav-icon">👦🏾</div>Kids</button>
+    <button class="nav-item" id="nav-clean" onclick="goPage('clean')"><div class="nav-icon">🧹</div>Clean</button>
+    <button class="nav-item" id="nav-spicy" onclick="goPage('spicy')"><div class="nav-icon">🔥</div>Spicy</button>
+    <button class="nav-item" id="nav-more" onclick="goPage('dates')"><div class="nav-icon">👫🏾</div>Dates</button>
+  </nav>
+<!-- Edit Overlay -->
+<div class="edit-overlay" id="edit-overlay" onclick="closeEditPanel()"></div>
+<div class="edit-panel" id="edit-panel">
+  <div class="edit-handle"></div>
+  <div class="edit-header">
+    <div class="edit-title" id="edit-panel-title">✏️ Edit</div>
+    <button class="edit-close" onclick="closeEditPanel()">✕</button>
+  </div>
+  <div class="edit-body" id="edit-panel-body"></div>
+</div>
+</div>
+<script>
+// Always use Eastern Time (EST/EDT) regardless of device timezone
+function getEasternNow(){
+  // Use Intl to get current time in America/New_York
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat('en-US',{
+    timeZone:'America/New_York',
+    hour:'numeric',minute:'numeric',second:'numeric',hour12:false
+  }).formatToParts(now);
+  const get = type => +parts.find(p=>p.type===type).value;
+  const h=get('hour'), m=get('minute'), s=get('second');
+  return {h, m, s, decimal: h + m/60 + s/3600};
+}
+let mode='you',darkMode=false,currentPage='home',currentCleanStep=0;
+let cleanTimerSecs=300,cleanTimerFull=300,cleanTimerInt=null,cleanTimerOn=false;
+let homeTimerSecs=300,homeTimerFull=300,homeTimerInt=null,homeTimerOn=false;
+let mealTab='breakfast',budgetTab='spending',dateTab='ideas',kidsTab='today',spicyTab='her',outingTab='free';
+function $(id){return document.getElementById(id)}
+function fmtTime(sec){const m=Math.floor(sec/60),s=sec%60;return m+':'+(s<10?'0':'')+s}
+function toggleDark(){darkMode=!darkMode;document.body.toggleAttribute('data-dark',darkMode);$('dark-btn').textContent=darkMode?'☀️':'🌙';}
+function setMode(m){mode=m;$('btn-you').classList.toggle('active',m==='you');$('btn-him').classList.toggle('active',m==='him');renderPage(currentPage);}
+const navIds={home:'nav-home',meals:'nav-meals',kids:'nav-kids',clean:'nav-clean',spicy:'nav-spicy',dates:'nav-more'};
+function goPage(name){
+  document.querySelectorAll('.ps').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pg=$('page-'+name);if(pg)pg.classList.add('active');
+  if(navIds[name])$(navIds[name]).classList.add('active');
+  currentPage=name;renderPage(name);$('mc').scrollTo(0,0);
+}
+function renderPage(n){
+  if(n==='home')renderHome();if(n==='bible')renderBible();if(n==='clean')renderClean();
+  if(n==='meals')renderMeal(mealTab);if(n==='budget')renderBudgetAll();if(n==='dates')renderDates();
+  if(n==='kids')renderKids(kidsTab);if(n==='tasks')renderTasks();if(n==='journal')renderJournal();
+  if(n==='spicy')renderSpicy(spicyTab);if(n==='outings')renderOutings(outingTab);
+}
+const verses=[
+  {t:'"She is clothed with strength and dignity, and she laughs without fear of the future."',r:'Proverbs 31:25'},
+  {t:'"Two are better than one, because they have a good return for their labor."',r:'Ecclesiastes 4:9'},
+  {t:'"Do not be anxious about anything — in every situation, present your requests to God."',r:'Philippians 4:6'},
+  {t:'"Love is patient, love is kind. It does not envy, it does not boast."',r:'1 Corinthians 13:4'},
+  {t:'"Trust in the Lord with all your heart and lean not on your own understanding."',r:'Proverbs 3:5'},
+  {t:'"I can do all this through him who gives me strength."',r:'Philippians 4:13'},
+  {t:'"Children are a heritage from the Lord, offspring a reward from him."',r:'Psalm 127:3'},
+  {t:'"Whatever you do, do it all in the name of the Lord Jesus."',r:'Colossians 3:17'},
+];
+let verseIdx=0;
+function refreshVerse(){
+  verseIdx=(verseIdx+1)%verses.length;const v=verses[verseIdx],el=$('vt');
+  el.style.transition='opacity .18s';el.style.opacity='0';
+  setTimeout(()=>{el.textContent='"'+v.t.replace(/^"|"$/g,'')+'"';el.style.opacity='1';el.nextElementSibling.innerHTML=v.r+'&nbsp;<span class="vtap">tap to refresh ✨</span>';},180);
+}
+// ── READING PLAN LIBRARY ──────────────────────────────────────────────
+// Each day has {her, his, both, devotPrompt, devotSource}
+// The plan auto-advances each calendar day using the start date as day 1.
+const PLAN_START = '2025-04-07'; // Change this to your actual start date
+const readingPlan = [
+  // Week 1 — New Beginnings
+  {her:'Psalm 1 — The blessed life',          his:'Joshua 1 — Be strong & courageous',  both:'Genesis 1:1-2:3 — Creation',          devotPrompt:'What does it mean to you to "delight in the Lord"? Share one area of your life you want to surrender to Him.',    devotSource:'Week 1, Day 1'},
+  {her:'Psalm 8 — How majestic is Your name', his:'Joshua 24:14-15 — Choose this day',  both:'John 1:1-18 — The Word became flesh',  devotPrompt:'As a couple, what does "as for me and my house, we will serve the Lord" look like practically this week?',           devotSource:'Week 1, Day 2'},
+  {her:'Psalm 46 — God is our refuge',        his:'Proverbs 3:1-12 — Trust the Lord',   both:'Romans 8:1-17 — No condemnation',      devotPrompt:'Where in your life do you need to lean on God\'s understanding rather than your own right now?',                    devotSource:'Week 1, Day 3'},
+  {her:'Proverbs 31:10-31 — Virtuous woman',  his:'Ephesians 5:25-33 — Love your wife', both:'1 Corinthians 13 — Love chapter',       devotPrompt:'Read 1 Cor 13 slowly together. Which quality of love do you each want to grow in most?',                           devotSource:'Week 1, Day 4'},
+  {her:'Psalm 139 — Known by God',            his:'Psalm 1 — The righteous man',         both:'Philippians 4:4-13 — Rejoice always',  devotPrompt:'What are you each most grateful for this week? Take turns naming 3 things, including each other.',                  devotSource:'Week 1, Day 5'},
+  {her:'Isaiah 40:28-31 — Renew your strength',his:'1 Kings 2:1-4 — David\'s charge',   both:'Matthew 5:1-12 — The Beatitudes',      devotPrompt:'Which Beatitude resonates most with where you are right now? How can you live it out this week?',                    devotSource:'Week 1, Day 6'},
+  {her:'Psalm 23 — The Lord is my shepherd',  his:'Proverbs 4:1-9 — Get wisdom',        both:'Hebrews 10:24-25 — Spur one another', devotPrompt:'How can you better encourage one another in faith this week? Be specific — name one thing each.',                   devotSource:'Week 1, Day 7'},
+  // Week 2 — Faith & Trust
+  {her:'Isaiah 41:10 — Do not fear',          his:'2 Timothy 1:7 — Spirit of power',     both:'James 1:2-8 — Trials & wisdom',        devotPrompt:'What trial are you each facing right now? Pray specifically over it together tonight.',                              devotSource:'Week 2, Day 1'},
+  {her:'Psalm 91 — Shelter of the Almighty',  his:'Romans 5:1-11 — Peace with God',      both:'Matthew 6:25-34 — Do not worry',       devotPrompt:'Which worry do you need to hand to God right now? Say it out loud to each other and pray over it.',                 devotSource:'Week 2, Day 2'},
+  {her:'Jeremiah 29:11 — Plans to prosper',   his:'Proverbs 16:1-9 — Commit to God',     both:'Psalm 37:1-7 — Delight in the Lord',   devotPrompt:'Do you both feel aligned on where God is leading your family? Share your sense of His direction openly.',           devotSource:'Week 2, Day 3'},
+  {her:'Lamentations 3:22-24 — New mercies',  his:'2 Chronicles 20:15-22 — Battle is God\'s', both:'Romans 8:28-39 — All things work together', devotPrompt:'Can you recall a time God turned something hard into something good? Share it and thank Him together.',     devotSource:'Week 2, Day 4'},
+  {her:'Psalm 34 — Taste and see',            his:'Daniel 3:16-18 — Even if He doesn\'t', both:'1 Peter 5:6-11 — Cast your cares',    devotPrompt:'Is there an area where you\'re finding it hard to trust God? Talk about it honestly — no judgment.',                 devotSource:'Week 2, Day 5'},
+  {her:'John 15:1-11 — Abide in the vine',    his:'Galatians 5:16-25 — Fruit of Spirit', both:'Psalm 119:105-112 — Lamp to my feet',  devotPrompt:'Which Fruit of the Spirit do you most want to see grow in your home this season? Make it a household goal.',         devotSource:'Week 2, Day 6'},
+  {her:'Isaiah 26:3-4 — Perfect peace',       his:'Joshua 21:43-45 — Not one word failed',both:'Revelation 3:20 — I stand at the door',devotPrompt:'Is there any door in your life you need to open to Jesus right now? Share it vulnerably.',                          devotSource:'Week 2, Day 7'},
+  // Week 3 — Marriage & Family
+  {her:'Song of Songs 2:1-7 — Beloved',       his:'Ephesians 5:21-33 — Mutual submission', both:'Genesis 2:18-25 — Not good to be alone', devotPrompt:'What made you fall in love? Tell each other the specific moment you knew.',                                    devotSource:'Week 3, Day 1'},
+  {her:'Proverbs 14:1 — Wise woman builds',   his:'Malachi 2:13-16 — Be faithful',       both:'Ecclesiastes 4:9-12 — Two are better', devotPrompt:'What is the strongest cord in your relationship right now? What needs more attention?',                            devotSource:'Week 3, Day 2'},
+  {her:'Ruth 1:16-18 — Where you go I will go',his:'Ephesians 6:1-4 — Fathers & children',both:'Psalm 128 — Blessed is the family',   devotPrompt:'How do you want your children to describe your home when they are grown? Talk through that vision together.',         devotSource:'Week 3, Day 3'},
+  {her:'Titus 2:3-5 — Older women teach',     his:'1 Timothy 5:8 — Provide for family',  both:'Deuteronomy 6:4-9 — Teach your children', devotPrompt:'What faith rhythms do you want to establish in your home? Morning prayer? Sunday worship? Family Bible time?',  devotSource:'Week 3, Day 4'},
+  {her:'Psalm 127:3-5 — Children are heritage',his:'Proverbs 22:6 — Train up a child',   both:'Matthew 18:1-6 — Become like children', devotPrompt:'What spiritual values do you most want Jacchius and Ahnaniah to carry into adulthood?',                          devotSource:'Week 3, Day 5'},
+  {her:'Philippians 2:3-8 — Humility of Christ',his:'1 Peter 3:7 — Dwell with understanding',both:'Colossians 3:12-17 — Clothe yourselves',devotPrompt:'Is there something you have been needing to apologize for? Tonight is a safe space — offer it freely.',       devotSource:'Week 3, Day 6'},
+  {her:'Psalm 103 — Forget not His benefits',  his:'1 John 4:7-12 — God is love',        both:'Romans 15:1-7 — Bear with one another', devotPrompt:'Name one way your spouse has shown you God\'s love recently. Look them in the eyes when you say it.',               devotSource:'Week 3, Day 7'},
+  // Week 4 — Purpose & Calling
+  {her:'Esther 4:14 — For such a time',        his:'Acts 9:1-19 — Paul\'s calling',       both:'Romans 12:1-8 — Living sacrifice',     devotPrompt:'What do you believe God has called your family to? Dream out loud together — no limits.',                         devotSource:'Week 4, Day 1'},
+  {her:'Micah 6:8 — Act justly, love mercy',   his:'Matthew 25:14-30 — Parable of talents', both:'1 Peter 2:9 — Royal priesthood',     devotPrompt:'What gifts has God put in each of you? How are you using them — and how could you better use them together?',       devotSource:'Week 4, Day 2'},
+  {her:'Proverbs 11:24-25 — The generous soul',his:'Luke 12:48 — Much is required',       both:'2 Corinthians 9:6-8 — Cheerful giver', devotPrompt:'How is your family positioned to be generous right now — with time, money, or gifts? Pick one and commit.',        devotSource:'Week 4, Day 3'},
+  {her:'Habakkuk 2:2-3 — Write the vision',    his:'Nehemiah 2:17-18 — Let us build',     both:'Luke 1:37 — Nothing impossible with God', devotPrompt:'Write your family vision in 2 sentences together. What does God want for your family in the next 3 years?',   devotSource:'Week 4, Day 4'},
+  {her:'Isaiah 58:6-8 — True fasting',         his:'Matthew 28:19-20 — Great Commission', both:'Acts 2:42-47 — Early church',          devotPrompt:'How is your family connected to a church community? Is there more you could give or receive there?',                devotSource:'Week 4, Day 5'},
+  {her:'Psalm 71:17-18 — Tell the next generation',his:'1 Samuel 3:1-10 — Speak Lord',   both:'2 Timothy 3:16-17 — Scripture is useful', devotPrompt:'How has God spoken to each of you this week through His Word? Share a moment where Scripture hit different.',  devotSource:'Week 4, Day 6'},
+  {her:'Psalm 150 — Praise the Lord',          his:'Revelation 5:9-14 — Worthy is the Lamb', both:'John 17:20-23 — That they may be one', devotPrompt:'Pray together out loud — one sentence each. Thank God for your family. Ask Him for one thing this coming week.',  devotSource:'Week 4, Day 7'},
+  // Week 5 — Healing & Restoration
+  {her:'Isaiah 53:4-6 — He bore our griefs',   his:'Psalm 30 — Joy comes in the morning',  both:'Joel 2:25 — Restore the years',        devotPrompt:'Is there anything from your past that still affects your marriage today? Name it gently and pray over it together.',devotSource:'Week 5, Day 1'},
+  {her:'Psalm 62:1-8 — Rest in God alone',     his:'Philippians 3:13-14 — Press on',       both:'Romans 8:18 — Present suffering',      devotPrompt:'What season of hardship has your family come through? Celebrate how far God has brought you.',                      devotSource:'Week 5, Day 2'},
+  {her:'Matthew 11:28-30 — Come to me',        his:'Psalm 18:1-6 — I love you Lord',       both:'2 Corinthians 12:9-10 — His grace',    devotPrompt:'Where are you each feeling weak right now? Offer that weakness to God in prayer together.',                       devotSource:'Week 5, Day 3'},
+  {her:'Luke 15:11-24 — The prodigal son',     his:'Luke 15:25-32 — The older son',        both:'Luke 15:1-7 — The lost sheep',         devotPrompt:'Which character in the prodigal son story do you relate to most right now? Be honest with each other.',            devotSource:'Week 5, Day 4'},
+  {her:'Psalm 51 — Create in me a clean heart',his:'1 John 1:9 — He is faithful to forgive',both:'Matthew 18:21-35 — Forgiveness',      devotPrompt:'Is there any unforgiveness between you that needs to be released? This is your safe moment.',                       devotSource:'Week 5, Day 5'},
+  {her:'Isaiah 43:18-19 — New thing springing',his:'Revelation 21:4-5 — All things new',   both:'Psalm 126 — Like those who dream',     devotPrompt:'What new thing do you sense God wants to do in your family? Speak it in faith over each other tonight.',            devotSource:'Week 5, Day 6'},
+  {her:'Zephaniah 3:17 — He rejoices over you',his:'Romans 8:37-39 — More than conquerors',both:'Revelation 22:20-21 — Come Lord Jesus', devotPrompt:'End this week by simply worshipping together. Play a worship song and let God\'s love wash over your home.',     devotSource:'Week 5, Day 7'},
+];
+
+// Day tracking — based on real calendar days since PLAN_START
+function getPlanDayIndex(){
+  const start=new Date(PLAN_START);
+  const today=new Date();
+  start.setHours(0,0,0,0); today.setHours(0,0,0,0);
+  const diff=Math.floor((today-start)/(1000*60*60*24));
+  return Math.max(0, diff) % readingPlan.length; // cycle through library forever
+}
+function getTodayPlan(){return readingPlan[getPlanDayIndex()];}
+
+// bibleReadings is now derived from today's plan entry — 3 slots only
+function getBibleReadings(){
+  const day=getTodayPlan();
+  return [
+    {p:'Her', l:day.her,  t:'~8 min',  chk:false},
+    {p:'His', l:day.his,  t:'~10 min', chk:false},
+    {p:'Both',l:day.both, t:'~12 min', chk:false},
+  ];
+}
+// Runtime readings with check state (reset each day via date check)
+let _readingDate = '';
+let bibleReadings = [];
+function ensureReadings(){
+  const today=new Date().toLocaleDateString();
+  if(today!==_readingDate){_readingDate=today;bibleReadings=getBibleReadings();}
+}
+const breakfasts=[
+  {title:'Shrimp & Grits',chef:'Chef Marcus Samuelsson',type:'black',badge:'rb-black',desc:'Creamy stone-ground grits topped with perfectly seasoned gulf shrimp, crispy turkey bacon, and a rich Creole butter sauce. A Southern classic elevated.',leftover:'Use leftover grits as a savory breakfast bowl tomorrow — top with a fried egg and hot sauce.',recipe:{ingredients:['1 cup stone-ground grits','4 cups water or chicken broth','1 lb large shrimp, peeled & deveined','4 strips turkey bacon, chopped','3 tbsp butter','1 cup sharp cheddar, shredded','2 cloves garlic, minced','1 tsp Creole seasoning','Salt & pepper to taste','2 green onions, sliced'],steps:['Bring broth to a boil, whisk in grits. Reduce heat and cook 20–25 min stirring often.','Stir in 2 tbsp butter and cheddar into grits. Season with salt. Keep warm.','Cook turkey bacon in skillet over medium heat until crispy. Set aside.','In same pan, melt 1 tbsp butter. Add garlic, cook 30 sec.','Add shrimp and Creole seasoning. Cook 2–3 min per side until pink.','Serve shrimp and bacon over grits. Top with green onions.']}},
+  {title:'Sweet Potato Pancakes',chef:'Chef Carla Hall',type:'black',badge:'rb-black',desc:'Fluffy pancakes made with roasted sweet potato, warm spices, and topped with brown butter maple syrup. So good the kids will want some too.',leftover:'Extra pancakes freeze beautifully — pop them in the toaster for a quick weekday breakfast.',recipe:{ingredients:['1 cup mashed roasted sweet potato','1½ cups all-purpose flour','2 tsp baking powder','1 tsp cinnamon','½ tsp nutmeg','2 eggs','1 cup buttermilk','2 tbsp melted butter','2 tbsp brown sugar','4 tbsp butter (for brown butter syrup)','½ cup maple syrup'],steps:['Whisk flour, baking powder, cinnamon, nutmeg, and sugar together.','In another bowl, mix sweet potato, eggs, buttermilk, and melted butter.','Fold wet into dry — don\'t overmix. Lumps are fine.','Cook on greased griddle over medium heat until bubbles form, flip once.','For brown butter syrup: melt 4 tbsp butter in small pan until golden and nutty. Add maple syrup, swirl.','Serve pancakes topped with brown butter syrup.']}},
+  {title:'Huevos Rancheros',chef:'Chef Aaron Sanchez',type:'cultural',badge:'rb-cultural',desc:'Crispy corn tortillas with refried black beans, poached eggs, fresh salsa roja, queso fresco, and avocado slices.',leftover:'Use leftover salsa roja on scrambled eggs the next morning or as a dip.',recipe:{ingredients:['4 corn tortillas','4 eggs','1 can black beans, drained','3 Roma tomatoes','½ onion','2 jalapeños','2 cloves garlic','½ cup crumbled queso fresco','1 avocado, sliced','Oil for frying','Salt & cumin to taste'],steps:['Char tomatoes, jalapeños, onion and garlic under broiler 5 min.','Blend charred veggies with salt and cumin into salsa roja. Simmer 10 min.','Fry tortillas in oil until crispy. Drain on paper towels.','Warm black beans in pan, season with salt.','Poach eggs in simmering water 3–4 min.','Layer: tortilla → beans → egg → salsa → queso fresco → avocado.']}},
+  {title:'Jerk Chicken & Egg Fried Rice',chef:'Chef Kwame Onwuachi',type:'black',badge:'rb-black',desc:'Smoky jerk-spiced chicken thighs alongside fluffy jasmine fried rice with soft egg ribbons and scallions.',leftover:'The fried rice reheats perfectly — add a fried egg on top for tomorrow\'s lunch.',recipe:{ingredients:['2 chicken thighs, boneless','2 tbsp jerk seasoning','2 cups cooked day-old jasmine rice','3 eggs, beaten','3 green onions, sliced','2 tbsp soy sauce','1 tbsp sesame oil','2 cloves garlic, minced','1 tbsp vegetable oil'],steps:['Rub chicken with jerk seasoning. Let sit 15 min.','Grill or pan-sear chicken over medium-high heat 6–7 min per side. Rest 5 min, then slice.','Heat oil in wok or large skillet over high heat. Add garlic, stir 30 sec.','Add rice, break up clumps, stir-fry 3 min until slightly crispy.','Push rice to side. Pour eggs in, scramble until just set, then fold into rice.','Add soy sauce and sesame oil. Toss. Top with scallions and sliced chicken.']}},
+  {title:'Shakshuka with Feta',chef:'Chef Einat Admony',type:'cultural',badge:'rb-cultural',desc:'Eggs poached in a spiced tomato-pepper sauce, finished with creamy feta, fresh herbs, and served with crusty bread.',leftover:'Leftover sauce works as a pasta sauce — just warm and add pasta to the pan.',recipe:{ingredients:['6 eggs','1 can crushed tomatoes (28 oz)','2 bell peppers, diced','1 onion, diced','4 cloves garlic, minced','1 tsp cumin','1 tsp paprika','½ tsp cayenne','½ cup crumbled feta','Fresh parsley','Crusty bread to serve','2 tbsp olive oil'],steps:['Heat olive oil in large oven-safe skillet. Sauté onion and peppers 5–6 min.','Add garlic and spices, cook 1 min more.','Pour in tomatoes. Simmer 10–15 min until sauce thickens.','Make wells in sauce. Crack one egg into each well.','Cover and cook over low heat 5–8 min until whites are set, yolks still soft.','Top with feta and parsley. Serve straight from pan with crusty bread.']}},
+  {title:'Southern Biscuits & Gravy',chef:'Chef Nina Compton',type:'black',badge:'rb-black',desc:'Buttery hand-rolled biscuits smothered in rich spiced sausage cream gravy with fresh thyme.',leftover:'Crumble leftover biscuits into tomorrow\'s soup or stew for a hearty addition.',recipe:{ingredients:['2 cups all-purpose flour','1 tbsp baking powder','½ tsp salt','6 tbsp cold butter, cubed','¾ cup cold buttermilk','½ lb ground turkey sausage','2 tbsp flour (for gravy)','2 cups whole milk','Fresh thyme','Black pepper'],steps:['Preheat oven 425°F. Mix flour, baking powder, salt.','Cut in cold butter until pea-sized crumbles form.','Stir in buttermilk just until dough comes together.','Pat to ¾ inch thick, cut into rounds. Bake 12–14 min until golden.','Brown sausage in skillet. Sprinkle in 2 tbsp flour, stir 1 min.','Slowly pour in milk, whisking. Simmer until thick. Season with thyme and black pepper.','Pour gravy over warm biscuits and serve immediately.']}},
+];
+const lunches=[
+  {title:'Blackened Catfish Po\'Boy',chef:'Chef Leah Chase',type:'black',badge:'rb-black',desc:'Crispy blackened catfish on a toasted French roll with Creole remoulade, shredded cabbage, tomato, and pickles.',leftover:'Leftover catfish flakes wonderfully into tomorrow\'s fish tacos or on top of a salad.',recipe:{ingredients:['2 catfish fillets','2 tbsp blackening seasoning','2 French rolls, split','1 cup shredded cabbage','1 tomato, sliced','Pickles','3 tbsp mayo','1 tbsp Creole mustard','1 tsp hot sauce','1 tsp lemon juice','2 tbsp butter'],steps:['Mix mayo, mustard, hot sauce, and lemon juice for remoulade. Chill.','Coat catfish in blackening seasoning on both sides.','Heat cast iron skillet very hot. Add butter, cook catfish 3–4 min per side.','Toast rolls cut-side down in same pan.','Spread remoulade on both sides of roll.','Layer: cabbage → catfish → tomato → pickles. Serve immediately.']}},
+  {title:'Jerk Chicken Bowl',chef:'Chef JJ Johnson',type:'black',badge:'rb-black',desc:'Tender jerk chicken over coconut rice and peas, with grilled pineapple salsa, pickled red onion, and lime.',leftover:'Shred any leftover chicken into a wrap with lettuce and your favorite sauce tomorrow.',recipe:{ingredients:['2 chicken breasts','3 tbsp jerk marinade','1 cup jasmine rice','1 can coconut milk','1 can kidney beans, drained','1 cup fresh pineapple, diced','½ red onion, thinly sliced','2 tbsp apple cider vinegar','1 tsp sugar','1 lime','Fresh cilantro'],steps:['Marinate chicken in jerk sauce at least 30 min (overnight is better).','Pickle onion: mix sliced onion with vinegar, sugar, pinch of salt. Rest 20 min.','Cook rice with coconut milk plus enough water to equal 2 cups liquid. Fold in beans.','Grill or bake chicken at 400°F for 20–25 min until cooked through. Rest and slice.','Grill pineapple in dry pan 2 min per side until caramelized. Dice into salsa with lime juice and cilantro.','Assemble bowls: rice → chicken → pineapple salsa → pickled onion.']}},
+  {title:'Arroz con Pollo',chef:'Chef Jose Andres',type:'cultural',badge:'rb-cultural',desc:'One-pot golden rice cooked in saffron broth with tender chicken, peas, roasted peppers, and herbs.',leftover:'Add extra broth and make it a hearty soup — just warm and add frozen veggies.',recipe:{ingredients:['4 chicken thighs, bone-in','1½ cups long-grain white rice','1 can diced tomatoes','3 cups chicken broth','1 pinch saffron','1 onion, diced','4 cloves garlic','1 red pepper, diced','1 cup frozen peas','1 tsp smoked paprika','Olive oil, salt, fresh parsley'],steps:['Season chicken with salt and paprika. Sear in olive oil until golden, set aside.','In same pot, sauté onion and pepper 5 min. Add garlic, cook 1 min.','Add tomatoes, stir and cook 3 min.','Bloom saffron in ¼ cup warm broth, add to pot with remaining broth.','Add rice and nestle chicken on top. Bring to boil, cover, reduce heat.','Cook 20–22 min until rice is done. Add peas last 5 min. Garnish with parsley.']}},
+  {title:'Korean BBQ Beef Bowl',chef:'Chef Roy Choi',type:'cultural',badge:'rb-cultural',desc:'Bulgogi-marinated beef over short-grain rice with kimchi, sesame spinach, pickled cucumber, and gochujang.',leftover:'Leftover bulgogi makes incredible fried rice the next day — add egg and soy sauce.',recipe:{ingredients:['1 lb ribeye or sirloin, thinly sliced','3 tbsp soy sauce','2 tbsp sesame oil','1 tbsp brown sugar','3 cloves garlic, grated','1 tsp ginger, grated','2 cups cooked short-grain rice','½ cup kimchi','2 cups spinach','1 cucumber, sliced','Rice vinegar','Gochujang to serve'],steps:['Mix soy sauce, sesame oil, brown sugar, garlic, and ginger for marinade.','Toss beef in marinade. Rest 30 min minimum.','Sauté spinach with a little sesame oil and pinch of salt. Set aside.','Toss cucumber slices with rice vinegar and pinch of sugar. Pickle 10 min.','Cook beef in very hot pan, 1–2 min per side. Do not overcrowd.','Assemble bowls: rice → beef → spinach → kimchi → cucumber → gochujang.']}},
+  {title:'Red Beans & Rice',chef:'Chef Paul Prudhomme',type:'cultural',badge:'rb-cultural',desc:'Slow-simmered Creole red kidney beans with smoked sausage, the holy trinity, and bay leaves over fluffy white rice.',leftover:'Transform leftover red beans into a thick soup — add chicken broth and blend half.',recipe:{ingredients:['2 cans red kidney beans','12 oz smoked turkey sausage, sliced','1 onion, diced','3 stalks celery, diced','1 green bell pepper, diced','4 cloves garlic, minced','2 bay leaves','1 tsp thyme','1 tsp smoked paprika','Cayenne to taste','2 cups long-grain rice, cooked'],steps:['Sauté onion, celery, and bell pepper in oil over medium heat 6–8 min.','Add garlic, thyme, paprika, and cayenne. Cook 1 min.','Add sausage, stir and brown lightly.','Add beans and 1 cup water. Toss in bay leaves.','Simmer uncovered 30–40 min, mashing some beans against the pot for creaminess.','Remove bay leaves. Serve over fluffy white rice.']}},
+  {title:'Jollof Rice with Chicken',chef:'Chef Pierre Thiam',type:'black',badge:'rb-black',desc:'West African party jollof — smoky tomato-based rice with perfectly marinated chicken, fried plantains, and coleslaw.',leftover:'Cold jollof rice makes amazing fried rice the next morning — add an egg and extra oil.',recipe:{ingredients:['2 cups long-grain parboiled rice','4 chicken thighs','1 can crushed tomatoes','3 Roma tomatoes','2 red bell peppers','1 Scotch bonnet or habanero','1 onion, divided','Chicken stock','2 tsp all-purpose seasoning','Bay leaves, thyme','Oil for frying','2 ripe plantains'],steps:['Blend Roma tomatoes, red peppers, scotch bonnet, and half the onion into a smooth purée.','Season chicken with all-purpose seasoning. Brown in oil, set aside.','Fry remaining onion in same pot. Add blended purée, cook down 15–20 min until reduced and dark.','Add stock, bay leaves, thyme. Bring to boil, add chicken back in.','Rinse rice, add to pot. Liquid should just cover. Cover tightly, cook 30 min on low.','Fry plantains in oil until golden. Serve jollof with chicken, plantains, and simple slaw.']}},
+];
+const dinners=[
+  {title:'Braised Oxtail with Butter Beans',chef:'Chef Kwame Onwuachi',type:'black',badge:'rb-black',desc:'Fall-off-the-bone oxtail slow-braised in red wine and aromatics with creamy butter beans, served over mashed sweet potato.',leftover:'Shred leftover oxtail and serve over pasta with the braising liquid thinned with cream.',recipe:{ingredients:['2 lbs oxtail pieces','1 cup red wine','2 cups beef broth','1 can butter beans, drained','1 onion, diced','4 cloves garlic','2 carrots, chopped','2 stalks celery','1 tbsp tomato paste','Thyme, bay leaves','2 large sweet potatoes','Butter, salt, pepper'],steps:['Season oxtail generously with salt and pepper. Brown in oil on all sides in Dutch oven.','Remove oxtail. Sauté onion, carrot, celery 5 min. Add garlic and tomato paste.','Pour in wine, scrape up brown bits. Add broth, thyme, bay leaves.','Return oxtail to pot. Cover and braise at 325°F for 3–3.5 hours until fall-off-bone.','Add butter beans last 20 min of cooking.','Boil and mash sweet potatoes with butter and salt. Serve oxtail and beans over mash.']}},
+  {title:'Mole Negro with Chicken',chef:'Chef Enrique Olvera',type:'cultural',badge:'rb-cultural',desc:'Complex Oaxacan mole negro with dried chiles, chocolate, and spices over roasted chicken thighs with rice.',leftover:'Thin leftover mole with chicken broth and use as an enchilada sauce tomorrow — it gets better overnight.',recipe:{ingredients:['4 chicken thighs','3 dried mulato chiles','2 dried ancho chiles','2 dried pasilla chiles','2 oz dark chocolate','¼ cup sesame seeds','1 tsp cumin','½ tsp cinnamon','3 cloves garlic','1 slice stale bread','Chicken broth','Salt, oil'],steps:['Toast dried chiles in dry pan until fragrant. Remove seeds and soak in hot water 15 min.','Toast sesame seeds, cumin, cinnamon in dry pan.','Blend soaked chiles, sesame seeds, spices, garlic, and bread with some broth until smooth.','Fry blended mole paste in oil 5 min, stirring constantly.','Add chocolate and 2 cups broth. Simmer 30 min until thick and glossy.','Season and roast chicken at 400°F 25 min. Serve smothered in mole with rice.']}},
+  {title:'Whole Roasted Jerk Fish',chef:'Chef Nina Compton',type:'black',badge:'rb-black',desc:'Whole snapper rubbed with homemade Jamaican jerk and roasted over allspice berries, scotch bonnets, and thyme.',leftover:'Flake leftover fish into coconut rice with herbs and lime for a fresh next-day bowl.',recipe:{ingredients:['1 whole red snapper (2–3 lbs), cleaned','3 tbsp jerk paste (store-bought or homemade)','1 lime, juiced','4 sprigs fresh thyme','1 tsp allspice berries','1 scotch bonnet, sliced','3 cloves garlic, sliced','Olive oil','Salt'],steps:['Score fish with deep cuts on each side.','Mix jerk paste with lime juice and olive oil.','Rub marinade all over fish and into cuts. Stuff cavity with thyme, garlic, and scotch bonnet.','Line baking dish with allspice berries and thyme sprigs. Lay fish on top.','Roast at 400°F for 25–30 min until flesh flakes easily and skin is charred.','Rest 5 min. Serve whole with lime wedges and coconut rice.']}},
+  {title:'Lamb Shank Tagine',chef:'Chef Marcus Samuelsson',type:'black',badge:'rb-black',desc:'Moroccan-spiced slow-braised lamb shanks with dried apricots, preserved lemon, olives, and chickpeas over couscous.',leftover:'Use leftover tagine filling as a hearty pita stuffing with yogurt and fresh herbs.',recipe:{ingredients:['2 lamb shanks','1 tsp cinnamon','1 tsp cumin','1 tsp coriander','½ tsp ginger','1 can chickpeas','½ cup dried apricots','½ cup green olives','1 preserved lemon, rind only','2 cups chicken broth','1 onion, sliced','1 cup couscous','Fresh cilantro'],steps:['Season lamb with all spices, salt, and pepper. Brown in oil in tagine or Dutch oven.','Remove lamb, sauté onion until soft and golden.','Return lamb, add broth, apricots, chickpeas, and preserved lemon rind.','Cover and cook low and slow: 300°F for 2.5–3 hours.','Add olives last 20 min. Sauce should be thick and fragrant.','Pour boiling water over couscous, cover 5 min, fluff. Serve tagine over couscous with fresh cilantro.']}},
+  {title:'Piri-Piri Chicken',chef:'Chef Lerato Umah-Shaylor',type:'black',badge:'rb-black',desc:'Nigerian-Portuguese style grilled chicken marinated in fiery piri-piri sauce, served with sweet potato wedges and coconut slaw.',leftover:'Cold piri-piri chicken makes an amazing next-day sandwich or wrap — slice thin and add pickles.',recipe:{ingredients:['4 chicken pieces (legs/thighs)','4 red Fresno or bird\'s eye chiles','4 cloves garlic','1 lemon, juice and zest','3 tbsp olive oil','1 tsp smoked paprika','Salt','2 sweet potatoes, cut into wedges','2 cups shredded cabbage','3 tbsp coconut cream','1 tbsp lime juice'],steps:['Blend chiles, garlic, lemon, paprika, olive oil, and salt into piri-piri sauce.','Score chicken pieces. Coat thoroughly in sauce. Marinate at least 1 hour.','Toss sweet potato wedges in oil and salt. Roast at 400°F 30 min, flipping halfway.','Grill chicken over medium-high heat 7–8 min per side, basting with extra sauce.','Mix cabbage with coconut cream, lime juice, and pinch of salt for slaw.','Plate chicken with sweet potato wedges and coconut slaw.']}},
+  {title:'Shrimp Etouffee',chef:'Chef Leah Chase',type:'black',badge:'rb-black',desc:'Classic New Orleans etouffee — tender Gulf shrimp smothered in a buttery roux-based Creole sauce over long-grain rice.',leftover:'Toss leftover etouffee with pasta for a quick tomorrow lunch — it is already a complete sauce.',recipe:{ingredients:['1 lb large shrimp, peeled','4 tbsp butter','4 tbsp flour','1 onion, diced','3 stalks celery, diced','1 green pepper, diced','3 cloves garlic, minced','1 cup shrimp or chicken stock','1 tsp Creole seasoning','Hot sauce to taste','2 green onions','Cooked white rice'],steps:['Make roux: melt butter over medium heat. Add flour and stir constantly 5–7 min until golden brown.','Add onion, celery, and green pepper. Cook in roux 5 min.','Add garlic and Creole seasoning. Stir 1 min.','Slowly add stock, whisking to prevent lumps. Simmer 10 min.','Add shrimp, cook just until pink — 3 min. Do not overcook.','Adjust heat with hot sauce. Serve over white rice topped with green onions.']}},
+  {title:'Jerk Salmon with Mango Salsa',chef:'Chef Carla Hall',type:'black',badge:'rb-black',desc:'Perfectly flaky salmon fillets coated in jerk seasoning, pan-seared and topped with a fresh mango-habanero salsa.',leftover:'Flake leftover salmon into cream cheese for a next morning bagel spread — incredible.',recipe:{ingredients:['2 salmon fillets','2 tbsp jerk seasoning','1 tbsp olive oil','1 mango, diced','½ red onion, finely diced','1 habanero, seeded and minced','Juice of 1 lime','Fresh cilantro','Salt to taste'],steps:['Coat salmon fillets with jerk seasoning on all sides.','Mix mango, red onion, habanero, lime juice, cilantro, and pinch of salt. Taste and adjust.','Heat olive oil in skillet over medium-high heat until shimmering.','Place salmon skin-side down. Cook 4 min without moving.','Flip and cook 2–3 min more. Fish should flake but still be moist inside.','Plate salmon and pile mango salsa generously on top.']}},
+];
+const kidsMeals=[
+  {name:'Dino Nuggets',icon:'🦖',desc:'Crispy chicken nuggets with ketchup dipping sauce — the ultimate safe food',sides:'Mac & cheese or fries',safe:true},
+  {name:'Cinnamon Oatmeal',icon:'🥣',desc:'Creamy oatmeal with brown sugar, cinnamon, and a drizzle of honey',sides:'Banana slices on the side',safe:true},
+  {name:'Mini Pizza',icon:'🍕',desc:'English muffin or naan pizza with sauce and melted cheese',sides:'Apple slices or baby carrots',safe:true},
+  {name:'Spaghetti & Meatballs',icon:'🍝',desc:'Simple marinara with mini meatballs — never fails',sides:'Garlic bread cut small',safe:true},
+  {name:'Pop-Tarts Breakfast',icon:'🍓',desc:'Toaster pastry with a side of fruit for balance',sides:'Grapes or strawberries',safe:true},
+  {name:'Mac & Cheese',icon:'🧀',desc:'Creamy mac — can sneak peas in if you\'re brave!',sides:'Peas mixed in or on the side',safe:true},
+  {name:'PB&J Sandwich',icon:'🥜',desc:'Peanut butter and jelly on soft bread, cut into fun shapes',sides:'Goldfish crackers and juice box',safe:true},
+  {name:'Pancake Faces',icon:'🥞',desc:'Regular pancakes but made into smiley faces with blueberry eyes',sides:'Maple syrup for dipping',adventurous:true},
+  {name:'Butter Noodles',icon:'🍜',desc:'Plain pasta with butter and a little parmesan — universally loved',sides:'Hidden veggie puree in the butter',safe:true},
+  {name:'Grilled Cheese',icon:'✨',desc:'Golden buttery grilled cheese cut into triangles for dipping',sides:'Tomato soup for dipping on brave days!',adventurous:true},
+];
+let cleanYou=[
+  {t:'Pick up 5 things off the floor',time:'5 min',d:'Just 5. Count them out loud. Nothing else. 💜',dur:300},
+  {t:'Wipe the kitchen counter',time:'5 min',d:'One cloth, left to right. Done.',dur:300},
+  {t:'Take out the trash',time:'3 min',d:'Bag out, new bag in. That\'s it! ✨',dur:180},
+  {t:'Sweep the entryway',time:'5 min',d:'Just the entry. You\'re doing so well.',dur:300},
+  {t:'Start one load of laundry',time:'5 min',d:'Press start and walk away. 🎉',dur:300},
+  {t:'Wipe bathroom sink & mirror',time:'5 min',d:'Quick wipe. You got this! 💪🏾🏾',dur:300},
+  {t:'Clear one surface completely',time:'10 min',d:'One table or counter — totally cleared. That\'s huge!',dur:600},
+];
+const cleanDaily=['Make beds','Wash dishes','Open windows for fresh air','Sweep/vacuum floors','Tidy living room','Empty all trash','Laundry if needed','Dust surfaces, wipe mirrors'];
+const cleanWeekly={
+  Sun:['Declutter drawers','Clean pet area','Clean blinds','Rotate/flip mattresses','Do all laundry'],
+  Mon:['Dust bedroom furniture','Vacuum sofas & pillows','Tidy nightstands','Organize closets','Declutter all bedrooms'],
+  Tue:['Wipe TV & electronics','Vacuum sofas & chairs','Fluff pillows & cushions','Dust shelves & decor','Lightly scent the room'],
+  Wed:['Clean stovetop & oven','Wipe all appliances','Empty & clean bins','Wipe dining table & chairs','Clean & dry sink'],
+  Thu:['Scrub sinks & counters','Wipe bathroom mirrors','Clean toilet & bath area','Replace towels & mats','Spray air freshener'],
+  Fri:['Wipe doors & handles','Vacuum/mop floors','Dust/vacuum surfaces','Organize entry','Dust furniture/decor'],
+  Sat:['Clean grill','Power wash areas','Tidy cushions & covers','Sweep outdoor furniture','Tidy garden bed'],
+};
+const cleanMonthly=['Wipe kitchen cabinets','Clean microwave & appliances','Deep clean refrigerator','Disinfect all trashcans','Clean laundry room & restock','Deep clean below/behind furniture','Organize closets & drawers','Wash duvets & blankets'];
+let kidScheduleToday=[
+  {time:'7:00',name:'Wake up',detail:'Both kids',badge:'kb-meal',icon:'🌅'},
+  {time:'7:30',name:'Breakfast',detail:'Choose from safe foods',badge:'kb-meal',icon:'🥣'},
+  {time:'9:00',name:'Free play',detail:'Indoor/outdoor',badge:'kb-free',icon:'🧸'},
+  {time:'10:30',name:'Gymnastics — Jacchius',detail:'Bring water bottle & grip socks',badge:'kb-gym',icon:'🤸🏾'},
+  {time:'12:00',name:'Lunch',detail:'Safe food selection',badge:'kb-meal',icon:'🍕'},
+  {time:'1:00',name:'Nap / quiet time',detail:'Both kids rest',badge:'kb-bed',icon:'😴'},
+  {time:'3:00',name:'Dance class',detail:'Tue only · extra hair ties',badge:'kb-dance',icon:'💃🏾'},
+  {time:'5:00',name:'Snack time',detail:'Fruit + something crunchy',badge:'kb-meal',icon:'🍎'},
+  {time:'6:00',name:'Dinner',detail:'Family meal',badge:'kb-meal',icon:'🍽️'},
+  {time:'6:45',name:'Bath time',detail:'Both kids · 20 min · lavender soap',badge:'kb-bath',icon:'🛁'},
+  {time:'7:15',name:'Wind-down',detail:'Quiet book or show',badge:'kb-free',icon:'📚'},
+  {time:'7:45',name:'Bedtime',detail:'Both kids · prayers & song',badge:'kb-bed',icon:'🌙'},
+];
+const kidsWeekly=[
+  {day:'Mon',events:['School','Gymnastics 4pm','Bath 6:45','Bed 7:45']},
+  {day:'Tue',events:['School','Dance 3pm','Bath 6:45','Bed 7:45']},
+  {day:'Wed',events:['School','Free play','Bath 6:45','Bed 7:45']},
+  {day:'Thu',events:['School','Gymnastics 4pm','Bath 6:45','Bed 7:45']},
+  {day:'Fri',events:['School','Family movie','Bath 7:00','Bed 8:00']},
+  {day:'Sat',events:['Family outing','Free play','Bath 7:00','Bed 8:00']},
+  {day:'Sun',events:['Church','Family lunch','Bath 6:45','Bed 7:45']},
+];
+let dateIdeas=[
+  {e:'🎬',title:'Backyard movie night',desc:'Kids in bed, projector out, popcorn, cozy blankets',cost:'Free',cc:'cfree'},
+  {e:'☕',title:'Prayer walk + coffee',desc:'Walk together, pray out loud, end at a cafe',cost:'~$10',cc:'clow'},
+  {e:'🌿',title:'Farmers market morning',desc:'Browse together, pick a mystery ingredient to cook',cost:'~$20',cc:'clow'},
+  {e:'👨🏾‍🍳',title:'Cooking challenge',desc:'Each pick a mystery ingredient, cook separately, taste test',cost:'~$25',cc:'clow'},
+  {e:'🕯️',title:'At-home spa night',desc:'Face masks, candles, worship music, foot rubs',cost:'~$15',cc:'clow'},
+  {e:'🌅',title:'Sunrise hike + breakfast',desc:'Early trail, big breakfast after',cost:'~$30',cc:'cmid'},
+  {e:'🎲',title:'Game night tournament',desc:'Top 3 board games, winner picks dessert',cost:'Free',cc:'cfree'},
+  {e:'🎨',title:'Pottery or paint class',desc:'Silly, hands-on, guaranteed laughs',cost:'~$60',cc:'csplurge'},
+  {e:'🚗',title:'Drive-in movie',desc:'Pack the car with snacks and blankets',cost:'~$35',cc:'cmid'},
+  {e:'🙌',title:'Serve together',desc:'Volunteer at church or food bank side by side',cost:'Free',cc:'cfree'},
+];
+let plannedDates=[
+  {title:'Backyard movie night 🎬',when:'This Friday, Apr 11',notes:'Get popcorn Thurs · Kids bed by 8pm'},
+  {title:'Farmers market morning 🌿',when:'Sat Apr 19',notes:'Go early 8am · Bring cash'},
+];
+let memories=[
+  {title:'Cooking challenge 👨🏾‍🍳',when:'Mar 8',notes:'He made a disaster, we laughed all night. Best night in months.'},
+  {title:'Prayer walk ☕',when:'Feb 22',notes:'Prayed over the kids schools together. Really special moment.'},
+];
+const spicyHer=[
+  {title:'Acts of Service Love Bomb',desc:'He does one chore you have been dreading without being asked — dishes, laundry folded how you like, or a deep-cleaned bathroom. No request needed. Just done. That IS foreplay.',label:'Acts of Service 💜'},
+  {title:'Show marathon & snuggle',desc:'Pick a show you have both been wanting to start. Low lights, on the couch, blanket over both of you. No phones. Just present. Let the episodes run. This is quality time as romance.',label:'Quality Time 💜'},
+  {title:'TikTok reaction night',desc:'Take turns showing each other videos — the funny ones, the weird ones, the emotional ones. React honestly. Laugh hard together. Falling asleep laughing IS intimacy.',label:'Quality Time 💜'},
+  {title:'Breakfast in bed by him',desc:'He makes your favorite breakfast, brings it to you, and sits with you while you eat. No rushing. No multitasking. Just him, you, and morning coffee.',label:'Acts of Service 💜'},
+  {title:'A letter from him',desc:'Ask him to write you a note — even 5 sentences — about something he loves about you. Keep it. Read it again on hard days.',label:'Words of Affirmation 💜'},
+  {title:'He handles bedtime solo',desc:'He does the full bedtime routine — both kids, prayers, songs, the whole thing — so you get 45 minutes completely alone. Bath, book, candle, silence. You return recharged.',label:'Acts of Service 💜'},
+  {title:'Watch something emotional together',desc:'A documentary, a faith-based film, a love story. Feel things together. Cry if you need to. Being vulnerable emotionally opens the door to physical closeness.',label:'Quality Time 💜'},
+];
+const spicyHim=[
+  {title:'10-second hug challenge',desc:'At some point today, stop what you are doing and hold him for a full 10 seconds — no pulling away early. Feel his heartbeat. Let the hug be intentional. This matters to him more than you know.',label:'Physical Touch 🔥'},
+  {title:'Neck & shoulder massage',desc:'While he is sitting — watching TV or after dinner — walk up behind him and spend 5 minutes on his neck and shoulders. No agenda. Just presence and touch. Watch what that does.',label:'Physical Touch 🔥'},
+  {title:'Hold his hand first',desc:'Next time you are sitting or walking together — reach for his hand first. Do not wait for him to initiate. That first move from you will mean everything to him.',label:'Physical Touch 🔥'},
+  {title:'Cuddle timer',desc:'Set a 15-minute timer. Lie together and just breathe. No phones. When the timer ends, you both decide what happens next.',label:'Physical Touch 🔥'},
+  {title:'Slow dance in the kitchen',desc:'After the kids are down, put on a slow song, walk to him, and ask him to dance. Right there in the kitchen. No occasion needed. This is one of those moments.',label:'Physical Touch 🔥'},
+  {title:'Morning touch intention',desc:'Before anyone gets out of bed, put your hand on his chest or back for just 30 seconds. A hand on the heart says I see you in a language beyond words.',label:'Physical Touch 🔥'},
+  {title:'The long kiss',desc:'Not a peck. A real, intentional kiss — 5 to 7 seconds minimum. Look at him first. Make eye contact. Then kiss him like you mean it. Do this once a day and watch your connection shift.',label:'Physical Touch 🔥'},
+];
+const spicyTog=[
+  {title:'Truth or Dare — couples edition',desc:'Write 10 questions or dares on paper. Put them in a bowl. Take turns drawing. Keep it playful at first — silly dares, sweet truths — then let it get deeper as the night goes on.',label:'Both 👫🏾'},
+  {title:'The 36 Questions',desc:'The psychology study questions designed to make two people fall deeply in love. Take turns answering. By question 36 you will know each other in a new way.',label:'Both 👫🏾'},
+  {title:'Compliment tennis',desc:'Sit facing each other. One of you starts with a genuine compliment. The other responds with one. Keep going back and forth for as long as you can. No repeats. No half-hearted answers.',label:'Both 👫🏾'},
+  {title:'Create a couples playlist',desc:'Take turns adding songs — ones that remind you of each other, early dating days, your wedding. Play it on date nights.',label:'Both 👫🏾'},
+  {title:'Write each other love letters',desc:'Set a timer for 20 minutes. Both write a letter to the other — what you love, what you are grateful for, what you dream of. Swap and read in silence. Then talk.',label:'Both 👫🏾'},
+  {title:'Couples bucket list',desc:'Each write 5 things on your couples bucket list — experiences, trips, things to try. Compare lists. Pick one to plan this month.',label:'Both 👫🏾'},
+];
+const outings={
+  free:[
+    {e:'⛪',title:'Sunday church + park',desc:'Church together as a family, then a nearby park with a picnic blanket and snacks for the kids'},
+    {e:'🌲',title:'Nature trail with toddlers',desc:'Find a beginner trail with flat terrain. Bring snacks and bug spray — let them explore'},
+    {e:'📚',title:'Library story time',desc:'Most public libraries have free Saturday story times for toddlers — often with crafts'},
+    {e:'🏖️',title:'Splash pad',desc:'Free city splash pads are a toddler dream in warm weather. Pack a towel and extra clothes'},
+    {e:'🌻',title:'Botanical garden walk',desc:'Many have free days — beautiful, sensory, and the kids can run (a little)'},
+  ],
+  cheap:[
+    {e:'🎳',title:'Bumper bowling',desc:'Toddler-friendly bumper bowling — kids love it, adults get competitive. Under $30 for the family'},
+    {e:'🎡',title:'Local fair or carnival',desc:'Seasonal fairs often have cheap kiddie rides. Budget $20-30 and let them go wild'},
+    {e:'🍦',title:'Ice cream + bookstore',desc:'Get everyone ice cream, then browse a bookstore together — let each kid pick ONE book'},
+    {e:'🎠',title:'Children\'s museum',desc:'Most have family memberships. Toddlers go absolutely feral in the best way'},
+    {e:'🚂',title:'Train or bus adventure',desc:'Kids at this age LOVE public transit. Ride somewhere, get lunch, come back. Cheap magic'},
+  ],
+  splurge:[
+    {e:'🐘',title:'Zoo or aquarium day',desc:'Full family experience — plan around nap time, bring the stroller, pack extra snacks'},
+    {e:'🎡',title:'Theme park (toddler zones)',desc:'Legoland, Sesame Place, or local parks with toddler-specific areas'},
+    {e:'🏊',title:'Hotel pool staycation',desc:'Book a night nearby with a pool. Toddlers in floats, parents sipping drinks poolside'},
+    {e:'🎭',title:'Children\'s theater show',desc:'Local productions of fairy tales or puppet shows — magical for 3 & 4 year olds'},
+    {e:'🗺️',title:'Day trip to a new city',desc:'Pick somewhere 2 hours away. Let the kids be excited about the car ride. Explore together'},
+  ],
+  faith:[
+    {e:'⛪',title:'Volunteer Sunday',desc:'Serve in children\'s ministry together as a family — kids love helping at this age'},
+    {e:'🙏🏾',title:'Family prayer walk',desc:'Walk your neighborhood praying over each home, school, and business out loud together'},
+    {e:'🌊',title:'Outdoor worship service',desc:'Many churches hold seasonal outdoor services — bring a blanket and let kids roam'},
+    {e:'🎶',title:'Praise & worship night',desc:'Find a local church concert or worship night — some welcome toddlers, some offer childcare'},
+    {e:'📖',title:'Bible story picnic',desc:'Pack a picnic and read a Bible story outdoors. Act it out with the kids. Make it silly and fun'},
+  ],
+};
+let budgetItems=[
+  {cat:'Groceries',spent:280,total:400,color:'linear-gradient(90deg,#a55eea,#f953c6)'},
+  {cat:'Bills',spent:520,total:520,color:'linear-gradient(90deg,#11998e,#38ef7d)'},
+  {cat:'Kids',spent:75,total:100,color:'linear-gradient(90deg,#fd7b41,#ffb347)'},
+  {cat:'Fun fund',spent:40,total:80,color:'linear-gradient(90deg,#f953c6,#b91d73)'},
+  {cat:'Savings',spent:200,total:300,color:'linear-gradient(90deg,#4facfe,#00f2fe)'},
+  {cat:'Clothing',spent:35,total:60,color:'linear-gradient(90deg,#1dd1a1,#7bed9f)'},
+];
+let savingsGoals=[
+  {name:'Family vacation',saved:820,goal:2000,color:'linear-gradient(90deg,#a55eea,#f953c6)',e:'✈️'},
+  {name:'Emergency fund',saved:3500,goal:5000,color:'linear-gradient(90deg,#11998e,#38ef7d)',e:'🛡️'},
+  {name:'New car',saved:1200,goal:8000,color:'linear-gradient(90deg,#fd7b41,#ffb347)',e:'🚗'},
+  {name:'Christmas',saved:150,goal:400,color:'linear-gradient(90deg,#f953c6,#ff6b6b)',e:'🎄'},
+];
+let bills=[
+  {name:'Mortgage / Rent',icon:'🏠',due:'Apr 1',amount:'$1,450',status:'paid'},
+  {name:'Electric',icon:'⚡',due:'Apr 14',amount:'$87',status:'soon'},
+  {name:'Internet',icon:'📡',due:'Apr 15',amount:'$55',status:'soon'},
+  {name:'Car insurance',icon:'🚗',due:'Apr 20',amount:'$112',status:'unpaid'},
+  {name:'Phone plan',icon:'📱',due:'Apr 22',amount:'$90',status:'unpaid'},
+  {name:'Streaming',icon:'📺',due:'Apr 28',amount:'$32',status:'unpaid'},
+];
+let groceryList={
+  'Produce':[{name:'Bananas',done:false},{name:'Spinach',done:false},{name:'Bell peppers',done:true},{name:'Avocados',done:false},{name:'Apples',done:false},{name:'Mango',done:false}],
+  'Protein':[{name:'Chicken thighs',done:false},{name:'Ground beef',done:true},{name:'Eggs (dozen)',done:false},{name:'Shrimp',done:false},{name:'Salmon',done:false}],
+  'Pantry':[{name:'Jasmine rice',done:false},{name:'Stone-ground grits',done:false},{name:'Spaghetti',done:false},{name:'Canned tomatoes',done:true}],
+  'Dairy':[{name:'Milk',done:false},{name:'Shredded cheese',done:false},{name:'Butter',done:true},{name:'Greek yogurt',done:false}],
+  'Kids foods':[{name:'Dino nuggets',done:false},{name:'Mac & cheese',done:false},{name:'Pop-Tarts',done:false},{name:'Peanut butter',done:false},{name:'Bread',done:false},{name:'Oatmeal',done:false}],
+  'Household':[{name:'Dish soap',done:false},{name:'Paper towels',done:false},{name:'Laundry detergent',done:false},{name:'Lavender bath soap (kids)',done:false}],
+};
+let tasks={
+  you:[
+    {text:'Reply to one email',cat:'Work',done:false,color:'#4facfe'},
+    {text:'10 min quiet time',cat:'Faith',done:false,color:'#a55eea'},
+    {text:'Kids snack + homework',cat:'Kids',done:true,color:'#fd7b41'},
+    {text:'One cleaning step',cat:'Home',done:false,color:'#1dd1a1'},
+  ],
+  him:[
+    {text:'Finish project report',cat:'Work',done:false,color:'#4facfe'},
+    {text:'School pickup at 3pm',cat:'Kids',done:false,color:'#fd7b41'},
+    {text:'Full kitchen clean',cat:'Home',done:true,color:'#1dd1a1'},
+    {text:'Date night planning',cat:'Us',done:false,color:'#f953c6'},
+    {text:'Check bills this week',cat:'Money',done:false,color:'#38ef7d'},
+    {text:'Bible reading',cat:'Faith',done:false,color:'#a55eea'},
+  ]
+};
+let journalEntries={
+  you:[
+    {date:'April 7, 2025',text:'Lord, thank you for this family. Help me be patient today. Guide our finances and protect our peace.'},
+    {date:'April 3, 2025',text:'Grateful for a husband who tries. Please help us communicate better this week. We are better together with You.'},
+  ],
+  him:[
+    {date:'April 5, 2025',text:'Lord, help me be the leader this family needs. Give me wisdom, patience, and strength today.'},
+  ]
+};
+let recipeIdx={breakfast:0,lunch:0,dinner:0};
+
+function renderHome(){renderFocusZone();renderHomeBible();renderHomeBills();}
+function renderFocusZone(){
+  const el=$('focus-zone');if(!el)return;
+  if(mode==='you'){
+    const step=cleanYou[currentCleanStep];
+    if(!step){el.innerHTML='<div style="text-align:center;padding:28px 0"><div style="font-size:48px;animation:pop .4s">🌟</div><div style="font-family:var(--serif);font-size:19px;color:var(--text);margin:8px 0 4px">You finished everything!</div><div style="font-size:13px;color:var(--text2);font-weight:600">Rest now. You earned it. 💜</div><button class="btn btn-purple btn-sm" style="margin-top:14px" onclick="currentCleanStep=0;renderHome()">Reset 🔄</button></div>';return;}
+    homeTimerSecs=step.dur;homeTimerFull=step.dur;homeTimerOn=false;
+    el.innerHTML='<div class="sl" style="color:var(--purple)">Your one thing right now 💜</div><div class="card card-purple"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px"><div class="badge bher">One step at a time</div><div style="font-size:11px;font-weight:800;color:var(--text3)">'+(currentCleanStep+1)+' / '+cleanYou.length+'</div></div><div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:5px;line-height:1.4;font-weight:700">'+step.t+'</div><div style="font-size:12px;color:var(--text2);margin-bottom:12px;font-weight:600">'+step.d+'</div><div class="ptrack"><div class="pfill" style="width:'+Math.round((currentCleanStep/cleanYou.length)*100)+'%"></div></div><div class="timer-block"><div class="tbig" id="htimer">'+fmtTime(step.dur)+'</div><div class="tctrl"><button class="btn btn-purple" id="hstart-btn" onclick="homeToggleTimer()">&#9658; Start '+step.time+'</button><button class="btn btn-mint" onclick="homeDone()">Done! ✓</button></div></div></div>';
+  } else {
+    el.innerHTML='<div class="sl" style="color:var(--teal)">Today\'s focus 💙</div><div class="card card-teal"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px"><div style="font-size:14px;font-weight:800;color:var(--text)">Go until done 💪🏾🏾</div><div class="badge bhis">His mode</div></div>'+cleanYou.map((s,i)=>'<div class="srow" onclick="toggleHimStep(this,'+i+')"><div class="snum">'+( i+1)+'</div><div><div style="font-size:13px;font-weight:600;color:var(--text)">'+s.t+'</div><div style="font-size:10px;color:var(--text3);font-weight:600">'+s.time+'</div></div></div>').join('')+'</div>';
+  }
+}
+function homeToggleTimer(){const btn=$('hstart-btn');if(!btn)return;if(!homeTimerOn){homeTimerOn=true;btn.textContent='⏸ Pause';homeTimerInt=setInterval(()=>{homeTimerSecs--;const t=$('htimer');if(t)t.textContent=fmtTime(homeTimerSecs);if(homeTimerSecs<=0){clearInterval(homeTimerInt);homeTimerOn=false;btn.textContent='☕ Break time!';homeTimerSecs=homeTimerFull;}},1000);}else{homeTimerOn=false;clearInterval(homeTimerInt);btn.textContent='▶ Resume';}}
+function homeDone(){clearInterval(homeTimerInt);homeTimerOn=false;currentCleanStep=Math.min(currentCleanStep+1,cleanYou.length);renderHome();}
+function toggleHimStep(row,i){const n=row.querySelector('.snum');n.classList.toggle('done');n.textContent=n.classList.contains('done')?'✓':(i+1);}
+function renderHomeBible(){
+  ensureReadings();
+  const el=$('home-bible');if(!el)return;
+  el.innerHTML='<div class="ct">📖 Today\'s readings</div>'+bibleReadings.map((r,i)=>'<div class="crow" onclick="toggleReading('+i+')"><div class="cbox '+(r.chk?'chk':'')+'">  '+(r.chk?'✓':'')+'</div><div style="flex:1"><div class="clbl '+(r.chk?'done':'')+'">'+r.l+'</div><div class="csub">'+r.t+'</div></div><div class="badge '+(r.p==='Both'?'bboth':r.p==='Her'?'bher':'bhis')+'">'+r.p+'</div></div>').join('');
+}
+function renderHomeBills(){const el=$('home-bills');if(!el)return;el.innerHTML='<div class="ct">📋 Upcoming</div>'+bills.filter(b=>b.status!=='paid').slice(0,3).map(b=>'<div class="bill-row"><div class="bill-icon" style="background:var(--s2)">'+b.icon+'</div><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">'+b.name+'</div><div style="font-size:11px;color:var(--text3);font-weight:600">Due '+b.due+'</div></div><div style="font-size:14px;font-weight:900;color:var(--text)">'+b.amount+'</div></div>').join('');}
+function toggleReading(i){ensureReadings();bibleReadings[i].chk=!bibleReadings[i].chk;syncBibleReadings();renderHomeBible();renderBible();}
+
+let bibleMainTab='plan';
+function setBibleTab(t){
+  bibleMainTab=t;
+  $('btab-plan').classList.toggle('active',t==='plan');
+  $('btab-read').classList.toggle('active',t==='read');
+  $('bible-plan-view').style.display=t==='plan'?'':'none';
+  $('bible-read-view').style.display=t==='read'?'':'none';
+  if(t==='read')renderBibleReader();
+}
+
+function renderBible(){
+  ensureReadings();
+  const done=bibleReadings.filter(r=>r.chk).length;
+  const dayIdx=getPlanDayIndex()+1;
+  const sn=$('streak-n');if(sn)sn.textContent=done+12;
+  const bd=$('bible-dn');if(bd)bd.textContent=done;
+  const dn=$('plan-day-n');if(dn)dn.textContent=dayIdx;
+  const el=$('bible-card');if(!el)return;
+  const day=getTodayPlan();
+  el.innerHTML='<div class="ct">📅 '+new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})+'</div>'
+    +bibleReadings.map((r,i)=>'<div class="crow" onclick="toggleReading('+i+')">'
+      +'<div class="cbox '+(r.chk?'chk':'')+'">  '+(r.chk?'✓':'')+'</div>'
+      +'<div style="flex:1"><div class="clbl '+(r.chk?'done':'')+'">'+r.l+'</div><div class="csub">'+r.p+' · '+r.t+'</div></div>'
+      +'<button onclick="event.stopPropagation();readerPassage=\''+r.l.split(' \u2014')[0].trim()+'\';setBibleTab(\'read\')" style="padding:3px 9px;border-radius:8px;border:1.5px solid var(--border2);background:transparent;color:var(--purple);font-size:10px;font-weight:800;cursor:pointer;font-family:var(--sans)">Read</button>'
+    +'</div>').join('');
+  const dp=$('devot-prompt');if(dp)dp.textContent='"'+day.devotPrompt+'"';
+  const ds=$('devot-source');if(ds)ds.textContent=day.devotSource+' \u00b7 '+readingPlan.length+'-day plan';
+  const db=$('devot-btn');if(db){db.textContent='We did this together \u2713';db.disabled=false;db.style.background='linear-gradient(135deg,var(--pink),var(--purple))';}
+}
+function markDevotional(){const btn=$('devot-btn');if(!btn)return;btn.textContent='Blessed together! \uD83D\uDE4F\uD83C\uDFFE\uD83D\uDC95';btn.disabled=true;btn.style.background='linear-gradient(135deg,var(--mint),var(--teal))';}
+
+// BIBLE READER
+let readerPassage='John 3:16';
+let readerVersion='KJV';
+let bibleNotes={};
+
+function renderBibleReader(){
+  const el=$('bible-reader-content');if(!el)return;
+  const versions=['KJV','NKJV','NIV','CSB'];
+  const passage=readerPassage||'John 3:16';
+  const notesKey=readerVersion+'::'+passage;
+  const note=bibleNotes[notesKey]||'';
+  const verBtns=versions.map(v=>'<button onclick="readerVersion=\''+v+'\';renderBibleReader()" style="padding:6px 14px;border-radius:20px;border:2px solid '+(readerVersion===v?'transparent':'var(--border2)')+';background:'+(readerVersion===v?'linear-gradient(135deg,var(--purple),var(--teal))':'transparent')+';color:'+(readerVersion===v?'white':'var(--text2)')+';font-size:11px;font-weight:800;cursor:pointer;font-family:var(--sans)">'+v+'</button>').join('');
+  const notesHtml=Object.keys(bibleNotes).length>0?'<div class="sl" style="color:var(--teal);margin-top:14px">All saved notes</div>'+Object.entries(bibleNotes).map(function(e){return'<div style="padding:11px;border-radius:10px;background:var(--teal-bg);border:2px solid rgba(0,210,211,.2);margin-bottom:7px"><div style="font-size:10px;font-weight:900;color:var(--teal);margin-bottom:4px">'+e[0].replace('::','\u00a0\u2014\u00a0')+'</div><div style="font-size:12px;color:var(--text);line-height:1.55">'+e[1]+'</div></div>';}).join(''):'';
+  const passageArea=(readerVersion==='KJV')
+    ? renderKJVPassage(passage)
+    : '<div style="background:var(--surface);border:2px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px"><div style="padding:10px 14px;background:linear-gradient(135deg,var(--purple-bg),var(--teal-bg));border-bottom:2px solid var(--border)"><div style="font-size:12px;font-weight:800;color:var(--text)">'+passage+' ('+readerVersion+')</div></div><iframe src="https://www.biblegateway.com/passage/?search='+encodeURIComponent(passage)+'&version='+readerVersion+'" style="width:100%;height:420px;border:none" loading="lazy"></iframe></div><a href="https://www.biblegateway.com/passage/?search='+encodeURIComponent(passage)+'&version='+readerVersion+'" target="_blank" style="display:block;text-align:center;padding:9px;border-radius:12px;border:2px solid var(--border2);color:var(--purple);font-size:12px;font-weight:800;text-decoration:none;margin-bottom:12px">Open on Bible Gateway \u2197</a>';
+  el.innerHTML='<div style="margin-bottom:12px">'
+    +'<div style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:7px">Version</div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">'+verBtns+'</div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:12px"><input id="reader-search" value="'+passage.replace(/"/g,'&quot;')+'" placeholder="e.g. Psalm 23 or John 3:16" style="flex:1;border:2px solid var(--border2);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:600;color:var(--text);background:var(--surface);outline:none" onkeydown="if(event.key===\'Enter\'){readerPassage=this.value;renderBibleReader();}"><button onclick="readerPassage=$(\'reader-search\').value;renderBibleReader()" style="padding:9px 16px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--sans)">Go</button></div>'
+    +passageArea
+    +'<div class="sl" style="color:var(--purple)">\uD83D\uDCDD Notes \u2014 '+passage+'</div>'
+    +'<textarea id="bible-note-input" placeholder="Type your notes, reflections, or prayer..." style="width:100%;border:2px solid var(--border2);border-radius:var(--r-sm);padding:12px;font-family:var(--serif);font-size:13px;color:var(--text);background:var(--surface);resize:none;min-height:100px;outline:none;line-height:1.6;margin-bottom:8px">'+note+'</textarea>'
+    +'<button onclick="saveBibleNote(\''+notesKey.replace(/'/g,"\\'")+'\')" style="padding:10px 22px;border-radius:20px;border:none;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--sans)">Save note \uD83D\uDC9C</button>'
+    +notesHtml
+    +'</div>';
+}
+
+function renderKJVPassage(passage){
+  const kjv={
+    'John 3:16':'For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life. — John 3:16 KJV',
+    'Psalm 23':'The LORD is my shepherd; I shall not want. He maketh me to lie down in green pastures: he leadeth me beside the still waters. He restoreth my soul: he leadeth me in the paths of righteousness for his name\'s sake. Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou art with me; thy rod and thy staff they comfort me. Thou preparest a table before me in the presence of mine enemies: thou anointest my head with oil; my cup runneth over. Surely goodness and mercy shall follow me all the days of my life: and I will dwell in the house of the LORD for ever. — Psalm 23 KJV',
+    'Philippians 4:13':'I can do all things through Christ which strengtheneth me. — Philippians 4:13 KJV',
+    'Philippians 4':'Rejoice in the Lord alway: and again I say, Rejoice. Let your moderation be known unto all men. The Lord is at hand. Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God. And the peace of God, which passeth all understanding, shall keep your hearts and minds through Christ Jesus. Finally, brethren, whatsoever things are true, whatsoever things are honest, whatsoever things are just, whatsoever things are pure, whatsoever things are lovely, whatsoever things are of good report; if there be any virtue, and if there be any praise, think on these things. I can do all things through Christ which strengtheneth me. — Philippians 4:4-13 KJV',
+    'Proverbs 3':'Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths. — Proverbs 3:5-6 KJV',
+    'Romans 8':'There is therefore now no condemnation to them which are in Christ Jesus, who walk not after the flesh, but after the Spirit... And we know that all things work together for good to them that love God, to them who are the called according to his purpose... Who shall separate us from the love of Christ? shall tribulation, or distress, or persecution, or famine, or nakedness, or peril, or sword?... Nay, in all these things we are more than conquerors through him that loved us. — Romans 8 KJV',
+    '1 Corinthians 13':'Though I speak with the tongues of men and of angels, and have not charity, I am become as sounding brass, or a tinkling cymbal. And though I have the gift of prophecy, and understand all mysteries, and all knowledge; and though I have all faith, so that I could remove mountains, and have not charity, I am nothing... Charity suffereth long, and is kind; charity envieth not; charity vaunteth not itself, is not puffed up... And now abideth faith, hope, charity, these three; but the greatest of these is charity. — 1 Corinthians 13 KJV',
+    'Jeremiah 29:11':'For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil, to give you an expected end. — Jeremiah 29:11 KJV',
+    'Galatians 5':'But the fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith, Meekness, temperance: against such there is no law. — Galatians 5:22-23 KJV',
+    'Isaiah 40':'Hast thou not known? hast thou not heard, that the everlasting God, the LORD, the Creator of the ends of the earth, fainteth not, neither is weary? there is no searching of his understanding. He giveth power to the faint; and to them that have no might he increaseth strength. Even the youths shall faint and be weary, and the young men shall utterly fall: But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint. — Isaiah 40:28-31 KJV',
+    'Matthew 5':'Blessed are the poor in spirit: for theirs is the kingdom of heaven. Blessed are they that mourn: for they shall be comforted. Blessed are the meek: for they shall inherit the earth. Blessed are they which do hunger and thirst after righteousness: for they shall be filled. Blessed are the merciful: for they shall obtain mercy. Blessed are the pure in heart: for they shall see God. Blessed are the peacemakers: for they shall be called the children of God. — Matthew 5:1-12 KJV',
+    'Proverbs 4':'Hear, ye children, the instruction of a father, and attend to know understanding... Get wisdom, get understanding: forget it not; neither decline from the words of my mouth. Forsake her not, and she shall preserve thee: love her, and she shall keep thee. Wisdom is the principal thing; therefore get wisdom: and with all thy getting get understanding. — Proverbs 4:1-9 KJV',
+  };
+  const key=Object.keys(kjv).find(k=>passage.toLowerCase().includes(k.toLowerCase()));
+  if(key){
+    return '<div style="background:var(--surface);border:2px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px">'
+      +'<div style="font-size:10px;font-weight:900;color:var(--purple);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">King James Version \u2014 Public Domain</div>'
+      +'<div style="font-family:var(--serif);font-size:14px;color:var(--text);line-height:1.9;font-style:italic">'+kjv[key]+'</div>'
+      +'</div>';
+  }
+  return '<div style="text-align:center;padding:20px;background:var(--purple-bg);border-radius:var(--r);margin-bottom:12px">'
+    +'<div style="font-size:24px;margin-bottom:8px">\uD83D\uDCDA</div>'
+    +'<div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:6px">'+passage+' (KJV)</div>'
+    +'<div style="font-size:12px;color:var(--text2);font-weight:600;margin-bottom:12px">Opening on Bible Gateway for full text</div>'
+    +'<a href="https://www.biblegateway.com/passage/?search='+encodeURIComponent(passage)+'&version=KJV" target="_blank" style="display:inline-block;padding:10px 22px;border-radius:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:12px;font-weight:800;text-decoration:none">Read '+passage+' \u2197</a>'
+    +'</div>';
+}
+
+function saveBibleNote(key){
+  const input=$('bible-note-input');if(!input)return;
+  if(input.value.trim()){bibleNotes[key]=input.value.trim();}else{delete bibleNotes[key];}syncBibleNotes();
+  renderBibleReader();
+}
+
+
+function renderClean(){
+  const el=$('clean-content');if(!el)return;
+  if(mode==='you'){
+    const step=cleanYou[currentCleanStep];
+    if(!step){el.innerHTML='<div style="text-align:center;padding:32px 16px"><div style="font-size:52px;animation:pop .4s">🌟</div><div style="font-family:var(--serif);font-size:20px;color:var(--text);margin:9px 0 5px">You did every single step!</div><div style="font-size:13px;color:var(--text2);font-weight:600">You are incredible. Rest now. 💜</div><button class="btn btn-purple" style="margin-top:14px" onclick="currentCleanStep=0;renderClean()">Reset 🔄</button></div>';return;}
+    cleanTimerSecs=step.dur;cleanTimerFull=step.dur;cleanTimerOn=false;
+    el.innerHTML='<div class="sl" style="color:var(--purple)">Step '+(currentCleanStep+1)+' of '+cleanYou.length+' 💜</div><div class="card card-purple"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px"><div class="badge bher">One thing at a time</div><div style="font-size:11px;font-weight:800;color:var(--text3)">'+cleanYou.filter((_,j)=>j<currentCleanStep).length+' done ✓</div></div><div class="ptrack"><div class="pfill" style="width:'+Math.round((currentCleanStep/cleanYou.length)*100)+'%"></div></div><div style="font-family:var(--serif);font-size:20px;color:var(--text);margin:12px 0 5px;line-height:1.35;font-weight:700">'+step.t+'</div><div style="font-size:13px;color:var(--text2);margin-bottom:14px;font-style:italic;font-weight:600">'+step.d+'</div><div class="timer-block"><div class="tbig" id="ctimer">'+fmtTime(step.dur)+'</div><div class="ptrack"><div class="pfill" id="ctimer-prog" style="width:0%"></div></div><div class="tctrl"><button class="btn btn-purple" id="cstart-btn" onclick="cleanToggleTimer()">&#9658; Start '+step.time+'</button><button class="btn btn-mint" onclick="cleanDone()">Done! Next ✓</button></div></div></div>'+(currentCleanStep+1<cleanYou.length?'<div style="opacity:.45;margin-top:4px"><div class="sl" style="color:var(--text3)">Coming up next</div><div class="card"><div style="font-size:13px;font-weight:600;color:var(--text)">'+cleanYou[currentCleanStep+1].t+'</div><div style="font-size:11px;color:var(--text3);font-weight:600;margin-top:3px">'+cleanYou[currentCleanStep+1].time+' · rest first 💜</div></div></div>':'');
+  } else {
+    const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const dcls=['day-sun','day-mon','day-tue','day-wed','day-thu','day-fri','day-sat'];
+    const ccls=['cell-sun','cell-mon','cell-tue','cell-wed','cell-thu','cell-fri','cell-sat'];
+    const dotC=['#ff6b6b','#ff9f43','#c8a800','#20bf6b','#54a0ff','#a55eea','#f953c6'];
+    el.innerHTML='<div class="sl" style="color:var(--teal)">Weekly schedule 💙</div><div class="card card-teal" style="padding:10px"><div class="sl" style="color:var(--teal);margin-top:0">Daily tasks ✅</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:12px">'+cleanDaily.map((t,i)=>'<div class="crow" onclick="toggleDaily('+i+')" style="padding:6px 0;border-bottom:none"><div class="cbox" id="dcbox-'+i+'"></div><div class="clbl" id="dlbl-'+i+'" style="font-size:11px">'+t+'</div></div>').join('')+'</div><div class="sl" style="color:var(--orange);margin-top:0">Weekly by day 🗓</div><div class="clean-grid"><table class="clean-table"><tr>'+days.map((d,i)=>'<th class="'+dcls[i]+'">'+d+'</th>').join('')+'</tr><tr>'+days.map((d,i)=>'<td class="'+ccls[i]+'">'+(cleanWeekly[d]||[]).map(t=>'<div onclick="this.style.opacity=this.style.opacity===\'0.4\'?\'1\':\'0.4\';this.style.textDecoration=this.style.textDecoration?\'\':(\'line-through\')" style="padding:2px 0;cursor:pointer;font-size:8px;color:var(--text);font-weight:700;margin-bottom:2px;display:flex;align-items:flex-start;gap:2px"><span style="color:'+dotC[i]+';font-size:10px;flex-shrink:0">●</span>'+t+'</div>').join('')+'</td>').join('')+'</tr></table></div><div class="sl" style="color:var(--purple);margin-top:12px">Monthly tasks 📅</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px">'+cleanMonthly.map((t,i)=>'<div class="crow" onclick="toggleMonthly('+i+')" style="padding:6px 0;border-bottom:none"><div class="cbox" id="mcbox-'+i+'"></div><div class="clbl" id="mlbl-'+i+'" style="font-size:11px">'+t+'</div></div>').join('')+'</div></div>';
+  }
+}
+function cleanToggleTimer(){const btn=$('cstart-btn');if(!btn)return;if(!cleanTimerOn){cleanTimerOn=true;btn.textContent='⏸ Pause';cleanTimerInt=setInterval(()=>{cleanTimerSecs--;const t=$('ctimer');if(t)t.textContent=fmtTime(cleanTimerSecs);const p=$('ctimer-prog');if(p)p.style.width=Math.round((1-cleanTimerSecs/cleanTimerFull)*100)+'%';if(cleanTimerSecs<=0){clearInterval(cleanTimerInt);cleanTimerOn=false;btn.textContent='☕ Break time!';cleanTimerSecs=cleanTimerFull;}},1000);}else{cleanTimerOn=false;clearInterval(cleanTimerInt);btn.textContent='▶ Resume';}}
+function cleanDone(){clearInterval(cleanTimerInt);cleanTimerOn=false;currentCleanStep=Math.min(currentCleanStep+1,cleanYou.length);renderClean();}
+function toggleDaily(i){const b=$('dcbox-'+i),l=$('dlbl-'+i);if(!b)return;b.classList.toggle('chk');b.textContent=b.classList.contains('chk')?'✓':'';l.classList.toggle('done');}
+function toggleMonthly(i){const b=$('mcbox-'+i),l=$('mlbl-'+i);if(!b)return;b.classList.toggle('chk');b.textContent=b.classList.contains('chk')?'✓':'';l.classList.toggle('done');}
+
+function setMealTab(t){mealTab=t;document.querySelectorAll('#meal-tabs .tab').forEach((el,i)=>el.classList.toggle('active',i===['breakfast','lunch','dinner','grocery','kids-food'].indexOf(t)));renderMeal(t);}
+function renderMeal(t){const el=$('meal-content');if(!el)return;if(t==='breakfast')renderRecipes(el,breakfasts);else if(t==='lunch')renderRecipes(el,lunches);else if(t==='dinner')renderRecipes(el,dinners);else if(t==='grocery')renderGrocery(el);else renderKidsFood(el);}
+let recipeOpen={};
+function toggleRecipeDropdown(tab,i){const key=tab+'_'+i;recipeOpen[key]=!recipeOpen[key];renderMeal(mealTab);}
+function renderRecipes(el,list){
+  const idx=recipeIdx[mealTab]||0;const r=list[idx];
+  const rKey=mealTab+'_featured';
+  const featOpen=recipeOpen[rKey]||false;
+  el.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:11px;color:var(--text2);font-weight:700">Featuring Black chefs &amp; cultural cuisine 🌍</div><div style="font-size:11px;color:var(--text3);font-weight:700">'+(idx+1)+' / '+list.length+'</div></div>'
+  +'<div class="recipe-card" style="border-color:var(--purple);border-width:2px"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:7px"><div><div class="recipe-title">'+r.title+'</div><div class="recipe-chef">👨🏾‍🍳 '+r.chef+'</div></div><div class="recipe-badge '+r.badge+'">'+(r.type==='black'?'Black Chef':'Cultural')+'</div></div><div class="recipe-body">'+r.desc+'</div><div class="leftover-tip">'+r.leftover+'</div>'
+  +'<button onclick="recipeOpen[\''+rKey+'\']=!'+(featOpen)+';renderMeal(mealTab)" style="margin-top:10px;width:100%;padding:9px;border-radius:10px;border:2px solid rgba(165,94,234,.3);background:var(--purple-bg);color:var(--purple);font-weight:800;font-size:12px;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:6px">'+(featOpen?'▲ Hide recipe':'▼ View full recipe & ingredients')+'</button>'
+  +(featOpen?'<div style="margin-top:12px"><div style="font-size:12px;font-weight:900;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">🧾 Ingredients</div><ul style="list-style:none;padding:0;margin:0 0 12px">'+r.recipe.ingredients.map(ing=>'<li style="font-size:12px;color:var(--text);font-weight:600;padding:4px 0;border-bottom:1px dashed var(--border);display:flex;align-items:center;gap:7px"><span style="color:var(--purple);font-size:10px">●</span>'+ing+'</li>').join('')+'</ul><div style="font-size:12px;font-weight:900;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">👩‍🍳 Steps</div><ol style="padding:0;margin:0;list-style:none">'+r.recipe.steps.map((s,si)=>'<div style="display:flex;gap:9px;padding:7px 0;border-bottom:1px dashed var(--border)"><div style="min-width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(si+1)+'</div><div style="font-size:12px;color:var(--text2);font-weight:600;line-height:1.55">'+s+'</div></div>').join('')+'</ol></div>':'')
+  +'<div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-sm" onclick="prevRecipe()" '+(idx===0?'disabled style="opacity:.4"':'')+'>← Prev</button><button class="btn btn-purple btn-sm" onclick="nextRecipe()">Next →</button></div></div>'
+  +'<div class="sl" style="color:var(--orange)">All recipes</div>'
+  +list.map((r,i)=>{const k=mealTab+'_'+i;const open=recipeOpen[k]||false;return'<div class="recipe-card" style="'+(i===idx?'border-color:var(--purple);border-width:2px;background:var(--purple-bg);':'')+'"><div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="recipeIdx[mealTab]='+i+';recipeOpen={};renderMeal(mealTab)"><div style="font-size:13px;font-weight:800;color:var(--text)">'+(i===idx?'▶ ':'')+r.title+'</div><div class="recipe-badge '+r.badge+'" style="font-size:9px">'+(r.type==='black'?'Black Chef':'Cultural')+'</div></div><div style="font-size:11px;color:var(--text2);font-weight:600;margin-top:2px">👨🏾‍🍳 '+r.chef+'</div><button onclick="event.stopPropagation();toggleRecipeDropdown(\''+mealTab+'\','+i+')" style="margin-top:8px;width:100%;padding:7px;border-radius:8px;border:1.5px solid var(--border2);background:transparent;color:var(--text2);font-weight:700;font-size:11px;cursor:pointer;font-family:var(--sans)">'+(open?'▲ Hide recipe':'▼ Recipe & ingredients')+'</button>'+(open?'<div style="margin-top:10px"><div style="font-size:11px;font-weight:900;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">🧾 Ingredients</div><ul style="list-style:none;padding:0;margin:0 0 10px">'+r.recipe.ingredients.map(ing=>'<li style="font-size:11px;color:var(--text);font-weight:600;padding:3px 0;border-bottom:1px dashed var(--border);display:flex;align-items:center;gap:6px"><span style="color:var(--purple);font-size:9px">●</span>'+ing+'</li>').join('')+'</ul><div style="font-size:11px;font-weight:900;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">👩‍🍳 Steps</div>'+r.recipe.steps.map((s,si)=>'<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px dashed var(--border)"><div style="min-width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--yellow));color:white;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(si+1)+'</div><div style="font-size:11px;color:var(--text2);font-weight:600;line-height:1.5">'+s+'</div></div>').join('')+'</div>':'')+'</div>';}).join('');
+}
+function prevRecipe(){recipeIdx[mealTab]=Math.max(0,(recipeIdx[mealTab]||0)-1);renderMeal(mealTab);}
+function nextRecipe(){const list=mealTab==='breakfast'?breakfasts:mealTab==='lunch'?lunches:dinners;recipeIdx[mealTab]=Math.min(list.length-1,(recipeIdx[mealTab]||0)+1);renderMeal(mealTab);}
+function renderGrocery(el){
+  const allItems=Object.values(groceryList).flat(),done=allItems.filter(i=>i.done).length;
+  let html='<div class="str"><div class="sc card-coral"><div class="sn" style="color:var(--coral)">'+(allItems.length-done)+'</div><div class="slb">Left</div></div><div class="sc card-lime"><div class="sn" style="color:#20bf6b">'+done+'</div><div class="slb">Got ✓</div></div><div class="sc card-sky"><div class="sn" style="color:var(--sky)">'+Math.round((done/allItems.length)*100)+'%</div><div class="slb">Done</div></div></div>';
+  for(const [cat,items] of Object.entries(groceryList)){html+='<div style="font-size:12px;font-weight:900;color:var(--text2);padding:7px 0 3px">'+cat+'</div><div class="card" style="padding:4px 13px">'+items.map((item,i)=>'<div class="crow" onclick="toggleGrocery(\''+cat+'\','+i+')"><div class="cbox '+(item.done?'chk':'')+'">  '+(item.done?'✓':'')+'</div><div class="clbl '+(item.done?'done':'')+'">'+item.name+'</div></div>').join('')+'</div>';}
+  el.innerHTML=html;
+}
+function toggleGrocery(cat,i){groceryList[cat][i].done=!groceryList[cat][i].done;syncGrocery();if(mealTab==='grocery'){const el=$('meal-content');if(el)renderGrocery(el);}}
+function renderKidsFood(el){
+  el.innerHTML='<div class="sl" style="color:var(--orange)">Kids safe foods 🍕</div><div style="font-size:12px;color:var(--text2);font-weight:600;margin-bottom:10px">Your toddlers favorite meals — always a win!</div>'+kidsMeals.map(m=>'<div class="recipe-card" style="'+(m.adventurous?'border-color:rgba(255,159,67,.4);background:var(--orange-bg);':'')+'"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px"><div style="font-size:14px;font-weight:800;color:var(--text)">'+m.icon+' '+m.name+'</div><div style="font-size:10px;padding:2px 8px;border-radius:10px;font-weight:800;background:'+(m.adventurous?'var(--orange-bg);color:var(--orange)':'var(--lime-bg);color:#20bf6b')+'">  '+(m.adventurous?'Branching out!':'Safe food ✓')+'</div></div><div style="font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:600">'+m.desc+'</div><div style="font-size:11px;color:var(--text3);font-weight:700">✨ Sides: '+m.sides+'</div></div>').join('');
+}
+
+function setKidsTab(t){kidsTab=t;document.querySelectorAll('#kids-tabs .tab').forEach((el,i)=>el.classList.toggle('active',i===['today','weekly','routines'].indexOf(t)));renderKids(t);}
+function renderKids(t){
+  const el=$('kids-content');if(!el)return;
+  if(t==='today'){
+    // Build analog clock schedule
+    const scheduleColors={
+      'kb-meal':'#ff9f43','kb-free':'#20bf6b','kb-gym':'#f953c6',
+      'kb-bed':'#54a0ff','kb-dance':'#a55eea','kb-bath':'#00d2d3'
+    };
+    // Convert time string to decimal hours (24hr)
+    function toHrs(timeStr){const[h,m]=timeStr.split(':').map(Number);return h+(m/60);}
+    // Schedule spans: each entry runs until the next one
+    const sched=kidScheduleToday;
+    const spans=sched.map((k,i)=>{
+      const start=toHrs(k.time);
+      const end=i<sched.length-1?toHrs(sched[i+1].time):toHrs(k.time)+1;
+      return{...k,start,end,color:scheduleColors[k.badge]||'#a55eea'};
+    });
+    // Clock face covers 7am–8pm = 13 hours, two passes (AM face + PM face merged into 12hr clock showing current arc)
+    // We'll show a 12-hour clock that highlights the current activity
+    const {h:_eh,m:_em,decimal:nowHrs}=getEasternNow();
+    const currentActivity=spans.find(s=>nowHrs>=s.start&&nowHrs<s.end)||null;
+    el.innerHTML=`
+<div style="text-align:center;padding:4px 0 8px">
+  <div style="font-family:var(--serif);font-size:16px;font-style:italic;color:var(--text);margin-bottom:2px">Today's Schedule 👦🏾</div>
+  <div style="font-size:12px;color:var(--text2);font-weight:600">${window._kid1Name||'Jacchius'} (${window._kid1Age||4}) &amp; ${window._kid2Name||'Ahnaniah'} (${window._kid2Age||3})</div>
+</div>
+<div style="display:flex;justify-content:center;margin-bottom:14px">
+  <canvas id="kids-clock" width="280" height="280" style="max-width:100%"></canvas>
+</div>
+${currentActivity?`<div style="background:${currentActivity.color}22;border:2px solid ${currentActivity.color}55;border-radius:14px;padding:13px;margin-bottom:12px;text-align:center">
+  <div style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:${currentActivity.color};margin-bottom:3px">Right now</div>
+  <div style="font-size:22px;margin-bottom:3px">${currentActivity.icon}</div>
+  <div style="font-size:15px;font-weight:800;color:var(--text)">${currentActivity.name}</div>
+  <div style="font-size:11px;color:var(--text2);font-weight:600;margin-top:2px">${currentActivity.detail}</div>
+</div>`:'<div style="text-align:center;padding:10px;font-size:13px;color:var(--text3);font-weight:600;margin-bottom:12px">Schedule starts at 7:00 AM 🌅</div>'}
+<div class="sl" style="color:var(--orange)">Full schedule</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+${spans.map(s=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:10px;background:${nowHrs>=s.start&&nowHrs<s.end?s.color+'22':'transparent'};border:${nowHrs>=s.start&&nowHrs<s.end?'2px solid '+s.color+'44':'2px solid transparent'}">
+  <div style="width:10px;height:10px;border-radius:50%;background:${s.color};flex-shrink:0"></div>
+  <div style="font-size:11px;font-weight:900;color:var(--text3);width:34px;flex-shrink:0">${s.time}</div>
+  <div style="font-size:13px">${s.icon}</div>
+  <div style="flex:1"><div style="font-size:12px;font-weight:800;color:var(--text)">${s.name}</div><div style="font-size:10px;color:var(--text3);font-weight:600">${s.detail}</div></div>
+</div>`).join('')}
+</div>`;
+    // Draw clock after DOM update
+    requestAnimationFrame(()=>drawKidsClock(spans,nowHrs));
+    // Keep clock ticking
+    if(window._kidsClockInt)clearInterval(window._kidsClockInt);
+    window._kidsClockInt=setInterval(()=>{if(kidsTab==='today'){const{decimal:nh}=getEasternNow();drawKidsClock(spans,nh);}else clearInterval(window._kidsClockInt);},10000);
+  }else if(t==='weekly'){
+    if(window._kidsClockInt)clearInterval(window._kidsClockInt);
+    const dcls=['day-sun','day-mon','day-tue','day-wed','day-thu','day-fri','day-sat'];
+    const ccls=['cell-sun','cell-mon','cell-tue','cell-wed','cell-thu','cell-fri','cell-sat'];
+    el.innerHTML='<div class="sl" style="color:var(--orange)">Weekly overview 🗓</div><div class="clean-grid"><table class="clean-table"><tr>'+kidsWeekly.map((d,i)=>'<th class="'+dcls[i]+'">'+d.day+'</th>').join('')+'</tr><tr>'+kidsWeekly.map((d,i)=>'<td class="'+ccls[i]+'">'+d.events.map(e=>'<div style="font-size:8px;font-weight:700;color:var(--text);padding:2px 0;border-bottom:1px dashed var(--border)">'+e+'</div>').join('')+'</td>').join('')+'</tr></table></div>';
+  }else{
+    if(window._kidsClockInt)clearInterval(window._kidsClockInt);
+    el.innerHTML='<div class="sl" style="color:var(--teal)">Daily routines ⏰</div><div class="card card-orange" style="margin-bottom:11px"><div class="ct">🌅 Morning routine</div>'+['7:00 — Wake up, cuddles, open curtains','7:20 — Bathroom: potty + wash hands + brush teeth','7:30 — Breakfast (safe food of their choice)','8:00 — Get dressed (lay clothes out the night before!)','8:20 — Shoes, bag, out the door'].map(t=>'<div class="srow"><div style="font-size:12px;font-weight:600;color:var(--text)">'+t+'</div></div>').join('')+'</div><div class="card card-teal" style="margin-bottom:11px"><div class="ct">🛁 Bath time routine (6:45pm)</div>'+['Run warm bath — add lavender bubble bath','Wash hair (sing a song to get through it!)','Body wash — let them help with the puff','Rinse & wrap in warm towel','Lotion & pajamas — let them pick their jammies','Brush teeth — 2 min timer song'].map(t=>'<div class="srow"><div style="font-size:12px;font-weight:600;color:var(--text)">'+t+'</div></div>').join('')+'</div><div class="card card-purple"><div class="ct">🌙 Bedtime routine (7:45pm)</div>'+['7:45 — In bedroom, lights dimmed','7:50 — 2 books each (keep it consistent!)','8:00 — Bedtime prayer together','8:05 — Goodnight song or lullaby','8:10 — Lights out — white noise on','Check in once after 10 min if needed'].map(t=>'<div class="srow"><div style="font-size:12px;font-weight:600;color:var(--text)">'+t+'</div></div>').join('')+'</div>';
+  }
+}
+function drawKidsClock(spans,nowHrs){
+  const canvas=$('kids-clock');if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,R=cx-14;
+  ctx.clearRect(0,0,W,H);
+
+  // Standard 12-hour clock face: 12 at top (-π/2), clockwise.
+  // Each hour = (1/12) * 2π radians.
+  // We use REAL clock positions: 7am sits where 7 is on a clock, 8am where 8 is, etc.
+  // AM hours 7-11 and PM hours 12-7 both map to their true clock-face position.
+  // Since 7am and 7pm share the same position, we use inner ring (AM) and outer ring (PM).
+  function clockAngle(h24){
+    // Convert 24hr to 12hr clock angle
+    const h12 = h24 % 12; // 0-11.999
+    return (h12 / 12) * Math.PI * 2 - Math.PI / 2;
+  }
+
+  // Background circle
+  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fillStyle='#f8f4ff';ctx.fill();
+  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.strokeStyle='rgba(165,94,234,.15)';ctx.lineWidth=3;ctx.stroke();
+
+  // Draw the 12 standard clock numerals first (so arcs draw over gaps, not numbers)
+  const numR = R - 22;
+  ctx.font = `bold ${Math.round(R*0.1)}px sans-serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  for(let n=1;n<=12;n++){
+    const a = (n/12)*Math.PI*2 - Math.PI/2;
+    ctx.fillStyle = 'rgba(45,27,105,.55)';
+    ctx.fillText(n, cx+Math.cos(a)*numR, cy+Math.sin(a)*numR);
+  }
+
+  // AM ring (inner): 7am–11:59am  → radius R-22 to R-4  (donut band)
+  const amInner = R*0.38, amOuter = R-4;
+  // PM ring (outer is actually same face — 12pm–7:45pm)
+  // Since schedule goes 7am–7:45pm (under 13hrs) we use a split ring:
+  // AM activities: drawn on inner half of face (r: 18%-60% of R)
+  // PM activities: drawn on outer half of face (r: 60%-95% of R)
+  const amR1 = R*0.20, amR2 = R*0.58;
+  const pmR1 = R*0.60, pmR2 = R-5;
+
+  spans.forEach(s=>{
+    // Clamp to drawable range
+    const sa = Math.max(s.start, 7), ea = Math.min(s.end, 19.75);
+    if(ea <= sa) return;
+
+    // Split into AM portion (7-12) and PM portion (12-19.75)
+    const amStart = Math.max(sa, 7),  amEnd = Math.min(ea, 12);
+    const pmStart = Math.max(sa, 12), pmEnd = Math.min(ea, 19.75);
+
+    function drawBand(hStart, hEnd, r1, r2){
+      if(hEnd <= hStart) return;
+      const a1 = clockAngle(hStart), a2 = clockAngle(hEnd);
+      // Donut arc wedge
+      ctx.beginPath();
+      ctx.arc(cx, cy, r2, a1, a2);
+      ctx.arc(cx, cy, r1, a2, a1, true);
+      ctx.closePath();
+      ctx.fillStyle = s.color + 'bb';
+      ctx.fill();
+      ctx.strokeStyle = s.color;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      // Icon at midpoint
+      if(hEnd - hStart > 0.4){
+        const mid = (clockAngle(hStart)+clockAngle(hEnd))/2;
+        const ir = (r1+r2)/2;
+        ctx.font = `${Math.round(R*0.11)}px serif`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(s.icon, cx+Math.cos(mid)*ir, cy+Math.sin(mid)*ir);
+      }
+    }
+
+    if(amEnd > amStart) drawBand(amStart, amEnd, amR1, amR2);
+    if(pmEnd > pmStart) drawBand(pmStart, pmEnd, pmR1, pmR2);
+  });
+
+  // Separator ring line between AM and PM bands
+  ctx.beginPath();ctx.arc(cx,cy,(amR2+pmR1)/2,0,Math.PI*2);
+  ctx.strokeStyle='rgba(165,94,234,.18)';ctx.lineWidth=1;ctx.stroke();
+
+  // AM / PM labels
+  ctx.font=`bold ${Math.round(R*0.075)}px sans-serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(165,94,234,.5)';
+  ctx.fillText('AM', cx, cy - (amR1+amR2)/2);
+  ctx.fillText('PM', cx, cy - (pmR1+pmR2)/2);
+
+  // Hour tick marks on rim
+  for(let n=1;n<=12;n++){
+    const a=(n/12)*Math.PI*2-Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(cx+Math.cos(a)*(R-6), cy+Math.sin(a)*(R-6));
+    ctx.lineTo(cx+Math.cos(a)*(R-2), cy+Math.sin(a)*(R-2));
+    ctx.strokeStyle='rgba(165,94,234,.4)';ctx.lineWidth=2;ctx.stroke();
+  }
+
+  // Center white hub
+  ctx.beginPath();ctx.arc(cx,cy,R*0.14,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
+  ctx.beginPath();ctx.arc(cx,cy,R*0.14,0,Math.PI*2);ctx.strokeStyle='rgba(165,94,234,.3)';ctx.lineWidth=2;ctx.stroke();
+
+  // Clock hands using real Eastern Time
+  const {h:realH, m:realM}=getEasternNow();
+  // Hour hand
+  const ha=((realH%12 + realM/60)/12)*Math.PI*2 - Math.PI/2;
+  ctx.beginPath();ctx.moveTo(cx,cy);
+  ctx.lineTo(cx+Math.cos(ha)*R*0.32, cy+Math.sin(ha)*R*0.32);
+  ctx.strokeStyle='#2d1b69';ctx.lineWidth=5;ctx.lineCap='round';ctx.stroke();
+  // Minute hand
+  const ma=(realM/60)*Math.PI*2 - Math.PI/2;
+  ctx.beginPath();ctx.moveTo(cx,cy);
+  ctx.lineTo(cx+Math.cos(ma)*R*0.46, cy+Math.sin(ma)*R*0.46);
+  ctx.strokeStyle='#a55eea';ctx.lineWidth=3;ctx.lineCap='round';ctx.stroke();
+  // Center pin
+  ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fillStyle='#a55eea';ctx.fill();
+}
+
+function setBudgetTab(t){budgetTab=t;['spending','savings','bills'].forEach(n=>{const k=n==='spending'?'s':n==='savings'?'g':'b';$('btab-'+k).classList.toggle('active',n===t);$('budget-'+n+'-view').style.display=n===t?'block':'none';});}
+function renderBudgetAll(){
+  const total=budgetItems.reduce((a,b)=>a+b.total,0),spent=budgetItems.reduce((a,b)=>a+b.spent,0);
+  const sv=$('budget-spending-view');if(!sv)return;
+  sv.innerHTML='<div class="str"><div class="sc card-lime"><div class="sn" style="color:#20bf6b">$'+(total-spent)+'</div><div class="slb">Left 🎉</div></div><div class="sc card-coral"><div class="sn" style="color:var(--coral)">$'+spent+'</div><div class="slb">Spent</div></div><div class="sc card-sky"><div class="sn" style="color:var(--sky)">'+Math.round((spent/total)*100)+'%</div><div class="slb">Used</div></div></div><div class="card"><div class="ct">💸 April</div>'+budgetItems.map(b=>'<div class="brow"><div class="bcat">'+b.cat+'</div><div class="bbar"><div class="bfill" style="width:'+Math.round((b.spent/b.total)*100)+'%;background:'+b.color+'"></div></div><div class="bamt">$'+b.spent+'</div></div>').join('')+'</div>';
+  const gv=$('budget-savings-view');if(gv)gv.innerHTML='<div class="sl" style="color:var(--purple)">Savings goals 🎯</div>'+savingsGoals.map(g=>'<div class="goal-card" style="background:var(--purple-bg);border-color:rgba(165,94,234,.2)"><div style="display:flex;justify-content:space-between;margin-bottom:7px"><div style="font-size:14px;font-weight:800;color:var(--text)">'+g.e+' '+g.name+'</div><div style="font-size:13px;font-weight:900;color:var(--purple)">'+Math.round((g.saved/g.goal)*100)+'%</div></div><div class="gbar"><div class="gfill" style="width:'+Math.round((g.saved/g.goal)*100)+'%;background:'+g.color+'"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);font-weight:700"><div>$'+g.saved.toLocaleString()+' saved</div><div>Goal: $'+g.goal.toLocaleString()+'</div></div></div>').join('');
+  const bv=$('budget-bills-view');if(bv)bv.innerHTML='<div class="card">'+bills.map((b,i)=>{
+  const labels={paid:'Paid ✓',soon:'Soon!',unpaid:'Unpaid',behind:'Behind ⚠️'};
+  const statusOrder=['paid','soon','unpaid','behind'];
+  const pillBtns=statusOrder.map(s=>'<button onclick="setBillStatus('+i+',\''+s+'\')" style="display:block;width:100%;padding:6px 12px;border:none;background:'+(s===b.status?'var(--s2)':'transparent')+';color:'+(s===b.status?'var(--text)':'var(--text3)')+';font-size:12px;font-weight:'+(s===b.status?'900':'600')+';cursor:pointer;text-align:left;font-family:var(--sans);border-radius:6px">'+labels[s]+'</button>').join('');
+  return '<div class="bill-row"><div class="bill-icon" style="background:var(--s2)">'+b.icon+'</div><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">'+b.name+'</div><div style="font-size:11px;color:var(--text3);font-weight:600">Due '+b.due+'</div></div><div style="display:flex;align-items:center;gap:6px"><div style="font-size:14px;font-weight:900;color:var(--text)">'+b.amount+'</div><div style="position:relative"><div class="spill s-'+b.status+'" onclick="toggleBillDrop(this)" style="cursor:pointer;user-select:none">'+labels[b.status]+' ▾</div><div class="bill-drop" style="display:none;position:absolute;right:0;top:110%;background:var(--surface);border:2px solid var(--border2);border-radius:12px;padding:4px;z-index:50;min-width:110px;box-shadow:0 8px 24px rgba(0,0,0,.12)">'+pillBtns+'</div></div></div></div>';
+}).join('')+'</div>';
+}
+
+function toggleBillDrop(pill){
+  // Close all other dropdowns first
+  document.querySelectorAll('.bill-drop').forEach(function(d){d.style.display='none';});
+  var drop=pill.nextElementSibling;
+  if(drop)drop.style.display=drop.style.display==='none'?'block':'none';
+  // Close on outside click
+  setTimeout(function(){
+    document.addEventListener('click',function handler(e){
+      if(!e.target.closest('.bill-drop')&&!e.target.classList.contains('spill')){
+        document.querySelectorAll('.bill-drop').forEach(function(d){d.style.display='none';});
+        document.removeEventListener('click',handler);
+      }
+    });
+  },0);
+}
+function setBillStatus(i,status){
+  bills[i].status=status;syncBills();
+  document.querySelectorAll('.bill-drop').forEach(function(d){d.style.display='none';});
+  renderBudgetAll();
+  renderHome();
+}
+function setDateTab(t){dateTab=t;['ideas','planned','memories'].forEach(n=>{$('dtab-'+n[0]).classList.toggle('active',n===t);$('date-'+n+'-view').style.display=n===t?'block':'none';});}
+let memoryPhotos={};
+function renderDates(){
+  $('date-ideas-view').innerHTML=dateIdeas.map(d=>'<div class="date-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div style="font-size:14px;font-weight:800;color:var(--text)">'+d.e+' '+d.title+'</div><div class="cpill '+d.cc+'">'+d.cost+'</div></div><div style="font-size:12px;color:var(--text2);font-weight:600;line-height:1.5">'+d.desc+'</div></div>').join('');
+  $('date-planned-view').innerHTML=plannedDates.map(d=>'<div class="date-card" style="background:var(--pink-bg);border-color:rgba(255,107,157,.25)"><div style="font-size:11px;color:var(--pink);font-weight:800;margin-bottom:2px">'+d.when+'</div><div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px">'+d.title+'</div><div style="font-size:12px;color:var(--text2);font-weight:600">📝 '+d.notes+'</div></div>').join('');
+  renderMemories();
+}
+function renderMemories(){
+  const el=$('date-memories-view');if(!el)return;
+  el.innerHTML='<div style="font-family:var(--serif);font-size:14px;color:var(--text2);margin-bottom:13px;font-style:italic;text-align:center">Every date is a chapter in your love story ✨</div>'
+  +'<div class="card card-pink" style="margin-bottom:13px"><div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:9px">📸 Add a new memory</div>'
+  +'<input type="text" id="mem-title" placeholder="Memory title (e.g. Movie night 🎬)" style="margin-bottom:8px">'
+  +'<input type="text" id="mem-date" placeholder="Date (e.g. Apr 9)" style="margin-bottom:8px">'
+  +'<textarea id="mem-notes" placeholder="What made it special..." style="min-height:60px;margin-bottom:8px"></textarea>'
+  +'<label style="display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;border:2px dashed rgba(255,107,157,.4);background:var(--rose-bg);cursor:pointer;margin-bottom:8px"><span style="font-size:20px">📷</span><div><div style="font-size:12px;font-weight:800;color:var(--pink)">Add photos</div><div style="font-size:10px;color:var(--text3);font-weight:600">Tap to upload from your camera roll</div></div><input type="file" accept="image/*" multiple id="mem-photo-input" style="display:none" onchange="previewMemPhotos(this)"></label>'
+  +'<div id="mem-photo-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>'
+  +'<button class="btn btn-purple btn-full" onclick="addMemory()">Save memory 💖</button></div>'
+  +memories.map((d,mi)=>'<div class="date-card" style="background:var(--purple-bg);border-left:4px solid var(--purple)">'
+    +(memoryPhotos[mi]&&memoryPhotos[mi].length?'<div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:8px;padding-bottom:4px">'+memoryPhotos[mi].map(src=>'<img src="'+src+'" style="width:80px;height:80px;object-fit:cover;border-radius:10px;flex-shrink:0;border:2px solid rgba(165,94,234,.3)">').join('')+'</div>':'')
+    +'<div style="font-size:11px;color:var(--text3);font-weight:700;margin-bottom:2px">'+d.when+'</div>'
+    +'<div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:3px">'+d.title+'</div>'
+    +'<div style="font-size:12px;color:var(--text2);line-height:1.5">'+d.notes+'</div>'
+    +'<label style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:5px 10px;border-radius:20px;border:1.5px dashed rgba(165,94,234,.4);font-size:10px;font-weight:800;color:var(--purple);cursor:pointer">📷 Add photo<input type="file" accept="image/*" multiple style="display:none" onchange="addPhotoToMemory(this,'+mi+')"></label>'
+  +'</div>').join('');
+}
+function previewMemPhotos(input){
+  const preview=$('mem-photo-preview');if(!preview)return;
+  preview.innerHTML='';
+  Array.from(input.files).forEach(file=>{const r=new FileReader();r.onload=e=>{const img=document.createElement('img');img.src=e.target.result;img.style.cssText='width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid rgba(165,94,234,.3)';preview.appendChild(img);};r.readAsDataURL(file);});
+}
+function addPhotoToMemory(input,mi){
+  if(!memoryPhotos[mi])memoryPhotos[mi]=[];
+  Array.from(input.files).forEach(file=>{const r=new FileReader();r.onload=e=>{memoryPhotos[mi].push(e.target.result);renderMemories();};r.readAsDataURL(file);});
+}
+function addMemory(){
+  const t=$('mem-title'),d=$('mem-date'),n=$('mem-notes'),p=$('mem-photo-input');
+  if(!t||!t.value.trim())return;
+  const newIdx=memories.length;
+  memories.unshift({title:t.value.trim(),when:d?d.value.trim()||'Today':'Today',notes:n?n.value.trim():'💕'});syncMemories();
+  if(p&&p.files.length){memoryPhotos[0]=memoryPhotos[0]||[];Array.from(p.files).forEach(file=>{const r=new FileReader();r.onload=e=>{memoryPhotos[0].push(e.target.result);renderMemories();};r.readAsDataURL(file);});}
+  renderMemories();
+}
+
+function renderTasks(){
+  const list=tasks[mode],done=list.filter(t=>t.done).length;
+  const banner=$('tasks-banner');if(banner)banner.innerHTML='<div class="card" style="background:'+(mode==='you'?'linear-gradient(135deg,#a55eea,#f953c6)':'linear-gradient(135deg,#11998e,#4facfe)')+';border:none;color:white;margin-bottom:11px"><div style="font-family:var(--serif);font-size:17px;font-style:italic;margin-bottom:3px">'+(mode==='you'?'Your day, one thing at a time 💜':'Full speed ahead 💙')+'</div><div style="font-size:12px;opacity:.85;font-weight:700">'+done+' of '+list.length+' done'+(done===list.length?' 🎉':'')+'</div></div>';
+  const ts=$('tasks-stats');if(ts)ts.innerHTML='<div class="sc '+(mode==='you'?'card-purple':'card-teal')+'"><div class="sn" style="color:'+(mode==='you'?'var(--purple)':'var(--teal)')+'">  '+(list.length-done)+'</div><div class="slb">To do</div></div><div class="sc card-lime"><div class="sn" style="color:#20bf6b">'+done+'</div><div class="slb">Done ✓</div></div><div class="sc card-sky"><div class="sn" style="color:var(--sky)">'+Math.round((done/list.length)*100)+'%</div><div class="slb">Progress</div></div>';
+  const el=$('tasks-content');if(!el)return;
+  el.innerHTML=list.map((t,i)=>'<div class="crow" onclick="toggleTask('+i+')"><div class="cbox '+(t.done?'chk':'')+'">  '+(t.done?'✓':'')+'</div><div style="flex:1"><div class="clbl '+(t.done?'done':'')+'">'+t.text+'</div></div><div style="font-size:10px;padding:2px 8px;border-radius:9px;font-weight:800;background:'+t.color+'22;color:'+t.color+';border:1.5px solid '+t.color+'44">'+t.cat+'</div></div>').join('');
+}
+function toggleTask(i){tasks[mode][i].done=!tasks[mode][i].done;syncTasks();renderTasks();}
+function addTask(){const input=$('new-task');if(!input||!input.value.trim())return;tasks[mode].push({text:input.value.trim(),cat:'Home',done:false,color:'#a55eea'});input.value='';syncTasks();renderTasks();}
+
+// PIN system: {you: null|'1234', him: null|'1234'}
+let journalPins = {you: null, him: null};
+let journalUnlocked = {you: false, him: false};
+let pinEntry = '';
+let pinMode = 'unlock'; // 'unlock' | 'set' | 'confirm'
+let pinConfirmFirst = '';
+
+function renderJournal() {
+  const pin = journalPins[mode];
+  const unlocked = journalUnlocked[mode];
+  if (!unlocked) {
+    if (pin === null) { renderPinSetup(); }
+    else { renderPinLock(); }
+    return;
+  }
+  renderJournalContent();
+}
+
+function lockJournal() {
+  journalUnlocked[mode] = false;
+  pinEntry = '';
+  renderJournal();
+}
+
+function renderPinLock() {
+  const isHer = mode === 'you';
+  const accentColor = isHer ? 'var(--purple)' : 'var(--teal)';
+  const grad = isHer ? 'linear-gradient(135deg,#a55eea,#f953c6)' : 'linear-gradient(135deg,#11998e,#4facfe)';
+  const name = isHer ? 'Her' : 'His';
+  pinEntry = ''; pinMode = 'unlock';
+  const banner = $('journal-banner');
+  if (banner) banner.innerHTML = '<div class="card" style="background:' + grad + ';border:none;margin-bottom:13px"><div style="font-family:var(--serif);font-size:17px;font-style:italic;color:white;margin-bottom:3px">' + name + ' Prayer Journal \uD83D\uDE4F\uD83C\uDFFE</div><div style="font-size:12px;color:rgba(255,255,255,.85);font-weight:600">Private \u2014 PIN required to enter</div></div>';
+  const writeEl = $('journal-write'); if (writeEl) writeEl.innerHTML = '';
+  const lbl = $('journal-entries-label'); if (lbl) lbl.textContent = '';
+  const el = $('journal-entries'); if (!el) return;
+  el.innerHTML = buildPinPad(accentColor, 'Enter your PIN', 'Enter your 4-digit PIN');
+}
+
+function renderPinSetup() {
+  const isHer = mode === 'you';
+  const accentColor = isHer ? 'var(--purple)' : 'var(--teal)';
+  const grad = isHer ? 'linear-gradient(135deg,#a55eea,#f953c6)' : 'linear-gradient(135deg,#11998e,#4facfe)';
+  const name = isHer ? 'Her' : 'His';
+  pinEntry = ''; pinMode = 'set';
+  const banner = $('journal-banner');
+  if (banner) banner.innerHTML = '<div class="card" style="background:' + grad + ';border:none;margin-bottom:13px"><div style="font-family:var(--serif);font-size:17px;font-style:italic;color:white;margin-bottom:3px">' + name + ' Prayer Journal \uD83D\uDE4F\uD83C\uDFFE</div><div style="font-size:12px;color:rgba(255,255,255,.85);font-weight:600">Set a private PIN to protect your journal</div></div>';
+  const writeEl = $('journal-write'); if (writeEl) writeEl.innerHTML = '';
+  const lbl = $('journal-entries-label'); if (lbl) lbl.textContent = '';
+  const el = $('journal-entries'); if (!el) return;
+  el.innerHTML = buildPinPad(accentColor, 'Create your PIN', 'Choose a 4-digit PIN only you know');
+}
+
+function buildPinPad(accentColor, title, subtitle) {
+  var keys = [1,2,3,4,5,6,7,8,9,'',0,'\u232b'];
+  var btns = keys.map(function(k) {
+    if (k === '') return '<div></div>';
+    var isBack = k === '\u232b';
+    return '<button onclick="pinTap(\'' + k + '\')" style="width:72px;height:72px;border-radius:50%;border:2.5px solid ' + (isBack ? 'var(--border2)' : accentColor + '55') + ';background:' + (isBack ? 'var(--s2)' : 'transparent') + ';font-size:' + (isBack ? '22' : '24') + 'px;font-weight:800;color:var(--text);cursor:pointer;font-family:var(--sans)">' + k + '</button>';
+  }).join('');
+  var dots = [0,1,2,3].map(function(i) {
+    return '<div id="pin-dot-' + i + '" style="width:18px;height:18px;border-radius:50%;border:2.5px solid ' + accentColor + ';background:transparent;transition:background .15s"></div>';
+  }).join('');
+  return '<div style="text-align:center;padding:10px 0 20px">'
+    + '<div style="font-size:32px;margin-bottom:10px">\uD83D\uDD10</div>'
+    + '<div style="font-size:15px;font-weight:900;color:var(--text);margin-bottom:4px">' + title + '</div>'
+    + '<div style="font-size:12px;color:var(--text3);font-weight:600;margin-bottom:22px" id="pin-subtitle">' + subtitle + '</div>'
+    + '<div style="display:flex;justify-content:center;gap:14px;margin-bottom:28px">' + dots + '</div>'
+    + '<div style="display:grid;grid-template-columns:repeat(3,72px);gap:12px;justify-content:center">' + btns + '</div>'
+    + '</div>';
+}
+
+function updatePinDots() {
+  var accentColor = mode === 'you' ? '#a55eea' : '#00d2d3';
+  for (var i = 0; i < 4; i++) {
+    var dot = $('pin-dot-' + i);
+    if (dot) dot.style.background = i < pinEntry.length ? accentColor : 'transparent';
+  }
+}
+
+function pinTap(k) {
+  if (k === '\u232b') { pinEntry = pinEntry.slice(0, -1); updatePinDots(); return; }
+  if (pinEntry.length >= 4) return;
+  pinEntry += k;
+  updatePinDots();
+  if (pinEntry.length === 4) setTimeout(processPinEntry, 150);
+}
+
+function processPinEntry() {
+  var sub = $('pin-subtitle');
+  if (pinMode === 'unlock') {
+    if (pinEntry === journalPins[mode]) {
+      journalUnlocked[mode] = true;
+      renderJournalContent();
+    } else {
+      pinEntry = ''; updatePinDots();
+      if (sub) { sub.textContent = 'Incorrect PIN \u2014 try again'; sub.style.color = 'var(--coral)';
+        setTimeout(function() { if (sub) { sub.textContent = 'Enter your 4-digit PIN'; sub.style.color = 'var(--text3)'; } }, 1600);
+      }
+    }
+  } else if (pinMode === 'set') {
+    pinConfirmFirst = pinEntry; pinEntry = ''; pinMode = 'confirm'; updatePinDots();
+    if (sub) { sub.textContent = 'Confirm your PIN'; sub.style.color = 'var(--text3)'; }
+  } else if (pinMode === 'confirm') {
+    if (pinEntry === pinConfirmFirst) {
+      journalPins[mode] = pinEntry; journalUnlocked[mode] = true; pinEntry = '';syncPins();
+      renderJournalContent();
+    } else {
+      pinEntry = ''; pinConfirmFirst = ''; pinMode = 'set'; updatePinDots();
+      if (sub) { sub.textContent = 'PINs didn\'t match \u2014 try again'; sub.style.color = 'var(--coral)';
+        setTimeout(function() { if (sub) { sub.textContent = 'Choose a 4-digit PIN only you know'; sub.style.color = 'var(--text3)'; } }, 1600);
+      }
+    }
+  }
+}
+
+function renderJournalContent() {
+  const isHer = mode === 'you';
+  const grad = isHer ? 'linear-gradient(135deg,#a55eea,#f953c6)' : 'linear-gradient(135deg,#11998e,#4facfe)';
+  const cardCls = isHer ? 'card-purple' : 'card-teal';
+  const accentColor = isHer ? 'var(--purple)' : 'var(--teal)';
+  const name = isHer ? 'Her' : 'His';
+  const icon = isHer ? '\uD83D\uDC9C' : '\uD83D\uDC99';
+  const banner = $('journal-banner');
+  if (banner) banner.innerHTML = '<div class="card" style="background:' + grad + ';border:none;margin-bottom:13px"><div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-family:var(--serif);font-size:17px;font-style:italic;color:white;margin-bottom:3px">' + name + ' Prayer Journal \uD83D\uDE4F\uD83C\uDFFE</div><div style="font-size:12px;color:rgba(255,255,255,.85);font-weight:600">A private sacred space \u2014 just between you and God</div></div><button onclick="lockJournal()" style="padding:6px 13px;border-radius:20px;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.15);color:white;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--sans)">\uD83D\uDD12 Lock</button></div></div>';
+  const writeEl = $('journal-write');
+  if (writeEl) writeEl.innerHTML = '<div class="card ' + cardCls + '"><div style="font-size:13px;color:var(--text2);font-weight:700;margin-bottom:9px">What\'s on your heart today?</div><textarea id="journal-input" placeholder="Lord, today I\'m grateful for...&#10;&#10;I\'m struggling with...&#10;&#10;Please guide us in..." style="border-color:' + accentColor + '44"></textarea><div style="margin-top:11px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-' + (isHer ? 'purple' : 'teal') + ' btn-sm" onclick="saveJournal()">Save ' + icon + '</button><button class="btn btn-teal btn-sm" onclick="addGratitude()">+ Gratitude \uD83C\uDF3F</button><button onclick="resetJournalPin()" style="padding:6px 13px;border-radius:20px;border:2px solid var(--border2);background:transparent;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans)">Change PIN</button></div></div>';
+  const lbl = $('journal-entries-label');
+  if (lbl) { lbl.style.color = accentColor; lbl.textContent = name + ' past entries'; }
+  const el = $('journal-entries'); if (!el) return;
+  const entries = journalEntries[mode] || [];
+  if (entries.length === 0) { el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px;font-weight:600;font-style:italic">No entries yet \u2014 start writing \uD83D\uDE4F\uD83C\uDFFE</div>'; return; }
+  el.innerHTML = entries.map(function(e, i) {
+    return '<div class="journal-entry" style="border-left-color:' + accentColor + ';background:' + accentColor + '11"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px"><div class="jdate">\uD83D\uDCC5 ' + e.date + '</div><button onclick="deleteJournalEntry(' + i + ')" style="padding:2px 9px;border-radius:8px;border:1.5px solid var(--border2);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sans)">\u00d7</button></div><div class="jtext">' + e.text + '</div></div>';
+  }).join('');
+}
+
+function resetJournalPin() { journalPins[mode] = null; journalUnlocked[mode] = false; syncPins();renderJournal(); }
+function saveJournal() {
+  const input = $('journal-input'); if (!input || !input.value.trim()) return;
+  const today = new Date().toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'});
+  journalEntries[mode].unshift({date:today, text:input.value.trim()});
+  input.value = ''; syncJournal();renderJournalContent();
+}
+function addGratitude() {
+  const input = $('journal-input'); if (!input) return;
+  if (input.value && !input.value.endsWith('\n\n')) input.value += '\n\n';
+  input.value += 'Grateful for: '; input.focus();
+}
+function deleteJournalEntry(i) { journalEntries[mode].splice(i, 1); syncJournal();renderJournalContent(); }
+
+
+function setSpicyTab(t){spicyTab=t;$('stab-him').classList.toggle('active',t==='him');$('stab-tog').classList.toggle('active',t==='together');$('stab-her').classList.toggle('active',t==='her');$('stab-sug').classList.toggle('active',t==='suggest');renderSpicy(t);}
+// Suggestions store: {from:'you'|'him', text:string, mood:string, revealed:bool}
+let spicySuggestions = [];
+let suggestRevealed = false;
+
+function renderSpicy(t){
+  const el=$('spicy-content');if(!el)return;
+  if(t==='him'){
+    if(mode==='you'){
+      el.innerHTML='<div style="font-size:13px;color:var(--text2);font-weight:700;margin-bottom:12px;line-height:1.6;padding:12px;background:var(--purple-bg);border-radius:var(--r-sm);border-left:4px solid var(--purple)">💜 <strong>Surprise ideas for him to do for you</strong> — share this tab with him and let him pick something special.</div>'+spicyHer.map(s=>'<div class="spicy-card spicy-her"><div class="spicy-label" style="color:var(--purple)">'+s.label+'</div><div class="spicy-title">'+s.title+'</div><div class="spicy-desc">'+s.desc+'</div></div>').join('');
+    } else {
+      el.innerHTML='<div style="font-size:13px;color:var(--text2);font-weight:700;margin-bottom:12px;line-height:1.6;padding:12px;background:var(--rose-bg);border-radius:var(--r-sm);border-left:4px solid var(--rose)">🔥 <strong>Ideas for her to surprise you</strong> — share this with her and let her pick something just for you.</div>'+spicyHim.map(s=>'<div class="spicy-card spicy-him"><div class="spicy-label" style="color:var(--rose)">'+s.label+'</div><div class="spicy-title">'+s.title+'</div><div class="spicy-desc">'+s.desc+'</div></div>').join('');
+    }
+  }else if(t==='her'){
+    if(mode==='you'){
+      el.innerHTML='<div style="font-size:13px;color:var(--text2);font-weight:700;margin-bottom:12px;line-height:1.6;padding:12px;background:var(--rose-bg);border-radius:var(--r-sm);border-left:4px solid var(--rose)">🔥 <strong>Things you can do for him</strong> — small gestures, huge impact on him.</div>'+spicyHim.map(s=>'<div class="spicy-card spicy-him"><div class="spicy-label" style="color:var(--rose)">'+s.label+'</div><div class="spicy-title">'+s.title+'</div><div class="spicy-desc">'+s.desc+'</div></div>').join('');
+    } else {
+      el.innerHTML='<div style="font-size:13px;color:var(--text2);font-weight:700;margin-bottom:12px;line-height:1.6;padding:12px;background:var(--purple-bg);border-radius:var(--r-sm);border-left:4px solid var(--purple)">💜 <strong>Things you can do for her</strong> — acts of service and quality time that fill her love tank.</div>'+spicyHer.map(s=>'<div class="spicy-card spicy-her"><div class="spicy-label" style="color:var(--purple)">'+s.label+'</div><div class="spicy-title">'+s.title+'</div><div class="spicy-desc">'+s.desc+'</div></div>').join('');
+    }
+  }else if(t==='together'){
+    el.innerHTML='<div style="font-size:13px;color:var(--text2);font-weight:700;margin-bottom:12px;line-height:1.6;padding:12px;background:var(--pink-bg);border-radius:var(--r-sm);border-left:4px solid var(--pink)">👫🏾 <strong>For both of you</strong> — activities that deepen your bond and naturally lead to intimacy.</div>'+spicyTog.map(s=>'<div class="spicy-card" style="background:linear-gradient(135deg,var(--purple-bg),var(--rose-bg));border:2px solid rgba(165,94,234,.2)"><div class="spicy-label" style="color:var(--purple)">'+s.label+'</div><div class="spicy-title">'+s.title+'</div><div class="spicy-desc">'+s.desc+'</div></div>').join('');
+  }else if(t==='suggest'){
+    renderSuggestTab(el);
+  }
+}
+
+function renderSuggestTab(el) {
+  const isHer = mode === 'you';
+  const myColor = isHer ? 'var(--purple)' : 'var(--teal)';
+  const myBg   = isHer ? 'var(--purple-bg)' : 'var(--teal-bg)';
+  const myLabel = isHer ? '💜 Her suggestion' : '💙 His suggestion';
+  const toLabel = isHer ? 'him' : 'her';
+  const moods   = ['💜 Romantic','🔥 Spicy','😂 Fun & Silly','🕯️ Slow & Tender','💆🏾 Relaxing','⚡ Spontaneous'];
+
+  // Filter: suggestions I wrote vs suggestions for me
+  const mine = spicySuggestions.filter(s => s.from === mode);
+  const forme = spicySuggestions.filter(s => s.from !== mode);
+  const unread = forme.filter(s => !s.revealed).length;
+
+  let html = '';
+
+  // --- Write a new suggestion ---
+  html += '<div style="background:linear-gradient(135deg,'+myBg+',var(--pink-bg));border:2px solid '+myColor+'33;border-radius:var(--r);padding:15px;margin-bottom:14px">'
+    + '<div style="font-size:13px;font-weight:900;color:'+myColor+';margin-bottom:10px">✍🏾 Leave a suggestion for '+toLabel+'</div>'
+    + '<textarea id="sug-text" placeholder="I&apos;d love it if you... ✨" style="width:100%;border:2px solid '+myColor+'44;border-radius:10px;padding:10px;font-family:var(--sans);font-size:13px;color:var(--text);background:var(--surface);resize:none;min-height:80px;outline:none;line-height:1.55;margin-bottom:10px"></textarea>'
+    + '<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:7px">Pick a vibe</div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">'
+    + moods.map(m => '<button onclick="selectMood(this)" data-mood="'+m+'" style="padding:5px 11px;border-radius:20px;border:2px solid var(--border2);background:transparent;color:var(--text2);font-size:11px;font-weight:800;cursor:pointer;font-family:var(--sans);transition:all .15s">'+m+'</button>').join('')
+    + '</div>'
+    + '<button onclick="submitSuggestion()" style="width:100%;padding:11px;border-radius:30px;border:none;background:linear-gradient(135deg,'+myColor+',var(--pink));color:white;font-size:13px;font-weight:900;cursor:pointer;font-family:var(--sans)">Send suggestion 💌</button>'
+    + '</div>';
+
+  // --- Envelope: suggestions for me ---
+  html += '<div style="margin-bottom:14px">';
+  html += '<div style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:9px;display:flex;align-items:center;gap:8px">💌 Suggestions for you'
+    + (unread > 0 ? '<span style="background:var(--coral);color:white;font-size:9px;padding:2px 7px;border-radius:10px">'+unread+' new</span>' : '')
+    + '</div>';
+
+  if (forme.length === 0) {
+    html += '<div style="text-align:center;padding:22px;border:2px dashed var(--border2);border-radius:var(--r);color:var(--text3);font-size:13px;font-weight:600">No suggestions yet 💭<br><span style="font-size:11px">Have '+toLabel.charAt(0).toUpperCase()+toLabel.slice(1)+' switch modes and leave one!</span></div>';
+  } else {
+    forme.forEach(function(s, i) {
+      const idx = spicySuggestions.indexOf(s);
+      if (!s.revealed) {
+        html += '<div style="background:linear-gradient(135deg,var(--pink-bg),var(--purple-bg));border:2px solid rgba(255,107,157,.3);border-radius:var(--r);padding:16px;margin-bottom:10px;text-align:center;cursor:pointer" onclick="revealSuggestion('+idx+')">'
+          + '<div style="font-size:36px;margin-bottom:8px">💌</div>'
+          + '<div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px">A suggestion is waiting for you</div>'
+          + (s.mood ? '<div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:10px">Vibe: '+s.mood+'</div>' : '')
+          + '<button style="padding:8px 20px;border-radius:20px;border:none;background:linear-gradient(135deg,var(--pink),var(--purple));color:white;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--sans)">Tap to open 💫</button>'
+          + '</div>';
+      } else {
+        const fromLabel = s.from === 'you' ? '💜 From Her' : '💙 From Him';
+        const cardBg = s.from === 'you' ? 'linear-gradient(135deg,var(--purple-bg),var(--pink-bg))' : 'linear-gradient(135deg,var(--teal-bg),var(--sky-bg))';
+        const borderCol = s.from === 'you' ? 'rgba(165,94,234,.3)' : 'rgba(0,210,211,.3)';
+        html += '<div style="background:'+cardBg+';border:2px solid '+borderCol+';border-radius:var(--r);padding:15px;margin-bottom:10px">'
+          + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+          + '<div style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--text3)">'+fromLabel+'</div>'
+          + (s.mood ? '<div style="font-size:10px;padding:2px 9px;border-radius:10px;background:var(--surface);border:1.5px solid var(--border2);font-weight:800;color:var(--text2)">'+s.mood+'</div>' : '')
+          + '</div>'
+          + '<div style="font-family:var(--serif);font-size:15px;color:var(--text);line-height:1.65;font-style:italic">&#8220;'+s.text+'&#8221;</div>'
+          + '<button onclick="deleteSuggestion('+idx+')" style="margin-top:10px;padding:4px 12px;border-radius:10px;border:1.5px solid var(--border2);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sans)">Dismiss</button>'
+          + '</div>';
+      }
+    });
+  }
+  html += '</div>';
+
+  // --- My sent suggestions ---
+  if (mine.length > 0) {
+    html += '<div style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:9px">📤 Your sent suggestions</div>';
+    mine.forEach(function(s, i) {
+      const idx = spicySuggestions.indexOf(s);
+      html += '<div style="background:var(--surface);border:2px solid var(--border);border-radius:var(--r-sm);padding:12px;margin-bottom:8px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px">'
+        + '<div style="flex:1">'
+        + (s.mood ? '<div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:4px">'+s.mood+'</div>' : '')
+        + '<div style="font-size:12px;color:var(--text2);line-height:1.5;font-weight:600">'+s.text+'</div>'
+        + '<div style="font-size:10px;color:var(--text3);margin-top:4px;font-weight:700">'+(s.revealed ? '✓ Opened' : '💌 Not opened yet')+'</div>'
+        + '</div>'
+        + '<button onclick="deleteSuggestion('+idx+')" style="padding:4px 10px;border-radius:8px;border:1.5px solid var(--border2);background:transparent;color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sans);flex-shrink:0">×</button>'
+        + '</div>';
+    });
+  }
+
+  el.innerHTML = html;
+}
+
+let selectedMood = '';
+function selectMood(btn) {
+  selectedMood = btn.dataset.mood;
+  document.querySelectorAll('[data-mood]').forEach(function(b) {
+    b.style.background = 'transparent';
+    b.style.color = 'var(--text2)';
+    b.style.borderColor = 'var(--border2)';
+  });
+  btn.style.background = 'linear-gradient(135deg,var(--purple),var(--pink))';
+  btn.style.color = 'white';
+  btn.style.borderColor = 'transparent';
+}
+
+function submitSuggestion() {
+  const input = document.getElementById('sug-text');
+  if (!input || !input.value.trim()) return;
+  spicySuggestions.push({ from: mode, text: input.value.trim(), mood: selectedMood, revealed: false });syncSuggestions();
+  selectedMood = '';
+  renderSuggestTab(document.getElementById('spicy-content'));
+}
+
+function revealSuggestion(idx) {
+  spicySuggestions[idx].revealed = true;syncSuggestions();
+  renderSuggestTab(document.getElementById('spicy-content'));
+}
+
+function deleteSuggestion(idx) {
+  spicySuggestions.splice(idx, 1);syncSuggestions();
+  renderSuggestTab(document.getElementById('spicy-content'));
+}
+
+function setOutingTab(t){outingTab=t;['free','cheap','splurge','faith'].forEach(n=>{$('otab-'+n).classList.toggle('active',n===t);});renderOutings(t);}
+function renderOutings(t){
+  const el=$('outings-content');if(!el)return;
+  const list=outings[t]||[];
+  const bgs={free:'#f0fff4',cheap:'#e0faf4',splurge:'#f5eeff',faith:'#e8f3ff'};
+  const acs={free:'#20bf6b',cheap:'#1dd1a1',splurge:'#a55eea',faith:'#54a0ff'};
+  el.innerHTML=list.map(o=>'<div class="outing-card" style="background:'+bgs[t]+';border-color:'+acs[t]+'44"><div style="display:flex;align-items:center;gap:10px;margin-bottom:5px"><div style="font-size:28px">'+o.e+'</div><div style="font-size:14px;font-weight:800;color:var(--text)">'+o.title+'</div></div><div style="font-size:12px;color:var(--text2);font-weight:600;line-height:1.55">'+o.desc+'</div></div>').join('');
+}
+
+
+
+// ===================== EDIT PANEL SYSTEM =====================
+let editSection = '';
+
+function openEditPanel() {
+  editSection = currentPage;
+  buildEditPanel(editSection);
+  document.getElementById('edit-overlay').classList.add('open');
+  document.getElementById('edit-panel').classList.add('open');
+}
+function closeEditPanel() {
+  document.getElementById('edit-overlay').classList.remove('open');
+  document.getElementById('edit-panel').classList.remove('open');
+}
+
+function buildEditPanel(sec) {
+  const titles = {
+    home:'🏠 Family Settings', kids:'👦🏾 Kids Schedule',
+    meals:'🛒 Grocery List', budget:'💰 Budget',
+    tasks:'✅ Tasks', bible:'📖 Bible Plan',
+    dates:'💖 Dates', clean:'🧹 Cleaning Steps',
+    spicy:'🔥 Intimacy', outings:'🌟 Outings', journal:'🙏 Journal'
+  };
+  document.getElementById('edit-panel-title').textContent = titles[sec] || '✏️ Edit';
+  const body = document.getElementById('edit-panel-body');
+  if (sec === 'home') buildHomeEdit(body);
+  else if (sec === 'kids') buildKidsEdit(body);
+  else if (sec === 'tasks') buildTasksEdit(body);
+  else if (sec === 'budget') buildBudgetEdit(body);
+  else if (sec === 'meals') buildMealsEdit(body);
+  else if (sec === 'bible') buildBibleEdit(body);
+  else if (sec === 'dates') buildDatesEdit(body);
+  else if (sec === 'clean') buildCleanEdit(body);
+  else if (sec === 'outings') buildOutingsEdit(body);
+  else {
+    body.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text3);font-size:14px;line-height:1.6">Navigate to a page first, then tap ✏️ to edit that section.</div>';
+  }
+}
+
+// ---- HOME ----
+function deleteVerse(i){verses.splice(i,1);buildHomeEdit(document.getElementById('edit-panel-body'));}
+function addVerse(){verses.push({t:'New verse',r:'Reference'});buildHomeEdit(document.getElementById('edit-panel-body'));}
+function buildHomeEdit(body) {
+  var verseRows = '';
+  verses.forEach(function(v, i) {
+    var ref = v.r.replace(/"/g,'&quot;');
+    var txt = v.t.replace(/^"|"$/g,'').replace(/"/g,'&quot;');
+    verseRows += '<div style="margin-bottom:9px;padding:10px;border-radius:12px;border:2px solid var(--border)">'
+      + '<div class="edit-row">'
+      + '<input value="' + ref + '" placeholder="Reference e.g. John 3:16" oninput="verses[' + i + '].r=this.value" style="max-width:145px">'
+      + '<button class="edit-del" onclick="deleteVerse(' + i + ')">×</button>'
+      + '</div>'
+      + '<div class="edit-row">'
+      + '<input value="' + txt + '" placeholder="Verse text" oninput="verses[' + i + '].t=this.value">'
+      + '</div>'
+      + '</div>';
+  });
+  body.innerHTML = '<div class="edit-section">'
+    + '<div class="edit-section-title">📖 Verse Carousel</div>'
+    + '<div style="font-size:11px;color:var(--text3);font-weight:600;margin-bottom:10px">These rotate when you tap the verse card on the home screen.</div>'
+    + verseRows
+    + '<button class="edit-add" onclick="addVerse()">+ Add verse</button>'
+    + '</div>'
+    + '<button class="edit-save" onclick="renderHome();closeEditPanel()">Save changes ✓</button>';
+}
+
+// ---- KIDS ----
+window._kid1Name = 'Jacchius';
+window._kid1Age = '4';
+window._kid2Name = 'Ahnaniah';
+window._kid2Age = '3';
+
+function buildKidsEdit(body) {
+  let rows = '';
+  kidScheduleToday.forEach(function(k, i) {
+    rows += '<div class="edit-row">'
+      + '<input value="' + k.time + '" style="max-width:55px" oninput="kidScheduleToday[' + i + '].time=this.value">'
+      + '<input value="' + k.name + '" oninput="kidScheduleToday[' + i + '].name=this.value">'
+      + '<input value="' + k.icon + '" style="max-width:44px" oninput="kidScheduleToday[' + i + '].icon=this.value">'
+      + '<button class="edit-del" onclick="kidScheduleToday.splice(' + i + ',1);buildKidsEdit(document.getElementById(\'edit-panel-body\'))">×</button>'
+      + '</div>';
+  });
+  body.innerHTML = '<div class="edit-section">'
+    + '<div class="edit-section-title">👦🏾 Kids Names</div>'
+    + '<div class="edit-row"><input id="ek-name1" value="' + window._kid1Name + '" placeholder="Child 1 name"><input id="ek-age1" value="' + window._kid1Age + '" placeholder="Age" style="max-width:60px"></div>'
+    + '<div class="edit-row"><input id="ek-name2" value="' + window._kid2Name + '" placeholder="Child 2 name"><input id="ek-age2" value="' + window._kid2Age + '" placeholder="Age" style="max-width:60px"></div>'
+    + '</div>'
+    + '<div class="edit-section">'
+    + '<div class="edit-section-title">⏰ Daily Schedule</div>'
+    + rows
+    + '<button class="edit-add" onclick="kidScheduleToday.push({time:\'08:00\',name:\'New activity\',detail:\'\',badge:\'kb-free\',icon:\'⭐\'});buildKidsEdit(document.getElementById(\'edit-panel-body\'))">+ Add activity</button>'
+    + '</div>'
+    + '<button class="edit-save" onclick="saveKidsEdit()">Save changes ✓</button>';
+}
+function saveKidsEdit() {
+  var n1 = document.getElementById('ek-name1');
+  var n2 = document.getElementById('ek-name2');
+  var a1 = document.getElementById('ek-age1');
+  var a2 = document.getElementById('ek-age2');
+  if (n1) window._kid1Name = n1.value;
+  if (n2) window._kid2Name = n2.value;
+  if (a1) window._kid1Age = a1.value;
+  if (a2) window._kid2Age = a2.value;
+  syncKids();renderKids(kidsTab);
+  closeEditPanel();
+}
+
+// ---- TASKS ----
+function buildTasksEdit(body) {
+  var list = tasks[mode];
+  var rows = '';
+  list.forEach(function(t, i) {
+    rows += '<div class="edit-row">'
+      + '<input value="' + t.text.replace(/"/g,'&quot;') + '" oninput="tasks[mode][' + i + '].text=this.value">'
+      + '<button class="edit-del" onclick="tasks[mode].splice(' + i + ',1);buildTasksEdit(document.getElementById(\'edit-panel-body\'))">×</button>'
+      + '</div>';
+  });
+  body.innerHTML = '<div class="edit-section">'
+    + '<div class="edit-section-title">' + (mode === 'you' ? '🤎 Her Tasks' : '🤎 His Tasks') + '</div>'
+    + rows
+    + '<button class="edit-add" onclick="tasks[mode].push({text:\'New task\',cat:\'Home\',done:false,color:\'#a55eea\'});buildTasksEdit(document.getElementById(\'edit-panel-body\'))">+ Add task</button>'
+    + '</div>'
+    + '<button class="edit-save" onclick="syncTasks();renderTasks();closeEditPanel()">Save changes ✓</button>';
+}
+
+// ---- BUDGET ----
+var budEditTab = 'spending';
+function buildBudgetEdit(body) {
+  var tabs = '<div class="edit-tabs">'
+    + ['spending','savings','bills'].map(function(t) {
+        return '<button class="edit-tab' + (budEditTab === t ? ' active' : '') + '" onclick="budEditTab=\'' + t + '\';buildBudgetEdit(document.getElementById(\'edit-panel-body\'))">'
+          + (t === 'spending' ? '💸 Spending' : t === 'savings' ? '🎯 Goals' : '📋 Bills') + '</button>';
+      }).join('') + '</div>';
+
+  var rows = '';
+  if (budEditTab === 'spending') {
+    budgetItems.forEach(function(b, i) {
+      rows += '<div class="edit-row">'
+        + '<input value="' + b.cat + '" style="max-width:95px" oninput="budgetItems[' + i + '].cat=this.value">'
+        + '<input type="number" value="' + b.spent + '" placeholder="Spent" style="max-width:70px" oninput="budgetItems[' + i + '].spent=+this.value">'
+        + '<input type="number" value="' + b.total + '" placeholder="Total" style="max-width:70px" oninput="budgetItems[' + i + '].total=+this.value">'
+        + '<button class="edit-del" onclick="budgetItems.splice(' + i + ',1);buildBudgetEdit(document.getElementById(\'edit-panel-body\'))">×</button>'
+        + '</div>';
+    });
+    rows += '<button class="edit-add" onclick="budgetItems.push({cat:\'New\',spent:0,total:100,color:\'linear-gradient(90deg,#a55eea,#f953c6)\'});buildBudgetEdit(document.getElementById(\'edit-panel-body\'))">+ Add category</button>';
+  } else if (budEditTab === 'savings') {
+    savingsGoals.forEach(function(g, i) {
+      rows += '<div class="edit-row">'
+        + '<input value="' + g.e + '" style="max-width:44px" oninput="savingsGoals[' + i + '].e=this.value">'
+        + '<input value="' + g.name + '" oninput="savingsGoals[' + i + '].name=this.value">'
+        + '<input type="number" value="' + g.saved + '" placeholder="Saved" style="max-width:70px" oninput="savingsGoals[' + i + '].saved=+this.value">'
+        + '<input type="number" value="' + g.goal + '" placeholder="Goal" style="max-width:70px" oninput="savingsGoals[' + i + '].goal=+this.value">'
+        + '<button class="edit-del" onclick="savingsGoals.splice(' + i + ',1);buildBudgetEdit(document.getElementById(\'edit-panel-body\'))">×</button>'
+        + '</div>';
+    });
+    rows += '<button class="edit-add" onclick="savingsGoals.push({name:\'New goal\',saved:0,goal:1000,color:\'linear-gradient(90deg,#a55eea,#f953c6)\',e:\'🎯\'});buildBudgetEdit(document.getElementById(\'edit-panel-body\'))">+ Add goal</button>';
+  } else {
+    bills.forEach(function(b, i) {
+      rows += '<div class="edit-row">'
+        + '<input value="' + b.icon + '" style="max-width:40px" oninput="bills[' + i + '].icon=this.value">'
+        + '<input value="' + b.name + '" oninput="bills[' + i + '].name=this.value">'
+        + '<input value="' + b.amount + '" style="max-width:65px" oninput="bills[' + i + '].amount=this.value">'
+        + '<input value="' + b.due + '" style="max-width:60px" oninput="bills[' + i + '].due=this.value">'
+        + '<select oninput="bills[' + i + '].status=this.value" style="max-width:72px">'
+        + '<option' + (b.status==='paid'?' selected':'') + '>paid</option>'
+        + '<option' + (b.status==='soon'?' selected':'') + '>soon</option>'
+        + '<option' + (b.status==='unpaid'?' selected':'') + '>unpaid</option>'
+        + '</select>'
+        + '<button class="edit-del" onclick="bills.splice(' + i + ',1);buildBudgetEdit(document.getElementById(\'edit-panel-body\'))">×</button>'
+        + '</div>';
+    });
+    rows += '<button class="edit-add" onclick="bills.push({name:\'New bill\',icon:\'💳\',due:\'Apr 30\',amount:\'$0\',status:\'unpaid\'});buildBudgetEdit(document.getElementById(\'edit-panel-body\'))">+ Add bill</button>';
+  }
+
+  body.innerHTML = tabs
+    + '<div class="edit-section"><div class="edit-section-title">Edit entries</div>' + rows + '</div>'
+    + '<button class="edit-save" onclick="syncBudget();syncBills();renderBudgetAll();renderHome();closeEditPanel()">Save changes ✓</button>';
+}
+
+// ---- MEALS / GROCERY ----
+function buildMealsEdit(body) {
+  var rows = '';
+  for (var cat in groceryList) {
+    var catName = cat;
+    rows += '<div style="font-size:12px;font-weight:800;color:var(--text2);margin:10px 0 4px">' + catName + '</div>';
+    groceryList[cat].forEach(function(item, i) {
+      var c = catName;
+      rows += '<div class="edit-row">'
+        + '<input value="' + item.name.replace(/"/g,'&quot;') + '" oninput="groceryList[\'' + c + '\'][' + i + '].name=this.value">'
+        + '<button class="edit-del" onclick="groceryList[\'' + c + '\'].splice(' + i + ',1);buildMealsEdit(document.getElementById(\'edit-panel-body\'))">×</button>'
+        + '</div>';
+    });
+    rows += '<button class="edit-add" onclick="groceryList[\'' + catName + '\'].push({name:\'Item\',done:false});buildMealsEdit(document.getElementById(\'edit-panel-body\'))">+ Add to ' + catName + '</button>';
+  }
+  body.innerHTML = '<div class="edit-section"><div class="edit-section-title">🛒 Grocery List</div>'
+    + rows + '</div>'
+    + '<button class="edit-save" onclick="syncGrocery();renderMeal(mealTab);closeEditPanel()">Save changes ✓</button>';
+}
+
+// ---- BIBLE ----
+function buildBibleEdit(body) {
+  var rows = '';
+  bibleReadings.forEach(function(r, i) {
+    rows += '<div class="edit-row">'
+      + '<input value="' + r.l.replace(/"/g,'&quot;') + '" oninput="bibleReadings[' + i + '].l=this.value">'
+      + '<input value="' + r.t + '" style="max-width:68px" placeholder="Time" oninput="bibleReadings[' + i + '].t=this.value">'
+      + '<select oninput="bibleReadings[' + i + '].p=this.value" style="max-width:65px">'
+      + '<option' + (r.p==='Her'?' selected':'') + '>Her</option>'
+      + '<option' + (r.p==='His'?' selected':'') + '>His</option>'
+      + '<option' + (r.p==='Both'?' selected':'') + '>Both</option>'
+      + '</select>'
+      + '<button class="edit-del" onclick="bibleReadings.splice(' + i + ',1);buildBibleEdit(document.getElementById(\'edit-panel-body\'))">×</button>'
+      + '</div>';
+  });
+  body.innerHTML = '<div class="edit-section"><div class="edit-section-title">📖 Reading Plan</div>'
+    + rows
+    + '<button class="edit-add" onclick="bibleReadings.push({p:\'Both\',l:\'New reading\',t:\'10 min\',chk:false});buildBibleEdit(document.getElementById(\'edit-panel-body\'))">+ Add reading</button>'
+    + '</div>'
+    + '<button class="edit-save" onclick="syncBibleReadings();renderBible();renderHome();closeEditPanel()">Save changes ✓</button>';
+}
+
+// ---- DATES ----
+var datesEditTab = 'planned';
+function buildDatesEdit(body) {
+  var tabs = '<div class="edit-tabs">'
+    + ['planned','ideas'].map(function(t) {
+        return '<button class="edit-tab' + (datesEditTab === t ? ' active' : '') + '" onclick="datesEditTab=\'' + t + '\';buildDatesEdit(document.getElementById(\'edit-panel-body\'))">'
+          + (t === 'planned' ? '📅 Planned' : '✨ Ideas') + '</button>';
+      }).join('') + '</div>';
+  var rows = '';
+  if (datesEditTab === 'planned') {
+    plannedDates.forEach(function(d, i) {
+      rows += '<div style="margin-bottom:10px;padding:10px;border-radius:12px;border:2px solid var(--border)">'
+        + '<div class="edit-row"><input value="' + d.title.replace(/"/g,'&quot;') + '" placeholder="Title" oninput="plannedDates[' + i + '].title=this.value">'
+        + '<button class="edit-del" onclick="plannedDates.splice(' + i + ',1);buildDatesEdit(document.getElementById(\'edit-panel-body\'))">×</button></div>'
+        + '<div class="edit-row"><input value="' + d.when.replace(/"/g,'&quot;') + '" placeholder="When" oninput="plannedDates[' + i + '].when=this.value">'
+        + '<input value="' + d.notes.replace(/"/g,'&quot;') + '" placeholder="Notes" oninput="plannedDates[' + i + '].notes=this.value"></div>'
+        + '</div>';
+    });
+    rows += '<button class="edit-add" onclick="plannedDates.push({title:\'Date night\',when:\'Soon\',notes:\'\'});buildDatesEdit(document.getElementById(\'edit-panel-body\'))">+ Add planned date</button>';
+  } else {
+    dateIdeas.forEach(function(d, i) {
+      rows += '<div class="edit-row">'
+        + '<input value="' + d.e + '" style="max-width:44px" oninput="dateIdeas[' + i + '].e=this.value">'
+        + '<input value="' + d.title.replace(/"/g,'&quot;') + '" oninput="dateIdeas[' + i + '].title=this.value">'
+        + '<input value="' + d.cost + '" style="max-width:65px" placeholder="Cost" oninput="dateIdeas[' + i + '].cost=this.value">'
+        + '<button class="edit-del" onclick="dateIdeas.splice(' + i + ',1);buildDatesEdit(document.getElementById(\'edit-panel-body\'))">×</button>'
+        + '</div>';
+    });
+    rows += '<button class="edit-add" onclick="dateIdeas.push({e:\'💫\',title:\'New idea\',desc:\'\',cost:\'Free\',cc:\'cfree\'});buildDatesEdit(document.getElementById(\'edit-panel-body\'))">+ Add idea</button>';
+  }
+  body.innerHTML = tabs + '<div class="edit-section"><div class="edit-section-title">Edit dates</div>' + rows + '</div>'
+    + '<button class="edit-save" onclick="syncMemories();renderDates();closeEditPanel()">Save changes ✓</button>';
+}
+
+// ---- CLEAN ----
+function buildCleanEdit(body) {
+  var rows = '';
+  cleanYou.forEach(function(s, i) {
+    rows += '<div class="edit-row">'
+      + '<input value="' + s.t.replace(/"/g,'&quot;') + '" oninput="cleanYou[' + i + '].t=this.value">'
+      + '<input value="' + s.time + '" style="max-width:65px" placeholder="Time" oninput="cleanYou[' + i + '].time=this.value">'
+      + '<button class="edit-del" onclick="cleanYou.splice(' + i + ',1);buildCleanEdit(document.getElementById(\'edit-panel-body\'))">×</button>'
+      + '</div>';
+  });
+  body.innerHTML = '<div class="edit-section"><div class="edit-section-title">🧹 Cleaning Steps</div>'
+    + rows
+    + '<button class="edit-add" onclick="cleanYou.push({t:\'New task\',time:\'5 min\',d:\'You got this! 💜\',dur:300});buildCleanEdit(document.getElementById(\'edit-panel-body\'))">+ Add step</button>'
+    + '</div>'
+    + '<button class="edit-save" onclick="syncClean();renderClean();closeEditPanel()">Save changes ✓</button>';
+}
+
+// ---- OUTINGS ----
+var outEditTab = 'free';
+function buildOutingsEdit(body) {
+  var tabs = '<div class="edit-tabs">'
+    + ['free','cheap','splurge','faith'].map(function(t) {
+        return '<button class="edit-tab' + (outEditTab === t ? ' active' : '') + '" onclick="outEditTab=\'' + t + '\';buildOutingsEdit(document.getElementById(\'edit-panel-body\'))">' + t + '</button>';
+      }).join('') + '</div>';
+  var list = outings[outEditTab] || [];
+  var rows = '';
+  list.forEach(function(o, i) {
+    var tab = outEditTab;
+    rows += '<div style="margin-bottom:8px;padding:9px 11px;border-radius:12px;border:2px solid var(--border)">'
+      + '<div class="edit-row">'
+      + '<input value="' + o.e + '" style="max-width:44px" oninput="outings[\'' + tab + '\'][' + i + '].e=this.value">'
+      + '<input value="' + o.title.replace(/"/g,'&quot;') + '" oninput="outings[\'' + tab + '\'][' + i + '].title=this.value">'
+      + '<button class="edit-del" onclick="outings[\'' + tab + '\'].splice(' + i + ',1);buildOutingsEdit(document.getElementById(\'edit-panel-body\'))">×</button>'
+      + '</div>'
+      + '<div class="edit-row"><input value="' + o.desc.replace(/"/g,'&quot;') + '" placeholder="Description" oninput="outings[\'' + tab + '\'][' + i + '].desc=this.value"></div>'
+      + '</div>';
+  });
+  var tab2 = outEditTab;
+  rows += '<button class="edit-add" onclick="outings[\'' + tab2 + '\'].push({e:\'🌟\',title:\'New outing\',desc:\'\'});buildOutingsEdit(document.getElementById(\'edit-panel-body\'))">+ Add outing</button>';
+  body.innerHTML = tabs + '<div class="edit-section"><div class="edit-section-title">Outing Ideas</div>' + rows + '</div>'
+    + '<button class="edit-save" onclick="renderOutings(outingTab);closeEditPanel()">Save changes ✓</button>';
+}
+// ===================== END EDIT PANEL =====================
+
+
+// ═══════════════════════════════════════════════════════════════
+// SUPABASE SYNC LAYER
+// Replace SUPABASE_URL and SUPABASE_ANON_KEY with your project values
+// ═══════════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://emyxbnrrvgkyklvmweaf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVteXhibnJydmdreWtsdm13ZWFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MjcwNjYsImV4cCI6MjA5MTQwMzA2Nn0.DVw_ZI_rXIzYzaKs3BydqmHr1yS27O2URfamMKVAVTo';
+const FAMILY_ID   = 'grace-and-grow-family'; // unique ID for your family's data
+
+let syncReady = false;
+let syncStatus = 'connecting'; // 'connecting' | 'live' | 'offline'
+let syncChannel = null;
+
+// ── Low-level fetch wrappers ──────────────────────────────────
+async function dbGet(table) {
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?family_id=eq.${FAMILY_ID}`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
+    });
+    if (!r.ok) return null;
+    const rows = await r.json();
+    return rows.length > 0 ? rows[0] : null;
+  } catch(e) { return null; }
+}
+
+async function dbUpsert(table, data) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ family_id: FAMILY_ID, ...data, updated_at: new Date().toISOString() })
+    });
+  } catch(e) { console.warn('Sync write failed:', e); }
+}
+
+// ── Realtime subscription (Supabase Realtime) ────────────────
+function startRealtimeSync() {
+  // Poll every 8 seconds as a lightweight realtime alternative
+  // (Full websocket realtime requires Supabase JS SDK — polling works great here)
+  if (window._syncPollInterval) clearInterval(window._syncPollInterval);
+  window._syncPollInterval = setInterval(async () => {
+    await pullAll(false);
+  }, 8000);
+}
+
+// ── PUSH: write a key to Supabase ────────────────────────────
+async function syncPush(key, value) {
+  if (!syncReady) return;
+  await dbUpsert('gg_sync', { key, value: JSON.stringify(value) });
+}
+
+// ── PULL: read everything from Supabase ──────────────────────
+async function pullAll(applyRender = true) {
+  try {
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/gg_sync?family_id=eq.${FAMILY_ID}&select=key,value`,
+      { headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY } }
+    );
+    if (!r.ok) { setSyncStatus('offline'); return; }
+    const rows = await r.json();
+    if (!Array.isArray(rows)) return;
+
+    rows.forEach(row => {
+      try {
+        const val = JSON.parse(row.value);
+        applySyncedValue(row.key, val);
+      } catch(e) {}
+    });
+
+    setSyncStatus('live');
+    if (applyRender) renderPage(currentPage);
+  } catch(e) {
+    setSyncStatus('offline');
+  }
+}
+
+function applySyncedValue(key, val) {
+  const map = {
+    bills:           v => { bills = v; },
+    budgetItems:     v => { budgetItems = v; },
+    savingsGoals:    v => { savingsGoals = v; },
+    groceryList:     v => { groceryList = v; },
+    tasks:           v => { tasks = v; },
+    journalEntries:  v => { journalEntries = v; },
+    bibleNotes:      v => { bibleNotes = v; },
+    spicySuggestions:v => { spicySuggestions = v; },
+    memories:        v => { memories = v; },
+    plannedDates:    v => { plannedDates = v; },
+    dateIdeas:       v => { dateIdeas = v; },
+    cleanYou:        v => { cleanYou = v; },
+    kidScheduleToday:v => { kidScheduleToday = v; },
+    bibleReadings:   v => { bibleReadings = v; },
+    journalPins:     v => { journalPins = v; },
+    kidNames:        v => { window._kid1Name=v.name1; window._kid1Age=v.age1; window._kid2Name=v.name2; window._kid2Age=v.age2; },
+  };
+  if (map[key]) map[key](val);
+}
+
+// ── Status indicator ─────────────────────────────────────────
+function setSyncStatus(status) {
+  syncStatus = status;
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  if (!dot || !lbl) return;
+  const states = {
+    connecting: { color: '#ffd32a', text: 'Connecting…' },
+    live:       { color: '#20bf6b', text: 'Synced ✓' },
+    offline:    { color: '#ff6b6b', text: 'Offline' }
+  };
+  const s = states[status] || states.offline;
+  dot.style.background = s.color;
+  lbl.textContent = s.text;
+}
+
+// ── Init ─────────────────────────────────────────────────────
+async function initSync() {
+  setSyncStatus('connecting');
+  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+    setSyncStatus('offline');
+    syncReady = false;
+    return;
+  }
+  await pullAll(true);
+  syncReady = true;
+  startRealtimeSync();
+}
+
+// ── Wrapped push helpers (call these after any data change) ──
+function syncBills()            { syncPush('bills', bills); }
+function syncBudget()           { syncPush('budgetItems', budgetItems); syncPush('savingsGoals', savingsGoals); }
+function syncGrocery()          { syncPush('groceryList', groceryList); }
+function syncTasks()            { syncPush('tasks', tasks); }
+function syncJournal()          { syncPush('journalEntries', journalEntries); }
+function syncBibleNotes()       { syncPush('bibleNotes', bibleNotes); }
+function syncSuggestions()      { syncPush('spicySuggestions', spicySuggestions); }
+function syncMemories()         { syncPush('memories', memories); syncPush('plannedDates', plannedDates); syncPush('dateIdeas', dateIdeas); }
+function syncKids()             { syncPush('kidScheduleToday', kidScheduleToday); syncPush('kidNames', {name1:window._kid1Name,age1:window._kid1Age,name2:window._kid2Name,age2:window._kid2Age}); }
+function syncBibleReadings()    { syncPush('bibleReadings', bibleReadings); }
+function syncPins()             { syncPush('journalPins', journalPins); }
+function syncClean()            { syncPush('cleanYou', cleanYou); }
+// ═══════════════════════════════════════════════════════════════
+// END SYNC LAYER
+// ═══════════════════════════════════════════════════════════════
+
+initSync();
+renderHome();
+renderBible();
+</script>
+</body>
+</html>
