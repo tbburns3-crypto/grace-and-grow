@@ -432,7 +432,8 @@ function getEasternNow(){
 let mode='you',darkMode=false,currentPage='home',currentCleanStep=0;
 let cleanTimerSecs=300,cleanTimerFull=300,cleanTimerInt=null,cleanTimerOn=false;
 let homeTimerSecs=300,homeTimerFull=300,homeTimerInt=null,homeTimerOn=false;
-let mealTab='breakfast',budgetTab='spending',dateTab='ideas',kidsTab='today',spicyTab='her',outingTab='free';
+let mealTab='breakfast',budgetTab='spending',dateTab='ideas',kidsTab='today',spicyTab='him',outingTab='free';
+let bibleStreak=0,streakLastDate='',devotDoneDate='';
 function $(id){return document.getElementById(id)}
 function fmtTime(sec){const m=Math.floor(sec/60),s=sec%60;return m+':'+(s<10?'0':'')+s}
 function toggleDark(){darkMode=!darkMode;document.body.toggleAttribute('data-dark',darkMode);$('dark-btn').textContent=darkMode?'☀️':'🌙';}
@@ -876,7 +877,7 @@ function renderHomeBible(){
   el.innerHTML='<div class="ct">📖 Today\'s readings</div>'+bibleReadings.map((r,i)=>'<div class="crow" onclick="toggleReading('+i+')"><div class="cbox '+(r.chk?'chk':'')+'">  '+(r.chk?'✓':'')+'</div><div style="flex:1"><div class="clbl '+(r.chk?'done':'')+'">'+r.l+'</div><div class="csub">'+r.t+'</div></div><div class="badge '+(r.p==='Both'?'bboth':r.p==='Her'?'bher':'bhis')+'">'+r.p+'</div></div>').join('');
 }
 function renderHomeBills(){const el=$('home-bills');if(!el)return;el.innerHTML='<div class="ct">📋 Upcoming</div>'+bills.filter(b=>b.status!=='paid').slice(0,3).map(b=>'<div class="bill-row"><div class="bill-icon" style="background:var(--s2)">'+b.icon+'</div><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">'+b.name+'</div><div style="font-size:11px;color:var(--text3);font-weight:600">Due '+b.due+'</div></div><div style="font-size:14px;font-weight:900;color:var(--text)">'+b.amount+'</div></div>').join('');}
-function toggleReading(i){ensureReadings();bibleReadings[i].chk=!bibleReadings[i].chk;syncBibleReadings();renderHomeBible();renderBible();}
+function toggleReading(i){ensureReadings();bibleReadings[i].chk=!bibleReadings[i].chk;syncBibleReadings();renderHomeBible();renderBible();tryIncrementStreak();}
 
 let bibleMainTab='plan';
 function setBibleTab(t){
@@ -891,8 +892,10 @@ function setBibleTab(t){
 function renderBible(){
   ensureReadings();
   const done=bibleReadings.filter(r=>r.chk).length;
-  const dayIdx=getPlanDayIndex()+1;
-  const sn=$('streak-n');if(sn)sn.textContent=done+12;
+  const dayIdx=(function(){const s=new Date('2026-04-01');const t=new Date();t.setHours(0,0,0,0);return Math.max(1,Math.floor((t-s)/(1000*60*60*24))+1);})();
+  checkStreakReset();
+  const streakStart=new Date('2026-04-01');const todayD=new Date();todayD.setHours(0,0,0,0);const dayNum=Math.max(1,Math.floor((todayD-streakStart)/(1000*60*60*24))+1);
+  const sn=$('streak-n');if(sn)sn.textContent=bibleStreak;
   const bd=$('bible-dn');if(bd)bd.textContent=done;
   const dn=$('plan-day-n');if(dn)dn.textContent=dayIdx;
   const el=$('bible-card');if(!el)return;
@@ -907,32 +910,54 @@ function renderBible(){
   const ds=$('devot-source');if(ds)ds.textContent=day.devotSource+' \u00b7 '+readingPlan.length+'-day plan';
   const db=$('devot-btn');if(db){db.textContent='We did this together \u2713';db.disabled=false;db.style.background='linear-gradient(135deg,var(--pink),var(--purple))';}
 }
-function markDevotional(){const btn=$('devot-btn');if(!btn)return;btn.textContent='Blessed together! \uD83D\uDE4F\uD83C\uDFFE\uD83D\uDC95';btn.disabled=true;btn.style.background='linear-gradient(135deg,var(--mint),var(--teal))';}
+
+function checkStreakReset(){
+  if(!streakLastDate||!bibleStreak)return;
+  const yesterday=new Date(Date.now()-86400000).toLocaleDateString();
+  const today=new Date().toLocaleDateString();
+  if(streakLastDate!==today&&streakLastDate!==yesterday){
+    bibleStreak=0;streakLastDate='';syncStreak();
+  }
+}
+function tryIncrementStreak(){
+  const today=new Date().toLocaleDateString();
+  if(streakLastDate===today)return;
+  const allDone=bibleReadings.length>0&&bibleReadings.every(r=>r.chk);
+  const devotDone=devotDoneDate===today;
+  if(allDone&&devotDone){
+    bibleStreak+=1;streakLastDate=today;syncStreak();renderBible();
+  }
+}
+function markDevotional(){const btn=$('devot-btn');if(!btn)return;btn.textContent='Blessed together! 🙏🏾💕';btn.disabled=true;btn.style.background='linear-gradient(135deg,var(--mint),var(--teal))';devotDoneDate=new Date().toLocaleDateString();tryIncrementStreak();syncStreak();}
 
 // ── KJV BIBLE READER ─────────────────────────────────────────
 let readerTranslation = 'KJV';
 
 // ── SEQUENTIAL BIBLE PLAN ────────────────────────────────────────
 const BIBLE_BOOK_ORDER = [
-  'Genesis','Exodus','Leviticus','Numbers','Deuteronomy',
-  'Joshua','Judges','Ruth','1 Samuel','2 Samuel',
-  '1 Kings','2 Kings','1 Chronicles','2 Chronicles',
-  'Ezra','Nehemiah','Esther','Job','Psalms','Proverbs',
-  'Ecclesiastes','Song of Solomon','Isaiah','Jeremiah',
-  'Lamentations','Ezekiel','Daniel','Hosea','Joel',
-  'Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk',
-  'Zephaniah','Haggai','Zechariah','Malachi',
-  'Matthew','Mark','Luke','John','Acts',
-  'Romans','1 Corinthians','2 Corinthians','Galatians',
-  'Ephesians','Philippians','Colossians','1 Thessalonians',
-  '2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon',
-  'Hebrews','James','1 Peter','2 Peter','1 John','2 John',
-  '3 John','Jude','Revelation'
-];
+  // Gospels first, then mix OT history / NT letters / Poetry / Prophets
+  'Matthew','Genesis','Psalms','Romans',
+  'Exodus','Mark','Proverbs','Acts',
+  'Luke','Leviticus','Job','1 Corinthians',
+  'John','Numbers','Ecclesiastes','2 Corinthians',
+  'Joshua','Galatians','Deuteronomy','Ephesians',
+  'Judges','Philippians','1 Samuel','Colossians',
+  '2 Samuel','1 Thessalonians','1 Kings','2 Thessalonians',
+  '2 Kings','1 Timothy','Isaiah','2 Timothy',
+  'Jeremiah','Titus','1 Chronicles','Philemon',
+  '2 Chronicles','Hebrews','Ezra','James',
+  'Nehemiah','1 Peter','Esther','2 Peter',
+  'Ruth','1 John','Daniel','2 John',
+  'Lamentations','3 John','Ezekiel','Jude',
+  'Revelation','Song of Solomon','Hosea','Joel',
+  'Amos','Obadiah','Jonah','Micah',
+  'Nahum','Habakkuk','Zephaniah','Haggai',
+  'Zechariah','Malachi',
+]
 function getTotalBibleChapters(){
   return BIBLE_BOOK_ORDER.reduce((s,b)=>s+(KJV_BOOKS[b]||0),0);
 }
-const BIBLE_SEQ_START = '2023-08-16'; // Day 1 = Genesis 1; today (Apr 15 2026) = Luke 1
+const BIBLE_SEQ_START = '2025-04-21'; // Mixed order; day 359 = Luke 1 on Apr 15 2026
 function getBibleChapterOfDay(){
   const parts=BIBLE_SEQ_START.split('-').map(Number);
   const start=new Date(parts[0],parts[1]-1,parts[2]);
@@ -970,6 +995,9 @@ const KJV_BOOKS = {
   'Hebrews':13,'James':5,'1 Peter':5,'2 Peter':3,'1 John':5,'2 John':1,
   '3 John':1,'Jude':1,'Revelation':22
 };
+// Map each book to its canonical number (bolls.life API uses 1-66)
+const BOLLS_BOOK_NUM = {};
+(function(){const canon=['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','Song of Solomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi','Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation'];canon.forEach((b,i)=>BOLLS_BOOK_NUM[b]=i+1);})();
 const OT_BOOKS = ['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','Song of Solomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi'];
 const NT_BOOKS = ['Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation'];
 
@@ -1092,27 +1120,24 @@ async function renderBibleReader() {
   const textEl = $('bible-reader-text');
   if (!textEl) return;
 
-  if (readerTranslation === 'KJV') {
-    try {
-      const bookQ = encodeURIComponent(readerBook + ' ' + readerChapter);
-      const resp = await fetch('https://bible-api.com/' + bookQ + '?translation=kjv');
-      if (!resp.ok) throw new Error('fetch failed');
-      const data = await resp.json();
-      if (data.verses && data.verses.length > 0) {
-        textEl.innerHTML = data.verses.map(v =>
-          '<div style="display:flex;gap:10px;padding:8px 4px;margin-bottom:2px">'
-          + '<span style="font-size:10px;font-weight:900;color:var(--purple);min-width:22px;padding-top:3px">' + v.verse + '</span>'
-          + '<span style="font-family:var(--serif);font-size:15px;color:var(--text);line-height:1.85">' + v.text.trim() + '</span>'
-          + '</div>'
-        ).join('') + '<div style="text-align:center;padding:12px 0;font-size:11px;color:var(--text3);font-weight:600">King James Version · Public Domain</div>';
-      } else { throw new Error('no verses'); }
-    } catch(e) {
-      const bgUrl = 'https://www.biblegateway.com/passage/?search=' + encodeURIComponent(readerBook + ' ' + readerChapter) + '&version=KJV';
-      textEl.innerHTML = '<div style="text-align:center;padding:24px 16px"><div style="font-size:28px;margin-bottom:8px">📖</div><div style="font-size:13px;color:var(--text2);font-weight:600;margin-bottom:14px">Couldn\u2019t load KJV \u2014 check your connection</div><a href="' + bgUrl + '" target="_blank" style="padding:10px 22px;border-radius:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:13px;font-weight:800;text-decoration:none">Read KJV on Bible Gateway ↗</a></div>';
-    }
-  } else {
+  // Fetch via bolls.life (supports KJV, NKJV, NIV, CSB natively — no API key required)
+  try {
+    const bookNum = BOLLS_BOOK_NUM[readerBook] || 1;
+    const url = 'https://bolls.life/get-chapter/' + readerTranslation + '/' + bookNum + '/' + readerChapter + '/';
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('bolls ' + resp.status);
+    const verses = await resp.json();
+    if (!Array.isArray(verses) || verses.length === 0) throw new Error('empty');
+    const labels = {KJV:'King James Version · Public Domain',NKJV:'New King James Version',NIV:'New International Version',CSB:'Christian Standard Bible'};
+    textEl.innerHTML = verses.map(v =>
+      '<div style="display:flex;gap:10px;padding:8px 4px;margin-bottom:2px">'
+      + '<span style="font-size:10px;font-weight:900;color:var(--purple);min-width:22px;padding-top:3px">' + v.verse + '</span>'
+      + '<span style="font-family:var(--serif);font-size:15px;color:var(--text);line-height:1.85">' + v.text.trim() + '</span>'
+      + '</div>'
+    ).join('') + '<div style="text-align:center;padding:12px 0;font-size:11px;color:var(--text3);font-weight:600">' + (labels[readerTranslation]||readerTranslation) + '</div>';
+  } catch(e) {
     const bgUrl = 'https://www.biblegateway.com/passage/?search=' + encodeURIComponent(readerBook + ' ' + readerChapter) + '&version=' + readerTranslation;
-    textEl.innerHTML = '<div style="text-align:center;padding:30px 16px"><div style="font-size:36px;margin-bottom:10px">📖</div><div style="font-family:var(--serif);font-size:19px;font-weight:700;color:var(--text);margin-bottom:4px">' + readerBook + ' ' + readerChapter + '</div><div style="font-size:12px;color:var(--text2);font-weight:700;margin-bottom:18px;letter-spacing:.5px">' + readerTranslation + '</div><a href="' + bgUrl + '" target="_blank" style="display:inline-block;padding:12px 26px;border-radius:24px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:14px;font-weight:800;text-decoration:none">Read ' + readerTranslation + ' on Bible Gateway ↗</a><div style="font-size:11px;color:var(--text3);margin-top:14px;font-weight:600">Opens in a new tab · Free on biblegateway.com</div></div>';
+    textEl.innerHTML = '<div style="text-align:center;padding:24px 16px"><div style="font-size:28px;margin-bottom:8px">📖</div><div style="font-size:13px;color:var(--text2);font-weight:600;margin-bottom:14px">Couldn’t load ' + readerTranslation + ' — check your connection</div><a href="' + bgUrl + '" target="_blank" style="padding:10px 22px;border-radius:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:13px;font-weight:800;text-decoration:none">Open on Bible Gateway ↗</a></div>';
   }
 }
 
@@ -1620,13 +1645,27 @@ function addGratitude() {
 function deleteJournalEntry(i) { journalEntries[mode].splice(i, 1); syncJournal();renderJournalContent(); }
 
 
-function setSpicyTab(t){spicyTab=t;$('stab-him').classList.toggle('active',t==='him');$('stab-tog').classList.toggle('active',t==='together');$('stab-her').classList.toggle('active',t==='her');$('stab-sug').classList.toggle('active',t==='suggest');renderSpicy(t);}
+function setSpicyTab(t){renderSpicy(t);}
 // Suggestions store: {from:'you'|'him', text:string, mood:string, revealed:bool}
 let spicySuggestions = [];
 let suggestRevealed = false;
 
 function renderSpicy(t){
   const el=$('spicy-content');if(!el)return;
+  // Hide the tab that shows your own gender — each person sees the opposite + Together + Suggest
+  const isHer=mode==='you';
+  const himT=$('stab-him'),herT=$('stab-her');
+  if(himT)himT.style.display=isHer?'':'none';
+  if(herT)herT.style.display=isHer?'none':'';
+  // Redirect to valid tab if on hidden one
+  if(t==='her'&&isHer)t='him';
+  if(t==='him'&&!isHer)t='her';
+  spicyTab=t;
+  if(himT)himT.classList.toggle('active',t==='him');
+  if(herT)herT.classList.toggle('active',t==='her');
+  const togT=$('stab-tog'),sugT=$('stab-sug');
+  if(togT)togT.classList.toggle('active',t==='together');
+  if(sugT)sugT.classList.toggle('active',t==='suggest');
   if(t==='him'){
     if(mode==='you'){
       el.innerHTML='<div style="font-size:13px;color:var(--text2);font-weight:700;margin-bottom:12px;line-height:1.6;padding:12px;background:var(--purple-bg);border-radius:var(--r-sm);border-left:4px solid var(--purple)">💜 <strong>Surprise ideas for him to do for you</strong> — share this tab with him and let him pick something special.</div>'+spicyHer.map(s=>'<div class="spicy-card spicy-her"><div class="spicy-label" style="color:var(--purple)">'+s.label+'</div><div class="spicy-title">'+s.title+'</div><div class="spicy-desc">'+s.desc+'</div></div>').join('');
@@ -2164,6 +2203,7 @@ function applySyncedValue(key, val) {
     kidScheduleToday:v => { kidScheduleToday = v; },
     bibleReadings:   v => { const td=new Date().toLocaleDateString(); if(Array.isArray(v)){bibleReadings=getBibleReadings();_readingDate=td;}else if(v&&v.date===td&&Array.isArray(v.readings)){bibleReadings=v.readings;_readingDate=td;}else{bibleReadings=getBibleReadings();_readingDate=td;} },
     journalPins:     v => { journalPins = v; },
+    bibleStreak:    v => { if(v&&typeof v.streak==='number'){bibleStreak=v.streak;streakLastDate=v.lastDate||'';devotDoneDate=v.devotDate||'';} },
     kidNames:        v => { window._kid1Name=v.name1; window._kid1Age=v.age1; window._kid2Name=v.name2; window._kid2Age=v.age2; },
   };
   if (map[key]) map[key](val);
@@ -2209,6 +2249,7 @@ function syncSuggestions()      { syncPush('spicySuggestions', spicySuggestions)
 function syncMemories()         { syncPush('memories', memories); syncPush('plannedDates', plannedDates); syncPush('dateIdeas', dateIdeas); }
 function syncKids()             { syncPush('kidScheduleToday', kidScheduleToday); syncPush('kidNames', {name1:window._kid1Name,age1:window._kid1Age,name2:window._kid2Name,age2:window._kid2Age}); }
 function syncBibleReadings()    { syncPush('bibleReadings', {date:new Date().toLocaleDateString(),readings:bibleReadings}); }
+function syncStreak()           { syncPush('bibleStreak', {streak:bibleStreak,lastDate:streakLastDate,devotDate:devotDoneDate}); }
 function syncPins()             { syncPush('journalPins', journalPins); }
 function syncClean()            { syncPush('cleanYou', {date:new Date().toLocaleDateString(),tasks:cleanYou}); }
 // ═══════════════════════════════════════════════════════════════
