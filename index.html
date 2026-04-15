@@ -932,8 +932,9 @@ const BIBLE_BOOK_ORDER = [
 function getTotalBibleChapters(){
   return BIBLE_BOOK_ORDER.reduce((s,b)=>s+(KJV_BOOKS[b]||0),0);
 }
+const BIBLE_SEQ_START = '2023-08-16'; // Day 1 = Genesis 1; today (Apr 15 2026) = Luke 1
 function getBibleChapterOfDay(){
-  const parts=PLAN_START.split('-').map(Number);
+  const parts=BIBLE_SEQ_START.split('-').map(Number);
   const start=new Date(parts[0],parts[1]-1,parts[2]);
   const today=new Date();today.setHours(0,0,0,0);
   const dayNum=Math.max(0,Math.floor((today-start)/(1000*60*60*24)));
