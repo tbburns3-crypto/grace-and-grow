@@ -1027,7 +1027,7 @@ async function renderBibleReader() {
     '<button onclick="readerChapter=' + ch + ';renderBibleReader()" style="min-width:36px;height:36px;border-radius:50%;border:2px solid ' + (ch===readerChapter?'transparent':'var(--border2)') + ';background:' + (ch===readerChapter?'linear-gradient(135deg,var(--purple),var(--pink))':'transparent') + ';color:' + (ch===readerChapter?'white':'var(--text2)') + ';font-size:12px;font-weight:800;cursor:pointer;font-family:var(--sans)">' + ch + '</button>'
   ).join('');
   const transBtns = ['KJV','NKJV','NIV','CSB'].map(t =>
-    '<button onclick="readerTranslation='' + t + '';renderBibleReader()" style="padding:6px 14px;border-radius:20px;border:2px solid ' + (t===readerTranslation?'var(--purple)':'var(--border2)') + ';background:' + (t===readerTranslation?'var(--purple)':'transparent') + ';color:' + (t===readerTranslation?'white':'var(--text2)') + ';font-size:11px;font-weight:800;cursor:pointer;font-family:var(--sans);transition:all .15s">' + t + '</button>'
+    '<button onclick="readerTranslation=\'' + t + '\';renderBibleReader()" style="padding:6px 14px;border-radius:20px;border:2px solid ' + (t===readerTranslation?'var(--purple)':'var(--border2)') + ';background:' + (t===readerTranslation?'var(--purple)':'transparent') + ';color:' + (t===readerTranslation?'white':'var(--text2)') + ';font-size:11px;font-weight:800;cursor:pointer;font-family:var(--sans);transition:all .15s">' + t + '</button>'
   ).join('');
 
   const notesHtml = Object.keys(bibleNotes).length > 0
@@ -1039,9 +1039,9 @@ async function renderBibleReader() {
 
   el.innerHTML =
     '<div style="background:linear-gradient(135deg,#667eea22,#764ba222);border:2px solid var(--border);border-radius:var(--r);padding:13px;margin-bottom:13px">'
-    + '<div style="font-size:10px;font-weight:900;color:var(--purple);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">📅 Today's chapter — Day ' + todayRef.dayNum + ' of ' + todayRef.total + '</div>'
+    + '<div style="font-size:10px;font-weight:900;color:var(--purple);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">📅 Today\'s chapter \u2014 Day ' + todayRef.dayNum + ' of ' + todayRef.total + '</div>'
     + '<div style="font-family:var(--serif);font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px">' + todayRef.book + ' ' + todayRef.chapter + '</div>'
-    + '<button onclick="readerBook='' + todayRef.book + '';readerChapter=' + todayRef.chapter + ';renderBibleReader()" style="padding:8px 20px;border-radius:20px;border:none;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--sans)">Read today's chapter →</button>'
+    + '<button onclick="readerBook=\'' + todayRef.book + '\';readerChapter=' + todayRef.chapter + ';renderBibleReader()" style="padding:8px 20px;border-radius:20px;border:none;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--sans)">Read today\u2019s chapter \u2192</button>'
     + '</div>'
     + '<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">'
     + '<select onchange="readerBook=this.value;readerChapter=1;renderBibleReader()" style="flex:1;border:2px solid var(--border2);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:700;color:var(--text);background:var(--surface);outline:none"><optgroup label="Old Testament">' + otOptions + '</optgroup><optgroup label="New Testament">' + ntOptions + '</optgroup></select>'
@@ -1054,7 +1054,7 @@ async function renderBibleReader() {
     + '<div id="bible-reader-text" style="background:var(--surface);border:2px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px"><div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Loading ' + readerTranslation + '…</div></div>'
     + '<div class="sl" style="color:var(--purple)">📝 Notes — ' + readerBook + ' ' + readerChapter + '</div>'
     + '<textarea id="bible-note-input" placeholder="Write your thoughts, prayers, or reflections on this chapter..." style="width:100%;border:2px solid var(--border2);border-radius:var(--r-sm);padding:12px;font-family:var(--serif);font-size:13px;color:var(--text);background:var(--surface);resize:none;min-height:90px;outline:none;line-height:1.6;margin-bottom:8px">' + note + '</textarea>'
-    + '<button onclick="saveBibleNote('' + notesKey + '')" style="padding:10px 22px;border-radius:20px;border:none;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--sans)">Save note 💜</button>'
+    + '<button onclick="saveBibleNote(\'' + notesKey + '\')" style="padding:10px 22px;border-radius:20px;border:none;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--sans)">Save note \uD83D\uDC9C</button>'
     + notesHtml;
 
   const textEl = $('bible-reader-text');
@@ -1076,14 +1076,12 @@ async function renderBibleReader() {
       } else { throw new Error('no verses'); }
     } catch(e) {
       const bgUrl = 'https://www.biblegateway.com/passage/?search=' + encodeURIComponent(readerBook + ' ' + readerChapter) + '&version=KJV';
-      textEl.innerHTML = '<div style="text-align:center;padding:24px 16px"><div style="font-size:28px;margin-bottom:8px">📖</div><div style="font-size:13px;color:var(--text2);font-weight:600;margin-bottom:14px">Couldn't load KJV — check your connection</div><a href="' + bgUrl + '" target="_blank" style="padding:10px 22px;border-radius:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:13px;font-weight:800;text-decoration:none">Read KJV on Bible Gateway ↗</a></div>';
+      textEl.innerHTML = '<div style="text-align:center;padding:24px 16px"><div style="font-size:28px;margin-bottom:8px">📖</div><div style="font-size:13px;color:var(--text2);font-weight:600;margin-bottom:14px">Couldn\u2019t load KJV \u2014 check your connection</div><a href="' + bgUrl + '" target="_blank" style="padding:10px 22px;border-radius:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:13px;font-weight:800;text-decoration:none">Read KJV on Bible Gateway ↗</a></div>';
     }
   } else {
     const bgUrl = 'https://www.biblegateway.com/passage/?search=' + encodeURIComponent(readerBook + ' ' + readerChapter) + '&version=' + readerTranslation;
     textEl.innerHTML = '<div style="text-align:center;padding:30px 16px"><div style="font-size:36px;margin-bottom:10px">📖</div><div style="font-family:var(--serif);font-size:19px;font-weight:700;color:var(--text);margin-bottom:4px">' + readerBook + ' ' + readerChapter + '</div><div style="font-size:12px;color:var(--text2);font-weight:700;margin-bottom:18px;letter-spacing:.5px">' + readerTranslation + '</div><a href="' + bgUrl + '" target="_blank" style="display:inline-block;padding:12px 26px;border-radius:24px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:14px;font-weight:800;text-decoration:none">Read ' + readerTranslation + ' on Bible Gateway ↗</a><div style="font-size:11px;color:var(--text3);margin-top:14px;font-weight:600">Opens in a new tab · Free on biblegateway.com</div></div>';
   }
-}
-
 }
 
 function toggleHighlight(key) {
