@@ -1142,7 +1142,7 @@ async function renderBibleReader() {
   const chBtns = Array.from({length: maxCh}, (_,i) => i+1).map(ch =>
     '<button onclick="readerChapter=' + ch + ';renderBibleReader()" style="min-width:36px;height:36px;border-radius:50%;border:2px solid ' + (ch===readerChapter?'transparent':'var(--border2)') + ';background:' + (ch===readerChapter?'linear-gradient(135deg,var(--purple),var(--pink))':'transparent') + ';color:' + (ch===readerChapter?'white':'var(--text2)') + ';font-size:12px;font-weight:800;cursor:pointer;font-family:var(--sans)">' + ch + '</button>'
   ).join('');
-  const transBtns = ['KJV','NKJV','NIV','CSB'].map(t =>
+  const transBtns = ['KJV','NKJV','NIV','ESV'].map(t =>
     '<button onclick="readerTranslation=\'' + t + '\';renderBibleReader()" style="padding:6px 14px;border-radius:20px;border:2px solid ' + (t===readerTranslation?'var(--purple)':'var(--border2)') + ';background:' + (t===readerTranslation?'var(--purple)':'transparent') + ';color:' + (t===readerTranslation?'white':'var(--text2)') + ';font-size:11px;font-weight:800;cursor:pointer;font-family:var(--sans);transition:all .15s">' + t + '</button>'
   ).join('');
 
@@ -1196,8 +1196,8 @@ async function renderBibleReader() {
       textEl.innerHTML = '<div style="text-align:center;padding:24px 16px"><div style="font-size:28px;margin-bottom:8px">📖</div><div style="font-size:13px;color:var(--text2);font-weight:600;margin-bottom:14px">Couldn’t load KJV — check your connection</div><a href="' + bgUrl + '" target="_blank" style="padding:10px 22px;border-radius:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:13px;font-weight:800;text-decoration:none">Open on Bible Gateway ↗</a></div>';
     }
   } else {
-    const bollsCode = readerTranslation === 'CSB' ? 'HCSB' : readerTranslation;
-    const dispLabel = {NKJV:'New King James Version', NIV:'New International Version', CSB:'Christian Standard Bible'};
+    const bollsCode = readerTranslation;
+    const dispLabel = {NKJV:'New King James Version', NIV:'New International Version', ESV:'English Standard Version'};
     try {
       const bookNum = BOLLS_BOOK_NUM[readerBook] || 1;
       const url = 'https://bolls.life/get-chapter/' + bollsCode + '/' + bookNum + '/' + readerChapter + '/';
@@ -1205,7 +1205,7 @@ async function renderBibleReader() {
       if (!resp.ok) throw new Error('bolls ' + resp.status);
       const verses = await resp.json();
       if (!Array.isArray(verses) || verses.length === 0) throw new Error('empty');
-      const clean = t => t.replace(/<[^>]*>/g,'').replace(/d+/g,'').replace(/s+/g,' ').trim();
+      const clean = t => t.replace(/<[^>]*>/g,'').replace(/\d+/g,'').replace(/\s+/g,' ').trim();
       textEl.innerHTML = verses.map(v =>
         '<div style="display:flex;gap:10px;padding:8px 4px;margin-bottom:2px">'
         + '<span style="font-size:10px;font-weight:900;color:var(--purple);min-width:22px;padding-top:3px">' + v.verse + '</span>'
