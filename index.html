@@ -549,15 +549,83 @@ const kidsMeals=[
   {name:'Butter Noodles',icon:'🍜',desc:'Plain pasta with butter and a little parmesan — universally loved',sides:'Hidden veggie puree in the butter',safe:true},
   {name:'Grilled Cheese',icon:'✨',desc:'Golden buttery grilled cheese cut into triangles for dipping',sides:'Tomato soup for dipping on brave days!',adventurous:true},
 ];
-let cleanYou=[
-  {t:'Pick up 5 things off the floor',time:'5 min',d:'Just 5. Count them out loud. Nothing else. 💜',dur:300},
-  {t:'Wipe the kitchen counter',time:'5 min',d:'One cloth, left to right. Done.',dur:300},
-  {t:'Take out the trash',time:'3 min',d:'Bag out, new bag in. That\'s it! ✨',dur:180},
-  {t:'Sweep the entryway',time:'5 min',d:'Just the entry. You\'re doing so well.',dur:300},
-  {t:'Start one load of laundry',time:'5 min',d:'Press start and walk away. 🎉',dur:300},
-  {t:'Wipe bathroom sink & mirror',time:'5 min',d:'Quick wipe. You got this! 💪🏾🏾',dur:300},
-  {t:'Clear one surface completely',time:'10 min',d:'One table or counter — totally cleared. That\'s huge!',dur:600},
-];
+// ── HER DAILY CLEANING SCHEDULE (rotates by day of week) ────────
+const cleanYouSchedule = {
+  Sun:[
+    {t:'Make all beds',time:'5 min',d:'Start the day fresh — shake it out 💜',dur:300},
+    {t:'Sort & start all laundry',time:'10 min',d:'Sort, load, press start. Let it run while you move.',dur:600},
+    {t:'Declutter one drawer',time:'10 min',d:'Pick ONE drawer. Empty it. Only put back what belongs.',dur:600},
+    {t:'Clean blinds',time:'10 min',d:'Top to bottom, each slat. Put on music first!',dur:600},
+    {t:'Clean pet area',time:'5 min',d:'Fresh water, clean bowl, tidy their space 🐾',dur:300},
+    {t:'Rotate or flip mattress',time:'10 min',d:'Flip or rotate — ask him to help if needed!',dur:600},
+    {t:'Wash dishes & wipe sink',time:'5 min',d:'Clear the kitchen, close out your Sunday clean.',dur:300},
+  ],
+  Mon:[
+    {t:'Make all beds',time:'5 min',d:'Start in the bedrooms. Smooth it out, fluff the pillows.',dur:300},
+    {t:'Declutter all bedrooms',time:'10 min',d:'One room at a time. Floor, surfaces, nothing out of place.',dur:600},
+    {t:'Dust bedroom furniture',time:'10 min',d:'Dresser, headboard, nightstands — one cloth, top to bottom.',dur:600},
+    {t:'Tidy both nightstands',time:'5 min',d:'Clear them. Only what belongs. Fresh feel.',dur:300},
+    {t:'Organize one closet shelf',time:'10 min',d:'Just one shelf — fold, sort, done.',dur:600},
+    {t:'Vacuum bedroom floors',time:'10 min',d:"Under the bed too. You've got this!",dur:600},
+    {t:'Wash dishes & wipe counter',time:'5 min',d:'Close out Monday strong 💜',dur:300},
+  ],
+  Tue:[
+    {t:'Pick up & put away',time:'5 min',d:'Walk the room. Anything out of place — put it away now.',dur:300},
+    {t:'Wipe TV & electronics',time:'5 min',d:'Microfiber cloth, gentle wipes. No streaks!',dur:300},
+    {t:'Vacuum sofas & chairs',time:'10 min',d:'Remove cushions, vacuum underneath too.',dur:600},
+    {t:'Fluff pillows & cushions',time:'3 min',d:'Plump them up! The whole vibe changes.',dur:180},
+    {t:'Dust shelves & decor',time:'10 min',d:"Top shelf down. Don't skip the corners.",dur:600},
+    {t:'Lightly scent the room',time:'3 min',d:'Candle, spray, or plug-in — make it smell like home 🕯️',dur:180},
+    {t:'Wash dishes & wipe counter',time:'5 min',d:'Quick kitchen sweep before you rest.',dur:300},
+  ],
+  Wed:[
+    {t:'Clear & wipe all counters',time:'5 min',d:"One cloth, left to right. Nothing stays that doesn't belong.",dur:300},
+    {t:'Clean stovetop',time:'10 min',d:'Remove burners if needed, wipe it all down.',dur:600},
+    {t:'Wipe all appliances',time:'10 min',d:'Microwave, toaster, fridge front — all of them.',dur:600},
+    {t:'Wipe dining table & chairs',time:'5 min',d:'Get the legs and undersides too!',dur:300},
+    {t:'Empty & clean trash bins',time:'5 min',d:'Bag out, wipe inside, fresh bag in.',dur:300},
+    {t:'Clean & dry sink',time:'5 min',d:'Scrub, rinse, dry — shiny sink = happy kitchen 🌟',dur:300},
+    {t:'Start a load of laundry',time:'5 min',d:'Press start and walk away. One thing done!',dur:300},
+  ],
+  Thu:[
+    {t:'Wipe bathroom mirrors',time:'5 min',d:'Streak-free with a microfiber. Quick and satisfying!',dur:300},
+    {t:'Scrub bathroom sinks & counters',time:'10 min',d:'Get into the corners. Rinse well, dry it off.',dur:600},
+    {t:'Clean toilet top to bottom',time:'10 min',d:"Tank, seat, bowl, base. Don't skip the base!",dur:600},
+    {t:'Scrub tub or shower',time:'15 min',d:'Full scrub — walls, floor, fixtures. Rinse thoroughly.',dur:900},
+    {t:'Replace towels & bath mat',time:'3 min',d:'Fresh towels feel like a luxury. You deserve it.',dur:180},
+    {t:'Spray bathroom air freshener',time:'2 min',d:'Clean bathroom smell = whole house feels clean 🌿',dur:120},
+    {t:'Wash dishes & wipe kitchen sink',time:'5 min',d:"Last step — you're done and you crushed it! 💜",dur:300},
+  ],
+  Fri:[
+    {t:'Tidy & organize entryway',time:'5 min',d:'Shoes, bags, coats — everything in its place.',dur:300},
+    {t:'Wipe front door & all handles',time:'5 min',d:'Door, handles, light switches — germ hotspots!',dur:300},
+    {t:'Dust furniture & decor',time:'10 min',d:'Quick pass through every room. You got this!',dur:600},
+    {t:'Vacuum all floors',time:'15 min',d:'Every room, under furniture too. Do it all at once.',dur:900},
+    {t:'Mop kitchen & bathroom floors',time:'10 min',d:'Hot water, good cleaner. Work backwards toward the door.',dur:600},
+    {t:'Start one load of laundry',time:'5 min',d:'Friday laundry = clean weekend. Press start!',dur:300},
+    {t:'Wipe counters & wash dishes',time:'5 min',d:'Close out Friday fresh. The weekend starts NOW 🎉',dur:300},
+  ],
+  Sat:[
+    {t:'10-minute full house tidy',time:'10 min',d:'Walk through every room. Pick up, put away, reset.',dur:600},
+    {t:'Sweep outdoor furniture',time:'5 min',d:'Patio chairs, table, cushions — shake them out.',dur:300},
+    {t:'Tidy cushions & covers',time:'5 min',d:'Straighten, fluff, replace any that need washing.',dur:300},
+    {t:'Clean the grill',time:'15 min',d:'Grates, inside, outside — ready for the next cookout!',dur:900},
+    {t:'Tidy garden bed or porch',time:'10 min',d:'Pull a few weeds, sweep the path, make it pretty.',dur:600},
+    {t:'Wipe dining table & chairs',time:'5 min',d:'Quick reset before the weekend really gets going.',dur:300},
+    {t:'Wash dishes & wipe counters',time:'5 min',d:'Saturday clean complete. Go enjoy the weekend! 🌟',dur:300},
+  ],
+};
+const _dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function getTodayCleanTasks(){
+  const day=_dayNames[new Date().getDay()];
+  return (cleanYouSchedule[day]||cleanYouSchedule['Mon']).map(s=>Object.assign({},s));
+}
+let _cleanDate='';
+let cleanYou=getTodayCleanTasks();
+function ensureCleanTasks(){
+  const today=new Date().toLocaleDateString();
+  if(today!==_cleanDate){_cleanDate=today;cleanYou=getTodayCleanTasks();currentCleanStep=0;}
+}
 const cleanDaily=['Make beds','Wash dishes','Open windows for fresh air','Sweep/vacuum floors','Tidy living room','Empty all trash','Laundry if needed','Dust surfaces, wipe mirrors'];
 const cleanWeekly={
   Sun:['Declutter drawers','Clean pet area','Clean blinds','Rotate/flip mattresses','Do all laundry'],
@@ -1005,6 +1073,7 @@ function saveBibleNote(key) {
 
 
 function renderClean(){
+  ensureCleanTasks();
   const el=$('clean-content');if(!el)return;
   if(mode==='you'){
     const step=cleanYou[currentCleanStep];
@@ -2008,7 +2077,7 @@ function applySyncedValue(key, val) {
     memories:        v => { memories = v; },
     plannedDates:    v => { plannedDates = v; },
     dateIdeas:       v => { dateIdeas = v; },
-    cleanYou:        v => { cleanYou = v; },
+    cleanYou:        v => { const td=new Date().toLocaleDateString(); if(v&&v.date===td&&Array.isArray(v.tasks)){cleanYou=v.tasks;_cleanDate=td;}else{cleanYou=getTodayCleanTasks();_cleanDate=td;} },
     kidScheduleToday:v => { kidScheduleToday = v; },
     bibleReadings:   v => { const td=new Date().toLocaleDateString(); if(Array.isArray(v)){bibleReadings=getBibleReadings();_readingDate=td;}else if(v&&v.date===td&&Array.isArray(v.readings)){bibleReadings=v.readings;_readingDate=td;}else{bibleReadings=getBibleReadings();_readingDate=td;} },
     journalPins:     v => { journalPins = v; },
@@ -2058,7 +2127,7 @@ function syncMemories()         { syncPush('memories', memories); syncPush('plan
 function syncKids()             { syncPush('kidScheduleToday', kidScheduleToday); syncPush('kidNames', {name1:window._kid1Name,age1:window._kid1Age,name2:window._kid2Name,age2:window._kid2Age}); }
 function syncBibleReadings()    { syncPush('bibleReadings', {date:new Date().toLocaleDateString(),readings:bibleReadings}); }
 function syncPins()             { syncPush('journalPins', journalPins); }
-function syncClean()            { syncPush('cleanYou', cleanYou); }
+function syncClean()            { syncPush('cleanYou', {date:new Date().toLocaleDateString(),tasks:cleanYou}); }
 // ═══════════════════════════════════════════════════════════════
 // END SYNC LAYER
 // ═══════════════════════════════════════════════════════════════
