@@ -307,6 +307,8 @@ function lockSubmit(){
         <div class="vr">Proverbs 31:25&nbsp;<span class="vtap">tap to refresh ✨</span></div>
       </div>
       <div id="focus-zone"></div>
+      <div class="sl" style="color:var(--orange)">Kids right now</div>
+      <div id="home-kids-activity"></div>
       <div class="sl" style="color:var(--sky)">Bible today</div>
       <div class="card card-purple" id="home-bible"></div>
       <div class="sl" style="color:var(--coral)">Bills this week</div>
@@ -669,27 +671,27 @@ const cleanWeekly={
 };
 const cleanMonthly=['Wipe kitchen cabinets','Clean microwave & appliances','Deep clean refrigerator','Disinfect all trashcans','Clean laundry room & restock','Deep clean below/behind furniture','Organize closets & drawers','Wash duvets & blankets'];
 let kidScheduleToday=[
-  {time:'7:00',name:'Wake up',detail:'Both kids',badge:'kb-meal',icon:'🌅'},
-  {time:'7:30',name:'Breakfast',detail:'Choose from safe foods',badge:'kb-meal',icon:'🥣'},
-  {time:'9:00',name:'Free play',detail:'Indoor/outdoor',badge:'kb-free',icon:'🧸'},
-  {time:'10:30',name:'Gymnastics — Jacchius',detail:'Bring water bottle & grip socks',badge:'kb-gym',icon:'🤸🏾'},
-  {time:'12:00',name:'Lunch',detail:'Safe food selection',badge:'kb-meal',icon:'🍕'},
-  {time:'1:00',name:'Nap / quiet time',detail:'Both kids rest',badge:'kb-bed',icon:'😴'},
-  {time:'3:00',name:'Dance class',detail:'Tue only · extra hair ties',badge:'kb-dance',icon:'💃🏾'},
-  {time:'5:00',name:'Snack time',detail:'Fruit + something crunchy',badge:'kb-meal',icon:'🍎'},
-  {time:'6:00',name:'Dinner',detail:'Family meal',badge:'kb-meal',icon:'🍽️'},
-  {time:'6:45',name:'Bath time',detail:'Both kids · 20 min · lavender soap',badge:'kb-bath',icon:'🛁'},
-  {time:'7:15',name:'Wind-down',detail:'Quiet book or show',badge:'kb-free',icon:'📚'},
-  {time:'7:45',name:'Bedtime',detail:'Both kids · prayers & song',badge:'kb-bed',icon:'🌙'},
+  {time:'7:00', name:'Wake up',                 detail:'Both kids',                            badge:'kb-meal', icon:'🌅'},
+  {time:'7:30', name:'Breakfast',               detail:'Choose from safe foods',               badge:'kb-meal', icon:'🥣'},
+  {time:'9:00', name:'Free play',               detail:'Indoor/outdoor',                       badge:'kb-free', icon:'🧸'},
+  {time:'12:00',name:'Lunch',                   detail:'Safe food selection',                  badge:'kb-meal', icon:'🍕'},
+  {time:'13:00',name:'Nap / quiet time',        detail:'Both kids rest',                       badge:'kb-bed',  icon:'😴'},
+  {time:'15:00',name:'Dance class',             detail:'Tue only · extra hair ties',           badge:'kb-dance',icon:'💃🏾'},
+  {time:'16:30',name:'Snack time',              detail:'Fruit + something crunchy',            badge:'kb-meal', icon:'🍎'},
+  {time:'17:30',name:'Gymnastics — Jacchius',   detail:'Bring water bottle & grip socks',      badge:'kb-gym',  icon:'🤸🏾'},
+  {time:'18:30',name:'Dinner',                  detail:'Family meal',                          badge:'kb-meal', icon:'🍽️'},
+  {time:'19:15',name:'Bath time',               detail:'Both kids · 20 min · lavender soap',  badge:'kb-bath', icon:'🛁'},
+  {time:'19:45',name:'Wind-down',               detail:'Quiet book or show',                   badge:'kb-free', icon:'📚'},
+  {time:'20:15',name:'Bedtime',                 detail:'Both kids · prayers & song',           badge:'kb-bed',  icon:'🌙'},
 ];
 const kidsWeekly=[
-  {day:'Mon',events:['School','Gymnastics 4pm','Bath 6:45','Bed 7:45']},
-  {day:'Tue',events:['School','Dance 3pm','Bath 6:45','Bed 7:45']},
-  {day:'Wed',events:['School','Free play','Bath 6:45','Bed 7:45']},
-  {day:'Thu',events:['School','Gymnastics 4pm','Bath 6:45','Bed 7:45']},
-  {day:'Fri',events:['School','Family movie','Bath 7:00','Bed 8:00']},
-  {day:'Sat',events:['Family outing','Free play','Bath 7:00','Bed 8:00']},
-  {day:'Sun',events:['Church','Family lunch','Bath 6:45','Bed 7:45']},
+  {day:'Mon',events:['School','Gymnastics 5:30pm','Bath 7:15','Bed 8:15']},
+  {day:'Tue',events:['School','Dance 3pm','Bath 7:15','Bed 8:15']},
+  {day:'Wed',events:['School','Free play','Bath 7:15','Bed 8:15']},
+  {day:'Thu',events:['School','Gymnastics 5:30pm','Bath 7:15','Bed 8:15']},
+  {day:'Fri',events:['School','Family movie','Bath 7:15','Bed 8:15']},
+  {day:'Sat',events:['Family outing','Free play','Bath 7:15','Bed 8:15']},
+  {day:'Sun',events:['Church','Family lunch','Bath 7:15','Bed 8:15']},
 ];
 let dateIdeas=[
   {e:'🎬',title:'Backyard movie night',desc:'Kids in bed, projector out, popcorn, cozy blankets',cost:'Free',cc:'cfree'},
@@ -824,7 +826,36 @@ let journalEntries={
 };
 let recipeIdx={breakfast:0,lunch:0,dinner:0};
 
-function renderHome(){renderFocusZone();renderHomeBible();renderHomeBills();}
+function renderHome(){renderFocusZone();renderHomeKids();renderHomeBible();renderHomeBills();}
+function renderHomeKids(){
+  const el=$('home-kids-activity');if(!el)return;
+  const scheduleColors={'kb-meal':'#ff9f43','kb-free':'#20bf6b','kb-gym':'#f953c6','kb-bed':'#54a0ff','kb-dance':'#a55eea','kb-bath':'#00d2d3'};
+  function toHrsH(t){const[h,m]=t.split(':').map(Number);return h+m/60;}
+  function fmt12hrH(t){const[h,m]=t.split(':').map(Number);const ap=h<12?'AM':'PM';const h12=h%12||12;return h12+':'+(m<10?'0':'')+m+' '+ap;}
+  const {decimal:nowHrs}=getEasternNow();
+  const spans=kidScheduleToday.map((k,i)=>{
+    const start=toHrsH(k.time);
+    const end=i<kidScheduleToday.length-1?toHrsH(kidScheduleToday[i+1].time):start+1;
+    return{...k,start,end,color:scheduleColors[k.badge]||'#a55eea'};
+  });
+  const cur=spans.find(s=>nowHrs>=s.start&&nowHrs<s.end)||null;
+  const next=cur?spans.find(s=>s.start>cur.start)||null:null;
+  if(!cur){
+    el.innerHTML='<div style="text-align:center;padding:10px;font-size:13px;color:var(--text3);font-weight:600;margin-bottom:4px">Schedule starts at 7:00 AM \uD83C\uDF05</div>';
+    return;
+  }
+  el.innerHTML=`<div style="background:${cur.color}18;border:2px solid ${cur.color}44;border-radius:14px;padding:13px;margin-bottom:12px">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="font-size:28px">${cur.icon}</div>
+    <div style="flex:1">
+      <div style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:${cur.color};margin-bottom:2px">Kids \u2022 Right now \u2022 ${fmt12hrH(cur.time)}</div>
+      <div style="font-size:14px;font-weight:800;color:var(--text)">${cur.name}</div>
+      <div style="font-size:11px;color:var(--text2);font-weight:600">${cur.detail}</div>
+    </div>
+  </div>
+  ${next?`<div style="margin-top:9px;padding-top:9px;border-top:1px dashed ${cur.color}44;font-size:11px;color:var(--text3);font-weight:700">\u23F1\uFE0F Up next \u2022 ${fmt12hrH(next.time)}: ${next.icon} ${next.name}</div>`:''}
+</div>`;
+}
 function renderFocusZone(){
   const el=$('focus-zone');if(!el)return;
   if(mode==='you'){
@@ -1160,8 +1191,15 @@ function renderKids(t){
       'kb-meal':'#ff9f43','kb-free':'#20bf6b','kb-gym':'#f953c6',
       'kb-bed':'#54a0ff','kb-dance':'#a55eea','kb-bath':'#00d2d3'
     };
-    // Convert time string to decimal hours (24hr)
+    // Convert 24hr time string "HH:MM" to decimal hours
     function toHrs(timeStr){const[h,m]=timeStr.split(':').map(Number);return h+(m/60);}
+    // Format 24hr "HH:MM" for display as "h:mm AM/PM"
+    function fmt12hr(timeStr){
+      const[h,m]=timeStr.split(':').map(Number);
+      const ampm=h<12?'AM':'PM';
+      const h12=h%12||12;
+      return h12+':'+(m<10?'0':'')+m+' '+ampm;
+    }
     // Schedule spans: each entry runs until the next one
     const sched=kidScheduleToday;
     const spans=sched.map((k,i)=>{
@@ -1173,25 +1211,40 @@ function renderKids(t){
     // We'll show a 12-hour clock that highlights the current activity
     const {h:_eh,m:_em,decimal:nowHrs}=getEasternNow();
     const currentActivity=spans.find(s=>nowHrs>=s.start&&nowHrs<s.end)||null;
+    const {h:nowH}=getEasternNow();
+    const nowAmPm=nowH<12?'AM':'PM';
     el.innerHTML=`
 <div style="text-align:center;padding:4px 0 8px">
-  <div style="font-family:var(--serif);font-size:16px;font-style:italic;color:var(--text);margin-bottom:2px">Today's Schedule 👦🏾</div>
+  <div style="font-family:var(--serif);font-size:16px;font-style:italic;color:var(--text);margin-bottom:2px">Today\u2019s Schedule \uD83D\uDC66\uD83C\uDFFE</div>
   <div style="font-size:12px;color:var(--text2);font-weight:600">${window._kid1Name||'Jacchius'} (${window._kid1Age||4}) &amp; ${window._kid2Name||'Ahnaniah'} (${window._kid2Age||3})</div>
 </div>
-<div style="display:flex;justify-content:center;margin-bottom:14px">
+<div style="display:flex;justify-content:center;margin-bottom:6px">
   <canvas id="kids-clock" width="280" height="280" style="max-width:100%"></canvas>
 </div>
+<div style="display:flex;justify-content:center;gap:16px;margin-bottom:12px;font-size:11px;font-weight:800">
+  <div style="display:flex;align-items:center;gap:5px">
+    <div style="width:28px;height:10px;border-radius:4px;background:rgba(165,94,234,.35);border:1.5px solid rgba(165,94,234,.5)"></div>
+    <span style="color:var(--text2)">Inner ring = <span style="color:#a55eea">AM</span></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:5px">
+    <div style="width:28px;height:10px;border-radius:4px;background:rgba(249,83,198,.35);border:1.5px solid rgba(249,83,198,.5)"></div>
+    <span style="color:var(--text2)">Outer ring = <span style="color:#f953c6">PM</span></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;background:${nowH<12?'rgba(165,94,234,.15)':'rgba(249,83,198,.15)'};border:1.5px solid ${nowH<12?'rgba(165,94,234,.4)':'rgba(249,83,198,.4)'}">
+    <span style="color:${nowH<12?'#a55eea':'#f953c6'}">Now: ${nowAmPm}</span>
+  </div>
+</div>
 ${currentActivity?`<div style="background:${currentActivity.color}22;border:2px solid ${currentActivity.color}55;border-radius:14px;padding:13px;margin-bottom:12px;text-align:center">
-  <div style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:${currentActivity.color};margin-bottom:3px">Right now</div>
+  <div style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:${currentActivity.color};margin-bottom:3px">Right now \u2022 ${fmt12hr(currentActivity.time)}</div>
   <div style="font-size:22px;margin-bottom:3px">${currentActivity.icon}</div>
   <div style="font-size:15px;font-weight:800;color:var(--text)">${currentActivity.name}</div>
   <div style="font-size:11px;color:var(--text2);font-weight:600;margin-top:2px">${currentActivity.detail}</div>
-</div>`:'<div style="text-align:center;padding:10px;font-size:13px;color:var(--text3);font-weight:600;margin-bottom:12px">Schedule starts at 7:00 AM 🌅</div>'}
+</div>`:'<div style="text-align:center;padding:10px;font-size:13px;color:var(--text3);font-weight:600;margin-bottom:12px">Schedule starts at 7:00 AM \uD83C\uDF05</div>'}
 <div class="sl" style="color:var(--orange)">Full schedule</div>
 <div style="display:flex;flex-direction:column;gap:2px">
 ${spans.map(s=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:10px;background:${nowHrs>=s.start&&nowHrs<s.end?s.color+'22':'transparent'};border:${nowHrs>=s.start&&nowHrs<s.end?'2px solid '+s.color+'44':'2px solid transparent'}">
   <div style="width:10px;height:10px;border-radius:50%;background:${s.color};flex-shrink:0"></div>
-  <div style="font-size:11px;font-weight:900;color:var(--text3);width:34px;flex-shrink:0">${s.time}</div>
+  <div style="font-size:11px;font-weight:900;color:var(--text3);width:54px;flex-shrink:0">${fmt12hr(s.time)}</div>
   <div style="font-size:13px">${s.icon}</div>
   <div style="flex:1"><div style="font-size:12px;font-weight:800;color:var(--text)">${s.name}</div><div style="font-size:10px;color:var(--text3);font-weight:600">${s.detail}</div></div>
 </div>`).join('')}
