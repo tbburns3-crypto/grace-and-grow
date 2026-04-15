@@ -306,6 +306,8 @@ function doUnlock(){
       <div id="focus-zone"></div>
       <div class="sl" style="color:var(--orange)">Kids right now</div>
       <div id="home-kids-activity"></div>
+      <div class="sl" style="color:var(--teal)">Meals today</div>
+      <div id="home-meals"></div>
       <div class="sl" style="color:var(--sky)">Bible today</div>
       <div class="card card-purple" id="home-bible"></div>
       <div class="sl" style="color:var(--coral)">Bills this week</div>
@@ -824,7 +826,64 @@ let journalEntries={
 };
 let recipeIdx={breakfast:0,lunch:0,dinner:0};
 
-function renderHome(){renderFocusZone();renderHomeKids();renderHomeBible();renderHomeBills();}
+function renderHome(){renderFocusZone();renderHomeKids();renderHomeMeals();renderHomeBible();renderHomeBills();}
+
+// ingredient check state — resets each day
+let _mealCheckDate='', _mealChecks={b:[],l:[],d:[]};
+function _getMealChecks(){
+  const today=new Date().toLocaleDateString();
+  if(_mealCheckDate!==today){
+    _mealCheckDate=today;
+    _mealChecks={b:[],l:[],d:[]};
+  }
+  return _mealChecks;
+}
+function toggleMealIngredient(cat,i){
+  const chk=_getMealChecks();
+  chk[cat][i]=!chk[cat][i];
+  renderHomeMeals();
+}
+function renderHomeMeals(){
+  const el=$('home-meals');if(!el)return;
+  const day=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/864e5);
+  const meals=[
+    {label:'🌅 Breakfast',color:'var(--orange)',bg:'var(--orange-bg)',cat:'b',meal:breakfasts[day%breakfasts.length]},
+    {label:'☀️ Lunch',   color:'var(--lime)',  bg:'var(--lime-bg)',  cat:'l',meal:lunches[day%lunches.length]},
+    {label:'🌙 Dinner',  color:'var(--purple)',bg:'var(--purple-bg)',cat:'d',meal:dinners[day%dinners.length]},
+  ];
+  const chk=_getMealChecks();
+  el.innerHTML=meals.map(({label,color,bg,cat,meal})=>{
+    const ings=meal.recipe.ingredients;
+    if(!chk[cat].length)chk[cat]=ings.map(()=>false);
+    const done=chk[cat].filter(Boolean).length;
+    const total=ings.length;
+    const pct=Math.round(done/total*100);
+    return `<div style="background:${bg};border:2px solid ${color}33;border-radius:14px;padding:13px;margin-bottom:10px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+    <div>
+      <div style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:${color};margin-bottom:2px">${label}</div>
+      <div style="font-size:14px;font-weight:800;color:var(--text)">${meal.title}</div>
+      <div style="font-size:11px;color:var(--text3);font-weight:600">${meal.chef}</div>
+    </div>
+    <div style="text-align:center;min-width:44px">
+      <div style="font-size:16px;font-weight:900;color:${color}">${done}/${total}</div>
+      <div style="font-size:9px;font-weight:800;color:var(--text3);text-transform:uppercase">items</div>
+    </div>
+  </div>
+  <div style="height:4px;background:var(--border);border-radius:4px;margin-bottom:10px;overflow:hidden">
+    <div style="height:100%;width:${pct}%;background:${color};border-radius:4px;transition:width .3s"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:5px">
+    ${ings.map((ing,i)=>`<div onclick="toggleMealIngredient('${cat}',${i})" style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:4px 2px">
+      <div style="width:18px;height:18px;border-radius:5px;border:2px solid ${chk[cat][i]?color:('var(--border2)')};background:${chk[cat][i]?color:'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s">
+        ${chk[cat][i]?'<svg width="10" height="8" viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg>':''}
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--text);${chk[cat][i]?'text-decoration:line-through;opacity:.5':''};">${ing}</div>
+    </div>`).join('')}
+  </div>
+</div>`;
+  }).join('');
+}
 function renderHomeKids(){
   const el=$('home-kids-activity');if(!el)return;
   const scheduleColors={'kb-meal':'#ff9f43','kb-free':'#20bf6b','kb-gym':'#f953c6','kb-bed':'#54a0ff','kb-dance':'#a55eea','kb-bath':'#00d2d3'};
