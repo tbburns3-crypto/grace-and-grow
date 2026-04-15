@@ -207,9 +207,38 @@ input[type=text]:focus{border-color:var(--purple)}
 .jtext{font-family:var(--serif);font-size:14px;color:var(--text);line-height:1.7;font-style:italic}
 .outing-card{border-radius:var(--r-sm);padding:13px;margin-bottom:9px;border:2px solid var(--border);cursor:pointer;transition:all .2s}
 .outing-card:hover{transform:translateY(-2px);box-shadow:0 5px 16px rgba(100,50,200,.1)}
+
+/* ── LOCK SCREEN ─────────────────────────────────────────── */
+#lock-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,#1a0533 0%,#2d0b5e 50%,#1a0533 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .5s;padding:20px}
+#lock-screen.fade-out{opacity:0;pointer-events:none}
+.lock-logo{font-family:var(--serif);font-size:28px;color:#fff;font-weight:700;text-align:center;line-height:1.3}
+.lock-sub{font-size:12px;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.lock-dots{display:flex;gap:14px;margin:8px 0}
+.lock-dot{width:44px;height:44px;border-radius:10px;border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;background:rgba(255,255,255,.07);transition:all .2s;text-transform:uppercase}
+.lock-dot.filled{background:rgba(165,94,234,.4);border-color:#a55eea}
+.lock-keys{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;width:100%;max-width:340px}
+.lock-key{height:46px;border-radius:10px;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:16px;font-weight:800;cursor:pointer;transition:all .15s;font-family:var(--sans);text-transform:uppercase;-webkit-tap-highlight-color:transparent}
+.lock-key:active,.lock-key:hover{background:rgba(165,94,234,.5);transform:scale(.93)}
+.lock-key.del-key{background:rgba(255,100,100,.2);font-size:14px}
+.lock-key.del-key:active{background:rgba(255,100,100,.5)}
+.lock-error{font-size:12px;color:#ff6b6b;font-weight:700;letter-spacing:1px;height:16px;text-align:center}
+@keyframes lock-shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.lock-dots.shake{animation:lock-shake .4s ease}
 </style>
 </head>
 <body>
+<div id="lock-screen">
+  <div class="lock-logo">Grace &amp; Grow ✨<br><span style="font-size:16px;opacity:.7">Family Edition</span></div>
+  <div class="lock-sub">Enter your code</div>
+  <div class="lock-dots" id="lock-dots">
+    <div class="lock-dot" id="ld0"></div>
+    <div class="lock-dot" id="ld1"></div>
+    <div class="lock-dot" id="ld2"></div>
+    <div class="lock-dot" id="ld3"></div>
+  </div>
+  <div class="lock-error" id="lock-error"></div>
+  <div class="lock-keys" id="lock-keys"></div>
+</div>
 <div class="app">
   <div class="topbar">
     <div class="logo-row">
@@ -1920,7 +1949,7 @@ function applySyncedValue(key, val) {
     dateIdeas:       v => { dateIdeas = v; },
     cleanYou:        v => { cleanYou = v; },
     kidScheduleToday:v => { kidScheduleToday = v; },
-    bibleReadings:   v => { bibleReadings = v; },
+    bibleReadings:   v => { const td=new Date().toLocaleDateString(); if(Array.isArray(v)){bibleReadings=getBibleReadings();_readingDate=td;}else if(v&&v.date===td&&Array.isArray(v.readings)){bibleReadings=v.readings;_readingDate=td;}else{bibleReadings=getBibleReadings();_readingDate=td;} },
     journalPins:     v => { journalPins = v; },
     kidNames:        v => { window._kid1Name=v.name1; window._kid1Age=v.age1; window._kid2Name=v.name2; window._kid2Age=v.age2; },
   };
@@ -1966,13 +1995,75 @@ function syncBibleNotes()       { syncPush('bibleNotes', bibleNotes); }
 function syncSuggestions()      { syncPush('spicySuggestions', spicySuggestions); }
 function syncMemories()         { syncPush('memories', memories); syncPush('plannedDates', plannedDates); syncPush('dateIdeas', dateIdeas); }
 function syncKids()             { syncPush('kidScheduleToday', kidScheduleToday); syncPush('kidNames', {name1:window._kid1Name,age1:window._kid1Age,name2:window._kid2Name,age2:window._kid2Age}); }
-function syncBibleReadings()    { syncPush('bibleReadings', bibleReadings); }
+function syncBibleReadings()    { syncPush('bibleReadings', {date:new Date().toLocaleDateString(),readings:bibleReadings}); }
 function syncPins()             { syncPush('journalPins', journalPins); }
 function syncClean()            { syncPush('cleanYou', cleanYou); }
 // ═══════════════════════════════════════════════════════════════
 // END SYNC LAYER
 // ═══════════════════════════════════════════════════════════════
 
+
+// ── LOCK SCREEN ──────────────────────────────────────────────
+(function(){
+  const CODE = 'love';
+  let entered = '';
+  const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+  function render(){
+    for(let i=0;i<4;i++){
+      const el=document.getElementById('ld'+i);
+      if(i<entered.length){el.textContent=entered[i].toUpperCase();el.classList.add('filled');}
+      else{el.textContent='';el.classList.remove('filled');}
+    }
+  }
+
+  function press(l){
+    if(entered.length>=4)return;
+    entered+=l;
+    render();
+    if(entered.length===4) check();
+  }
+
+  function del(){
+    entered=entered.slice(0,-1);
+    render();
+    document.getElementById('lock-error').textContent='';
+  }
+
+  function check(){
+    if(entered===CODE){
+      sessionStorage.setItem('gg_unlocked','1');
+      const ls=document.getElementById('lock-screen');
+      ls.classList.add('fade-out');
+      setTimeout(()=>{ls.style.display='none';},500);
+    } else {
+      const dots=document.getElementById('lock-dots');
+      dots.classList.add('shake');
+      document.getElementById('lock-error').textContent='Try again 💜';
+      setTimeout(()=>{dots.classList.remove('shake');entered='';render();document.getElementById('lock-error').textContent='';},600);
+    }
+  }
+
+  function buildKeys(){
+    const grid=document.getElementById('lock-keys');
+    letters.forEach(l=>{
+      const btn=document.createElement('button');
+      btn.className='lock-key';btn.textContent=l.toUpperCase();
+      btn.onclick=()=>press(l);grid.appendChild(btn);
+    });
+    const delBtn=document.createElement('button');
+    delBtn.className='lock-key del-key';delBtn.textContent='⌫';
+    delBtn.onclick=del;grid.appendChild(delBtn);
+  }
+
+  if(sessionStorage.getItem('gg_unlocked')==='1'){
+    const ls=document.getElementById('lock-screen');
+    if(ls)ls.style.display='none';
+  } else {
+    buildKeys();
+    render();
+  }
+})();
 initSync();
 renderHome();
 renderBible();
