@@ -251,6 +251,37 @@ input[type=text]:focus{border-color:var(--purple)}
   <button onclick="lockSubmit()" style="width:100%;max-width:260px;padding:15px;border-radius:14px;border:none;background:linear-gradient(135deg,#a55eea,#764ba2);color:#fff;font-size:16px;font-weight:800;cursor:pointer;font-family:var(--sans)">Unlock 💜</button>
 </div>
 
+<script>
+function lockSubmit(){
+  var input=document.getElementById('lock-input');
+  if(!input)return;
+  var val=input.value.toLowerCase().replace(/s/g,'');
+  if(val==='love'){
+    try{sessionStorage.setItem('gg_unlocked','1');}catch(e){}
+    var ls=document.getElementById('lock-screen');
+    if(ls){
+      ls.style.transition='opacity 0.5s';
+      ls.style.opacity='0';
+      setTimeout(function(){ls.style.display='none';},500);
+    }
+  } else {
+    var err=document.getElementById('lock-error');
+    if(err){err.textContent='Try again 💜';}
+    input.value='';
+    setTimeout(function(){if(err)err.textContent=' ';input.focus();},1200);
+  }
+}
+(function(){
+  var ls=document.getElementById('lock-screen');
+  var unlocked=false;
+  try{unlocked=sessionStorage.getItem('gg_unlocked')==='1';}catch(e){}
+  if(unlocked){
+    if(ls)ls.style.display='none';
+  } else {
+    setTimeout(function(){var inp=document.getElementById('lock-input');if(inp)inp.focus();},400);
+  }
+})();
+</script>
 <div class="app">
   <div class="topbar">
     <div class="logo-row">
