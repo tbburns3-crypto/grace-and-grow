@@ -1176,24 +1176,46 @@ async function renderBibleReader() {
   const textEl = $('bible-reader-text');
   if (!textEl) return;
 
-  // Fetch via bolls.life (supports KJV, NKJV, NIV, CSB natively — no API key required)
-  try {
-    const bookNum = BOLLS_BOOK_NUM[readerBook] || 1;
-    const url = 'https://bolls.life/get-chapter/' + readerTranslation + '/' + bookNum + '/' + readerChapter + '/';
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error('bolls ' + resp.status);
-    const verses = await resp.json();
-    if (!Array.isArray(verses) || verses.length === 0) throw new Error('empty');
-    const labels = {KJV:'King James Version · Public Domain',NKJV:'New King James Version',NIV:'New International Version',CSB:'Christian Standard Bible'};
-    textEl.innerHTML = verses.map(v =>
-      '<div style="display:flex;gap:10px;padding:8px 4px;margin-bottom:2px">'
-      + '<span style="font-size:10px;font-weight:900;color:var(--purple);min-width:22px;padding-top:3px">' + v.verse + '</span>'
-      + '<span style="font-family:var(--serif);font-size:15px;color:var(--text);line-height:1.85">' + v.text.replace(/<[^>]*>/g,'').replace(/[HG]\d+/g,'').replace(/\s+/g,' ').trim() + '</span>'
-      + '</div>'
-    ).join('') + '<div style="text-align:center;padding:12px 0;font-size:11px;color:var(--text3);font-weight:600">' + (labels[readerTranslation]||readerTranslation) + '</div>';
-  } catch(e) {
-    const bgUrl = 'https://www.biblegateway.com/passage/?search=' + encodeURIComponent(readerBook + ' ' + readerChapter) + '&version=' + readerTranslation;
-    textEl.innerHTML = '<div style="text-align:center;padding:24px 16px"><div style="font-size:28px;margin-bottom:8px">📖</div><div style="font-size:13px;color:var(--text2);font-weight:600;margin-bottom:14px">Couldn’t load ' + readerTranslation + ' — check your connection</div><a href="' + bgUrl + '" target="_blank" style="padding:10px 22px;border-radius:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:13px;font-weight:800;text-decoration:none">Open on Bible Gateway ↗</a></div>';
+  // KJV: bible-api.com (clean text, no Strong numbers)
+  // NKJV / NIV / CSB: bolls.life (CSB uses HCSB code which is the same text)
+  if (readerTranslation === 'KJV') {
+    try {
+      const bookQ = encodeURIComponent(readerBook + ' ' + readerChapter);
+      const resp = await fetch('https://bible-api.com/' + bookQ + '?translation=kjv');
+      if (!resp.ok) throw new Error('failed');
+      const data = await resp.json();
+      if (!data.verses || !data.verses.length) throw new Error('empty');
+      textEl.innerHTML = data.verses.map(v =>
+        '<div style="display:flex;gap:10px;padding:8px 4px;margin-bottom:2px">'
+        + '<span style="font-size:10px;font-weight:900;color:var(--purple);min-width:22px;padding-top:3px">' + v.verse + '</span>'
+        + '<span style="font-family:var(--serif);font-size:15px;color:var(--text);line-height:1.85">' + v.text.trim() + '</span>'
+        + '</div>'
+      ).join('') + '<div style="text-align:center;padding:12px 0;font-size:11px;color:var(--text3);font-weight:600">King James Version · Public Domain</div>';
+    } catch(e) {
+      const bgUrl = 'https://www.biblegateway.com/passage/?search=' + encodeURIComponent(readerBook + ' ' + readerChapter) + '&version=KJV';
+      textEl.innerHTML = '<div style="text-align:center;padding:24px 16px"><div style="font-size:28px;margin-bottom:8px">📖</div><div style="font-size:13px;color:var(--text2);font-weight:600;margin-bottom:14px">Couldn’t load KJV — check your connection</div><a href="' + bgUrl + '" target="_blank" style="padding:10px 22px;border-radius:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:13px;font-weight:800;text-decoration:none">Open on Bible Gateway ↗</a></div>';
+    }
+  } else {
+    const bollsCode = readerTranslation === 'CSB' ? 'HCSB' : readerTranslation;
+    const dispLabel = {NKJV:'New King James Version', NIV:'New International Version', CSB:'Christian Standard Bible'};
+    try {
+      const bookNum = BOLLS_BOOK_NUM[readerBook] || 1;
+      const url = 'https://bolls.life/get-chapter/' + bollsCode + '/' + bookNum + '/' + readerChapter + '/';
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('bolls ' + resp.status);
+      const verses = await resp.json();
+      if (!Array.isArray(verses) || verses.length === 0) throw new Error('empty');
+      const clean = t => t.replace(/<[^>]*>/g,'').replace(/d+/g,'').replace(/s+/g,' ').trim();
+      textEl.innerHTML = verses.map(v =>
+        '<div style="display:flex;gap:10px;padding:8px 4px;margin-bottom:2px">'
+        + '<span style="font-size:10px;font-weight:900;color:var(--purple);min-width:22px;padding-top:3px">' + v.verse + '</span>'
+        + '<span style="font-family:var(--serif);font-size:15px;color:var(--text);line-height:1.85">' + clean(v.text) + '</span>'
+        + '</div>'
+      ).join('') + '<div style="text-align:center;padding:12px 0;font-size:11px;color:var(--text3);font-weight:600">' + (dispLabel[readerTranslation]||readerTranslation) + '</div>';
+    } catch(e) {
+      const bgUrl = 'https://www.biblegateway.com/passage/?search=' + encodeURIComponent(readerBook + ' ' + readerChapter) + '&version=' + readerTranslation;
+      textEl.innerHTML = '<div style="text-align:center;padding:24px 16px"><div style="font-size:28px;margin-bottom:8px">📖</div><div style="font-size:13px;color:var(--text2);font-weight:600;margin-bottom:14px">Couldn’t load ' + readerTranslation + ' — check your connection</div><a href="' + bgUrl + '" target="_blank" style="padding:10px 22px;border-radius:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:13px;font-weight:800;text-decoration:none">Open on Bible Gateway ↗</a></div>';
+    }
   }
 }
 
