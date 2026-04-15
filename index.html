@@ -250,7 +250,14 @@ input[type=text]:focus{border-color:var(--purple)}
     <div class="lock-dot" id="ld3"></div>
   </div>
   <div class="lock-error" id="lock-error"></div>
-  <div class="lock-keys" id="lock-keys"></div>
+  <div style="width:100%;max-width:280px;position:relative">
+    <input id="lock-input" type="text" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+      placeholder="Type your code..."
+      style="width:100%;padding:14px 16px;font-size:18px;font-weight:800;letter-spacing:4px;text-transform:uppercase;text-align:center;border:2px solid rgba(255,255,255,.25);border-radius:14px;background:rgba(255,255,255,.1);color:#fff;outline:none;font-family:var(--sans);box-sizing:border-box"
+      oninput="lockInput(this.value)"
+      onkeydown="if(event.key==='Enter')lockSubmit()">
+  </div>
+  <button onclick="lockSubmit()" style="width:100%;max-width:280px;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#a55eea,#764ba2);color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--sans);letter-spacing:.5px">Unlock 💜</button>
 </div>
 <div class="app">
   <div class="topbar">
@@ -2066,64 +2073,41 @@ function syncClean()            { syncPush('cleanYou', cleanYou); }
 
 
 // ── LOCK SCREEN ──────────────────────────────────────────────
-(function(){
-  const CODE = 'love';
-  let entered = '';
-  const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
-
-  function render(){
-    for(let i=0;i<4;i++){
-      const el=document.getElementById('ld'+i);
-      if(i<entered.length){el.textContent=entered[i].toUpperCase();el.classList.add('filled');}
-      else{el.textContent='';el.classList.remove('filled');}
-    }
+function lockInput(val){
+  const v=val.toLowerCase().replace(/[^a-z]/g,'');
+  const input=document.getElementById('lock-input');
+  if(input)input.value=v.toUpperCase();
+  for(let i=0;i<4;i++){
+    const el=document.getElementById('ld'+i);
+    if(!el)continue;
+    if(i<v.length){el.textContent=v[i].toUpperCase();el.classList.add('filled');}
+    else{el.textContent='';el.classList.remove('filled');}
   }
-
-  function press(l){
-    if(entered.length>=4)return;
-    entered+=l;
-    render();
-    if(entered.length===4) check();
-  }
-
-  function del(){
-    entered=entered.slice(0,-1);
-    render();
-    document.getElementById('lock-error').textContent='';
-  }
-
-  function check(){
-    if(entered===CODE){
-      sessionStorage.setItem('gg_unlocked','1');
-      const ls=document.getElementById('lock-screen');
-      ls.classList.add('fade-out');
-      setTimeout(()=>{ls.style.display='none';},500);
-    } else {
-      const dots=document.getElementById('lock-dots');
-      dots.classList.add('shake');
-      document.getElementById('lock-error').textContent='Try again 💜';
-      setTimeout(()=>{dots.classList.remove('shake');entered='';render();document.getElementById('lock-error').textContent='';},600);
-    }
-  }
-
-  function buildKeys(){
-    const grid=document.getElementById('lock-keys');
-    letters.forEach(l=>{
-      const btn=document.createElement('button');
-      btn.className='lock-key';btn.textContent=l.toUpperCase();
-      btn.onclick=()=>press(l);grid.appendChild(btn);
-    });
-    const delBtn=document.createElement('button');
-    delBtn.className='lock-key del-key';delBtn.textContent='⌫';
-    delBtn.onclick=del;grid.appendChild(delBtn);
-  }
-
-  if(sessionStorage.getItem('gg_unlocked')==='1'){
+}
+function lockSubmit(){
+  const input=document.getElementById('lock-input');
+  if(!input)return;
+  const val=input.value.toLowerCase().trim();
+  if(val==='love'){
+    sessionStorage.setItem('gg_unlocked','1');
     const ls=document.getElementById('lock-screen');
+    if(ls){ls.classList.add('fade-out');setTimeout(()=>{ls.style.display='none';},500);}
+  } else {
+    const dots=document.getElementById('lock-dots');
+    const err=document.getElementById('lock-error');
+    if(dots){dots.classList.add('shake');setTimeout(()=>dots.classList.remove('shake'),500);}
+    if(err){err.textContent='Try again 💜';setTimeout(()=>{err.textContent='';},1500);}
+    input.value='';
+    for(let i=0;i<4;i++){const el=document.getElementById('ld'+i);if(el){el.textContent='';el.classList.remove('filled');}}
+    setTimeout(()=>input.focus(),100);
+  }
+}
+(function(){
+  const ls=document.getElementById('lock-screen');
+  if(sessionStorage.getItem('gg_unlocked')==='1'){
     if(ls)ls.style.display='none';
   } else {
-    buildKeys();
-    render();
+    setTimeout(()=>{const inp=document.getElementById('lock-input');if(inp)inp.focus();},300);
   }
 })();
 initSync();
