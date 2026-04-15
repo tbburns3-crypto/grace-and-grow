@@ -1188,7 +1188,7 @@ async function renderBibleReader() {
       textEl.innerHTML = data.verses.map(v =>
         '<div style="display:flex;gap:10px;padding:8px 4px;margin-bottom:2px">'
         + '<span style="font-size:10px;font-weight:900;color:var(--purple);min-width:22px;padding-top:3px">' + v.verse + '</span>'
-        + '<span style="font-family:var(--serif);font-size:15px;color:var(--text);line-height:1.85">' + v.text.trim() + '</span>'
+        + '<span style="font-family:var(--serif);font-size:15px;color:var(--text);line-height:1.85">' + v.text.replace(/\d+/g,'').replace(/\s+/g,' ').trim() + '</span>'
         + '</div>'
       ).join('') + '<div style="text-align:center;padding:12px 0;font-size:11px;color:var(--text3);font-weight:600">King James Version · Public Domain</div>';
     } catch(e) {
