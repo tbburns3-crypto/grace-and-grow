@@ -244,42 +244,39 @@ input[type=text]:focus{border-color:var(--purple)}
   <div class="lock-logo">Grace &amp; Grow ✨<br><span style="font-size:16px;opacity:.7">Family Edition</span></div>
   <div class="lock-sub">Enter your code</div>
   <div class="lock-error" id="lock-error">&nbsp;</div>
-  <input id="lock-input" type="password" autocomplete="off" spellcheck="false"
-    placeholder="code..."
+  <input id="lock-input" type="text" inputmode="text"
+    autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+    placeholder="type code here..."
     style="width:100%;max-width:260px;padding:16px;font-size:22px;font-weight:800;letter-spacing:6px;text-align:center;border:2px solid rgba(255,255,255,.3);border-radius:14px;background:rgba(255,255,255,.12);color:#fff;outline:none;font-family:var(--sans);box-sizing:border-box"
-    onkeydown="if(event.key==='Enter'){var v=this.value.toLowerCase().trim();if(v==='love'){try{sessionStorage.setItem('gg_unlocked','1');}catch(e){}var ls=document.getElementById('lock-screen');ls.style.opacity='0';ls.style.transition='opacity .5s';setTimeout(function(){ls.style.display='none';},500);}else{var er=document.getElementById('lock-error');er.textContent='Try again 💜';this.value='';setTimeout(function(){er.textContent=' ';},1500);}}">
-  <button onclick="var v=document.getElementById('lock-input').value.toLowerCase().trim();if(v==='love'){try{sessionStorage.setItem('gg_unlocked','1');}catch(e){}var ls=document.getElementById('lock-screen');ls.style.opacity='0';ls.style.transition='opacity .5s';setTimeout(function(){ls.style.display='none';},500);}else{var er=document.getElementById('lock-error');er.textContent='Try again 💜';document.getElementById('lock-input').value='';setTimeout(function(){er.textContent=' ';},1500);}" style="width:100%;max-width:260px;padding:15px;border-radius:14px;border:none;background:linear-gradient(135deg,#a55eea,#764ba2);color:#fff;font-size:16px;font-weight:800;cursor:pointer;font-family:var(--sans)">Unlock 💜</button>
+    onkeydown="if(event.key==='Enter')doUnlock()">
+  <button onclick="doUnlock()" style="width:100%;max-width:260px;padding:15px;border-radius:14px;border:none;background:linear-gradient(135deg,#a55eea,#764ba2);color:#fff;font-size:16px;font-weight:800;cursor:pointer;font-family:var(--sans);-webkit-tap-highlight-color:transparent">💜 Unlock</button>
 </div>
 
 <script>
-function lockSubmit(){
-  var input=document.getElementById('lock-input');
-  if(!input)return;
-  var val=input.value.toLowerCase().replace(/s/g,'');
+function doUnlock(){
+  var inp=document.getElementById('lock-input');
+  var ls=document.getElementById('lock-screen');
+  var err=document.getElementById('lock-error');
+  if(!inp||!ls)return;
+  var val=(inp.value||'').toLowerCase().trim();
   if(val==='love'){
     try{sessionStorage.setItem('gg_unlocked','1');}catch(e){}
-    var ls=document.getElementById('lock-screen');
-    if(ls){
-      ls.style.transition='opacity 0.5s';
-      ls.style.opacity='0';
-      setTimeout(function(){ls.style.display='none';},500);
-    }
+    ls.style.transition='opacity 0.5s';
+    ls.style.opacity='0';
+    setTimeout(function(){ls.style.display='none';},520);
   } else {
-    var err=document.getElementById('lock-error');
     if(err){err.textContent='Try again 💜';}
-    input.value='';
-    setTimeout(function(){if(err)err.textContent=' ';input.focus();},1200);
+    inp.value='';
+    inp.focus();
+    setTimeout(function(){if(err)err.textContent=' ';},1500);
   }
 }
 (function(){
   var ls=document.getElementById('lock-screen');
   var unlocked=false;
   try{unlocked=sessionStorage.getItem('gg_unlocked')==='1';}catch(e){}
-  if(unlocked){
-    if(ls)ls.style.display='none';
-  } else {
-    setTimeout(function(){var inp=document.getElementById('lock-input');if(inp)inp.focus();},400);
-  }
+  if(unlocked){if(ls)ls.style.display='none';}
+  else{setTimeout(function(){var i=document.getElementById('lock-input');if(i)i.focus();},300);}
 })();
 </script>
 <div class="app">
