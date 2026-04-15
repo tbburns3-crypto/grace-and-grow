@@ -224,6 +224,19 @@ input[type=text]:focus{border-color:var(--purple)}
 .lock-error{font-size:12px;color:#ff6b6b;font-weight:700;letter-spacing:1px;height:16px;text-align:center}
 @keyframes lock-shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 .lock-dots.shake{animation:lock-shake .4s ease}
+
+/* ── MORE SHEET ──────────────────────────────────────────── */
+#more-sheet-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s}
+#more-sheet-overlay.open{opacity:1;pointer-events:all}
+#more-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:480px;background:var(--surface);border-radius:18px 18px 0 0;z-index:201;padding:16px 16px 32px;transition:transform .3s cubic-bezier(.32,1,.23,1);box-shadow:0 -6px 32px rgba(100,50,200,.18)}
+#more-sheet.open{transform:translateX(-50%) translateY(0)}
+.more-handle{width:40px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 16px}
+.more-title{font-size:11px;font-weight:800;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;text-align:center}
+.more-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.more-tile{border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;transition:all .18s;background:var(--surface2);border:2px solid var(--border)}
+.more-tile:active{transform:scale(.94)}
+.more-tile .more-icon{font-size:24px;line-height:1;margin-bottom:4px}
+.more-tile .more-lbl{font-size:11px;font-weight:800;color:var(--text2)}
 </style>
 </head>
 <body>
@@ -264,18 +277,6 @@ input[type=text]:focus{border-color:var(--purple)}
         <div class="vr">Proverbs 31:25&nbsp;<span class="vtap">tap to refresh ✨</span></div>
       </div>
       <div id="focus-zone"></div>
-      <div class="sl" style="color:var(--purple)">Quick access</div>
-      <div class="qgrid">
-        <div class="qtile qt1" onclick="goPage('bible')"><span class="qicon">📖</span><span class="qlbl">Bible</span></div>
-        <div class="qtile qt2" onclick="goPage('clean')"><span class="qicon">🧹</span><span class="qlbl">Clean</span></div>
-        <div class="qtile qt3" onclick="goPage('meals')"><span class="qicon">🥘</span><span class="qlbl">Meals</span></div>
-        <div class="qtile qt4" onclick="goPage('budget')"><span class="qicon">💰</span><span class="qlbl">Budget</span></div>
-        <div class="qtile qt5" onclick="goPage('dates')"><span class="qicon">👫🏾</span><span class="qlbl">Dates</span></div>
-        <div class="qtile qt6" onclick="goPage('journal')"><span class="qicon">🙏🏾</span><span class="qlbl">Prayer</span></div>
-        <div class="qtile qt7" onclick="goPage('kids')"><span class="qicon">👦🏾</span><span class="qlbl">Kids</span></div>
-        <div class="qtile qt8" onclick="goPage('spicy')"><span class="qicon">🔥</span><span class="qlbl">Spicy</span></div>
-        <div class="qtile qt9" onclick="goPage('outings')"><span class="qicon">🌟</span><span class="qlbl">Outings</span></div>
-      </div>
       <div class="sl" style="color:var(--sky)">Bible today</div>
       <div class="card card-purple" id="home-bible"></div>
       <div class="sl" style="color:var(--coral)">Bills this week</div>
@@ -352,12 +353,26 @@ input[type=text]:focus{border-color:var(--purple)}
   </div>
   <nav class="navbar">
     <button class="nav-item active" id="nav-home" onclick="goPage('home')"><div class="nav-icon">🏠</div>Home</button>
+    <button class="nav-item" id="nav-bible" onclick="goPage('bible')"><div class="nav-icon">📖</div>Bible</button>
     <button class="nav-item" id="nav-meals" onclick="goPage('meals')"><div class="nav-icon">🥘</div>Meals</button>
     <button class="nav-item" id="nav-kids" onclick="goPage('kids')"><div class="nav-icon">👦🏾</div>Kids</button>
     <button class="nav-item" id="nav-clean" onclick="goPage('clean')"><div class="nav-icon">🧹</div>Clean</button>
-    <button class="nav-item" id="nav-spicy" onclick="goPage('spicy')"><div class="nav-icon">🔥</div>Spicy</button>
-    <button class="nav-item" id="nav-more" onclick="goPage('dates')"><div class="nav-icon">👫🏾</div>Dates</button>
+    <button class="nav-item" id="nav-more-btn" onclick="openMoreSheet()"><div class="nav-icon">☰</div>More</button>
   </nav>
+  <!-- More sheet -->
+  <div id="more-sheet-overlay" onclick="closeMoreSheet()"></div>
+  <div id="more-sheet">
+    <div class="more-handle"></div>
+    <div class="more-title">More sections</div>
+    <div class="more-grid">
+      <div class="more-tile" onclick="goPageFromSheet('spicy')"><div class="more-icon">🔥</div><div class="more-lbl">Spicy</div></div>
+      <div class="more-tile" onclick="goPageFromSheet('dates')"><div class="more-icon">👫🏾</div><div class="more-lbl">Dates</div></div>
+      <div class="more-tile" onclick="goPageFromSheet('budget')"><div class="more-icon">💰</div><div class="more-lbl">Budget</div></div>
+      <div class="more-tile" onclick="goPageFromSheet('journal')"><div class="more-icon">🙏🏾</div><div class="more-lbl">Prayer</div></div>
+      <div class="more-tile" onclick="goPageFromSheet('tasks')"><div class="more-icon">✅</div><div class="more-lbl">Tasks</div></div>
+      <div class="more-tile" onclick="goPageFromSheet('outings')"><div class="more-icon">🌟</div><div class="more-lbl">Outings</div></div>
+    </div>
+  </div>
 <!-- Edit Overlay -->
 <div class="edit-overlay" id="edit-overlay" onclick="closeEditPanel()"></div>
 <div class="edit-panel" id="edit-panel">
@@ -390,12 +405,17 @@ function $(id){return document.getElementById(id)}
 function fmtTime(sec){const m=Math.floor(sec/60),s=sec%60;return m+':'+(s<10?'0':'')+s}
 function toggleDark(){darkMode=!darkMode;document.body.toggleAttribute('data-dark',darkMode);$('dark-btn').textContent=darkMode?'☀️':'🌙';}
 function setMode(m){mode=m;$('btn-you').classList.toggle('active',m==='you');$('btn-him').classList.toggle('active',m==='him');renderPage(currentPage);}
-const navIds={home:'nav-home',meals:'nav-meals',kids:'nav-kids',clean:'nav-clean',spicy:'nav-spicy',dates:'nav-more'};
+const navIds={home:'nav-home',bible:'nav-bible',meals:'nav-meals',kids:'nav-kids',clean:'nav-clean'};
+const morePages=new Set(['spicy','dates','budget','journal','tasks','outings']);
+function openMoreSheet(){document.getElementById('more-sheet-overlay').classList.add('open');document.getElementById('more-sheet').classList.add('open');}
+function closeMoreSheet(){document.getElementById('more-sheet-overlay').classList.remove('open');document.getElementById('more-sheet').classList.remove('open');}
+function goPageFromSheet(name){closeMoreSheet();setTimeout(()=>goPage(name),180);}
 function goPage(name){
   document.querySelectorAll('.ps').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pg=$('page-'+name);if(pg)pg.classList.add('active');
   if(navIds[name])$(navIds[name]).classList.add('active');
+  else if(morePages.has(name)){const mb=$('nav-more-btn');if(mb)mb.classList.add('active');}
   currentPage=name;renderPage(name);$('mc').scrollTo(0,0);
 }
 function renderPage(n){
