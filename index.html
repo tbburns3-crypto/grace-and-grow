@@ -953,7 +953,7 @@ function setBibleTab(t){
   $('bible-plan-view').style.display=t==='plan'?'':'none';
   $('bible-read-view').style.display=t==='read'?'':'none';
   if(t==='read'){
-    const _tc=getBibleChapterOfDay();
+    const _tc=getPlanTodayRef();
     const _td=new Date().toLocaleDateString();
     if(!window._readerInitDate||window._readerInitDate!==_td){
       readerBook=_tc.book;readerChapter=_tc.chapter;window._readerInitDate=_td;
@@ -1044,6 +1044,16 @@ function getBibleChapterOfDay(){
     idx-=chs;
   }
   return{book:'Genesis',chapter:1,dayNum:1,total};
+}
+function getPlanTodayRef(){
+  const day=getTodayPlan();
+  const both=(day.both||'').split('—')[0].trim();
+  const parts=both.split(' ');
+  const ch=parseInt(parts[parts.length-1])||1;
+  let book=parts.slice(0,-1).join(' ').trim();
+  if(book==='Psalm')book='Psalms';
+  const found=Object.keys(KJV_BOOKS).find(b=>b.toLowerCase()===book.toLowerCase())||book;
+  return{book:found,chapter:ch,label:both,source:day.devotSource||''};
 }
 let readerBook = 'John';
 let readerChapter = 3;
@@ -1152,7 +1162,7 @@ async function renderBibleReader() {
   const maxCh = KJV_BOOKS[readerBook] || 1;
   const notesKey = readerBook + ' ' + readerChapter;
   const note = bibleNotes[notesKey] || '';
-  const todayRef = getBibleChapterOfDay();
+  const todayRef = getPlanTodayRef();
 
   const otOptions = OT_BOOKS.map(b => '<option value="' + b + '" ' + (b===readerBook?'selected':'') + '>' + b + '</option>').join('');
   const ntOptions = NT_BOOKS.map(b => '<option value="' + b + '" ' + (b===readerBook?'selected':'') + '>' + b + '</option>').join('');
@@ -1172,8 +1182,8 @@ async function renderBibleReader() {
 
   el.innerHTML =
     '<div style="background:linear-gradient(135deg,#667eea22,#764ba222);border:2px solid var(--border);border-radius:var(--r);padding:13px;margin-bottom:13px">'
-    + '<div style="font-size:10px;font-weight:900;color:var(--purple);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">📅 Today\'s chapter \u2014 Day ' + todayRef.dayNum + ' of ' + todayRef.total + '</div>'
-    + '<div style="font-family:var(--serif);font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px">' + todayRef.book + ' ' + todayRef.chapter + '</div>'
+    + '<div style="font-size:10px;font-weight:900;color:var(--purple);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">📅 Today\'s reading \u2014 ' + todayRef.source + '</div>'
+    + '<div style="font-family:var(--serif);font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px">' + todayRef.label + '</div>'
     + '<button onclick="readerBook=\'' + todayRef.book + '\';readerChapter=' + todayRef.chapter + ';renderBibleReader()" style="padding:8px 20px;border-radius:20px;border:none;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--sans)">Read today\u2019s chapter \u2192</button>'
     + '</div>'
     + '<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">'
