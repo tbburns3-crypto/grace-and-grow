@@ -843,6 +843,9 @@ function toggleMealIngredient(cat,i){
   chk[cat][i]=!chk[cat][i];
   renderHomeMeals();
 }
+const _kidSafeB=['Scrambled eggs & toast','PB&J on toast','Cereal & milk','Banana pancakes','Oatmeal with honey','Yogurt with fruit'];
+const _kidSafeL=['Mac & cheese','Grilled cheese sandwich','Turkey & cheese sandwich','PB&J sandwich','Quesadilla with cheese','Chicken nuggets & fries'];
+const _kidSafeD=['Chicken nuggets & mac and cheese','Grilled cheese & tomato soup','Hot dogs & tater tots','Buttered pasta with parmesan','Mini cheese pizzas','Corn dogs & sweet corn','PB&J & apple slices'];
 function renderHomeMeals(){
   const el=$('home-meals');if(!el)return;
   const day=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/864e5);
@@ -872,6 +875,13 @@ function renderHomeMeals(){
   </div>
   <div style="height:4px;background:var(--border);border-radius:4px;margin-bottom:10px;overflow:hidden">
     <div style="height:100%;width:${pct}%;background:${color};border-radius:4px;transition:width .3s"></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.06);border:1.5px solid ${color}33;margin-bottom:9px">
+    <span style="font-size:15px">🧒🏾</span>
+    <div>
+      <div style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:1px">Kid-safe backup</div>
+      <div style="font-size:12px;font-weight:700;color:var(--text)">${cat==='b'?_kidSafeB[day%_kidSafeB.length]:cat==='l'?_kidSafeL[day%_kidSafeL.length]:_kidSafeD[day%_kidSafeD.length]}</div>
+    </div>
   </div>
   <div style="display:flex;flex-direction:column;gap:5px">
     ${ings.map((ing,i)=>`<div onclick="toggleMealIngredient('${cat}',${i})" style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:4px 2px">
@@ -942,7 +952,14 @@ function setBibleTab(t){
   $('btab-read').classList.toggle('active',t==='read');
   $('bible-plan-view').style.display=t==='plan'?'':'none';
   $('bible-read-view').style.display=t==='read'?'':'none';
-  if(t==='read')renderBibleReader();
+  if(t==='read'){
+    const _tc=getBibleChapterOfDay();
+    const _td=new Date().toLocaleDateString();
+    if(!window._readerInitDate||window._readerInitDate!==_td){
+      readerBook=_tc.book;readerChapter=_tc.chapter;window._readerInitDate=_td;
+    }
+    renderBibleReader();
+  }
 }
 
 function renderBible(){
@@ -1018,7 +1035,7 @@ function getBibleChapterOfDay(){
   const parts=BIBLE_SEQ_START.split('-').map(Number);
   const start=new Date(parts[0],parts[1]-1,parts[2]);
   const today=new Date();today.setHours(0,0,0,0);
-  const dayNum=Math.max(0,Math.floor((today-start)/(1000*60*60*24)));
+  const dayNum=Math.max(0,Math.round((today-start)/(1000*60*60*24)));
   const total=getTotalBibleChapters();
   let idx=dayNum%total;
   for(const book of BIBLE_BOOK_ORDER){
