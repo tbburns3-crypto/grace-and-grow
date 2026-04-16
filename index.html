@@ -2306,9 +2306,9 @@ function applySyncedValue(key, val) {
     dateIdeas:       v => { dateIdeas = v; },
     cleanYou:        v => { const td=new Date().toLocaleDateString(); if(v&&v.date===td&&Array.isArray(v.tasks)){cleanYou=v.tasks;_cleanDate=td;}else{cleanYou=getTodayCleanTasks();_cleanDate=td;} },
     kidScheduleToday:v => { kidScheduleToday = v; },
-    bibleReadings:   v => { const td=new Date().toLocaleDateString(); if(v&&v.date===td&&Array.isArray(v.readings)){if(_readingDate===td&&bibleReadings.length>0){bibleReadings=v.readings.map((r,i)=>Object.assign({},r,{chk:(bibleReadings[i]?bibleReadings[i].chk:false)||r.chk}));}else{bibleReadings=v.readings;_readingDate=td;}}else if(_readingDate!==td){bibleReadings=getBibleReadings();_readingDate=td;} },
+    bibleReadings:   v => { const td=new Date().toLocaleDateString(); if(v&&v.date===td&&Array.isArray(v.readings)){if(_readingDate===td&&bibleReadings.length>0){bibleReadings=v.readings.map((r,i)=>Object.assign({},r,{chk:(bibleReadings[i]?bibleReadings[i].chk:false)||r.chk}));}else{bibleReadings=v.readings;_readingDate=td;} _lsSave('bibleReadings',{date:td,readings:bibleReadings});}else if(_readingDate!==td){bibleReadings=getBibleReadings();_readingDate=td;} },
     journalPins:     v => { journalPins = v; },
-    bibleStreak:    v => { if(v&&typeof v.streak==='number'){bibleStreak=v.streak;streakLastDate=v.lastDate||'';devotDoneDate=v.devotDate||'';} },
+    bibleStreak:    v => { if(v&&typeof v.streak==='number'){bibleStreak=v.streak;streakLastDate=v.lastDate||'';devotDoneDate=v.devotDate||''; _lsSave('bibleStreak',v);} },
     kidNames:        v => { window._kid1Name=v.name1; window._kid1Age=v.age1; window._kid2Name=v.name2; window._kid2Age=v.age2; },
   };
   if (map[key]) map[key](val);
@@ -2331,6 +2331,30 @@ function setSyncStatus(status) {
 }
 
 // ── Init ─────────────────────────────────────────────────────
+// ── LOCAL STORAGE CACHE (instant load on refresh) ───────────────
+function _lsSave(key, val){ try{ localStorage.setItem('gg_'+key, JSON.stringify(val)); }catch(e){} }
+function _lsLoad(key){ try{ const v=localStorage.getItem('gg_'+key); return v?JSON.parse(v):null; }catch(e){ return null; } }
+
+// Restore from localStorage immediately (before Supabase responds)
+(function _localInit(){
+  const td = new Date().toLocaleDateString();
+  // Bible readings
+  const lr = _lsLoad('bibleReadings');
+  if(lr && lr.date===td && Array.isArray(lr.readings)){
+    bibleReadings=lr.readings; _readingDate=td;
+  }
+  // Streak / devot
+  const ls = _lsLoad('bibleStreak');
+  if(ls && typeof ls.streak==='number'){
+    bibleStreak=ls.streak; streakLastDate=ls.lastDate||''; devotDoneDate=ls.devotDate||'';
+  }
+  // Clean tasks
+  const lc = _lsLoad('cleanYou');
+  if(lc && lc.date===td && Array.isArray(lc.tasks)){
+    cleanYou=lc.tasks; _cleanDate=td;
+  }
+})();
+
 async function initSync() {
   setSyncStatus('connecting');
   if (SUPABASE_URL === 'YOUR_SUPABASE_URL') {
@@ -2353,10 +2377,10 @@ function syncBibleNotes()       { syncPush('bibleNotes', bibleNotes); }
 function syncSuggestions()      { syncPush('spicySuggestions', spicySuggestions); }
 function syncMemories()         { syncPush('memories', memories); syncPush('plannedDates', plannedDates); syncPush('dateIdeas', dateIdeas); }
 function syncKids()             { syncPush('kidScheduleToday', kidScheduleToday); syncPush('kidNames', {name1:window._kid1Name,age1:window._kid1Age,name2:window._kid2Name,age2:window._kid2Age}); }
-function syncBibleReadings()    { syncPush('bibleReadings', {date:new Date().toLocaleDateString(),readings:bibleReadings}); }
-function syncStreak()           { syncPush('bibleStreak', {streak:bibleStreak,lastDate:streakLastDate,devotDate:devotDoneDate}); }
+function syncBibleReadings()    { const _d={date:new Date().toLocaleDateString(),readings:bibleReadings}; _lsSave('bibleReadings',_d); syncPush('bibleReadings', _d); }
+function syncStreak()           { const _s={streak:bibleStreak,lastDate:streakLastDate,devotDate:devotDoneDate}; _lsSave('bibleStreak',_s); syncPush('bibleStreak', _s); }
 function syncPins()             { syncPush('journalPins', journalPins); }
-function syncClean()            { syncPush('cleanYou', {date:new Date().toLocaleDateString(),tasks:cleanYou}); }
+function syncClean()            { const _c={date:new Date().toLocaleDateString(),tasks:cleanYou}; _lsSave('cleanYou',_c); syncPush('cleanYou', _c); }
 // ═══════════════════════════════════════════════════════════════
 // END SYNC LAYER
 // ═══════════════════════════════════════════════════════════════
