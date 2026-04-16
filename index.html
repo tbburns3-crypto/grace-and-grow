@@ -964,7 +964,7 @@ function renderBible(){
     +'</div>').join('');
   const dp=$('devot-prompt');if(dp)dp.textContent='"'+day.devotPrompt+'"';
   const ds=$('devot-source');if(ds)ds.textContent=day.devotSource+' \u00b7 '+readingPlan.length+'-day plan';
-  const db=$('devot-btn');if(db){db.textContent='We did this together \u2713';db.disabled=false;db.style.background='linear-gradient(135deg,var(--pink),var(--purple))';}
+  const db=$('devot-btn');if(db){const devotToday=devotDoneDate===new Date().toLocaleDateString();db.textContent=devotToday?'Blessed together! \uD83D\uDE4F\uD83C\uDFFE\uD83D\uDC95':'We did this together \u2713';db.disabled=devotToday;db.style.background=devotToday?'linear-gradient(135deg,var(--mint),var(--teal))':'linear-gradient(135deg,var(--pink),var(--purple))';}
 }
 
 function checkStreakReset(){
@@ -2279,7 +2279,7 @@ function applySyncedValue(key, val) {
     dateIdeas:       v => { dateIdeas = v; },
     cleanYou:        v => { const td=new Date().toLocaleDateString(); if(v&&v.date===td&&Array.isArray(v.tasks)){cleanYou=v.tasks;_cleanDate=td;}else{cleanYou=getTodayCleanTasks();_cleanDate=td;} },
     kidScheduleToday:v => { kidScheduleToday = v; },
-    bibleReadings:   v => { const td=new Date().toLocaleDateString(); if(Array.isArray(v)){bibleReadings=getBibleReadings();_readingDate=td;}else if(v&&v.date===td&&Array.isArray(v.readings)){bibleReadings=v.readings;_readingDate=td;}else{bibleReadings=getBibleReadings();_readingDate=td;} },
+    bibleReadings:   v => { const td=new Date().toLocaleDateString(); if(v&&v.date===td&&Array.isArray(v.readings)){if(_readingDate===td&&bibleReadings.length>0){bibleReadings=v.readings.map((r,i)=>Object.assign({},r,{chk:(bibleReadings[i]?bibleReadings[i].chk:false)||r.chk}));}else{bibleReadings=v.readings;_readingDate=td;}}else if(_readingDate!==td){bibleReadings=getBibleReadings();_readingDate=td;} },
     journalPins:     v => { journalPins = v; },
     bibleStreak:    v => { if(v&&typeof v.streak==='number'){bibleStreak=v.streak;streakLastDate=v.lastDate||'';devotDoneDate=v.devotDate||'';} },
     kidNames:        v => { window._kid1Name=v.name1; window._kid1Age=v.age1; window._kid2Name=v.name2; window._kid2Age=v.age2; },
