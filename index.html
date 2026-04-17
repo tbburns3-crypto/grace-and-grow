@@ -467,6 +467,19 @@ const verses=[
   {t:'"Whatever you do, do it all in the name of the Lord Jesus."',r:'Colossians 3:17'},
 ];
 let verseIdx=0;
+let _verseDay='';
+function renderVerse(){
+  const el=$('vt');if(!el)return;
+  const today=new Date().toLocaleDateString();
+  if(_verseDay!==today){
+    _verseDay=today;
+    verseIdx=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/864e5)%verses.length;
+  }
+  const v=verses[verseIdx];
+  el.textContent='"'+v.t.replace(/^"|"$/g,'')+'"';
+  const nr=el.nextElementSibling;
+  if(nr)nr.innerHTML=v.r+'&nbsp;<span class="vtap">tap to refresh ✨</span>';
+}
 function refreshVerse(){
   verseIdx=(verseIdx+1)%verses.length;const v=verses[verseIdx],el=$('vt');
   el.style.transition='opacity .18s';el.style.opacity='0';
@@ -826,7 +839,7 @@ let journalEntries={
 };
 let recipeIdx={breakfast:0,lunch:0,dinner:0};
 
-function renderHome(){renderFocusZone();renderHomeKids();renderHomeMeals();renderHomeBible();renderHomeBills();}
+function renderHome(){renderVerse();renderFocusZone();renderHomeKids();renderHomeMeals();renderHomeBible();renderHomeBills();}
 
 // ingredient check state — resets each day
 let _mealCheckDate='', _mealChecks={b:[],l:[],d:[]};
@@ -2262,6 +2275,7 @@ function startRealtimeSync() {
 
 // ── PUSH: write a key to Supabase ────────────────────────────
 async function syncPush(key, value) {
+  _lsSave(key, value);
   if (!syncReady) return;
   await dbUpsert('gg_sync', { key, value: JSON.stringify(value) });
 }
@@ -2281,6 +2295,7 @@ async function pullAll(applyRender = true) {
       try {
         const val = JSON.parse(row.value);
         applySyncedValue(row.key, val);
+        _lsSave(row.key, val); // cache latest from server
       } catch(e) {}
     });
 
@@ -2337,22 +2352,14 @@ function _lsLoad(key){ try{ const v=localStorage.getItem('gg_'+key); return v?JS
 
 // Restore from localStorage immediately (before Supabase responds)
 (function _localInit(){
-  const td = new Date().toLocaleDateString();
-  // Bible readings
-  const lr = _lsLoad('bibleReadings');
-  if(lr && lr.date===td && Array.isArray(lr.readings)){
-    bibleReadings=lr.readings; _readingDate=td;
-  }
-  // Streak / devot
-  const ls = _lsLoad('bibleStreak');
-  if(ls && typeof ls.streak==='number'){
-    bibleStreak=ls.streak; streakLastDate=ls.lastDate||''; devotDoneDate=ls.devotDate||'';
-  }
-  // Clean tasks
-  const lc = _lsLoad('cleanYou');
-  if(lc && lc.date===td && Array.isArray(lc.tasks)){
-    cleanYou=lc.tasks; _cleanDate=td;
-  }
+  const ALL_KEYS=['bills','budgetItems','savingsGoals','groceryList','tasks',
+    'journalEntries','bibleNotes','spicySuggestions','memories','plannedDates',
+    'dateIdeas','kidScheduleToday','kidNames','journalPins',
+    'bibleReadings','bibleStreak','cleanYou'];
+  ALL_KEYS.forEach(key=>{
+    const v=_lsLoad(key);
+    if(v!==null) try{ applySyncedValue(key,v); }catch(e){}
+  });
 })();
 
 async function initSync() {
