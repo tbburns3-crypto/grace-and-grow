@@ -559,12 +559,13 @@ function ensureReadings(){
   if(today!==_readingDate){_readingDate=today;bibleReadings=getBibleReadings();}
 }
 const breakfasts=[
-  {title:'Shrimp & Grits',chef:'Chef Marcus Samuelsson',type:'black',badge:'rb-black',desc:'Creamy stone-ground grits topped with perfectly seasoned gulf shrimp, crispy turkey bacon, and a rich Creole butter sauce. A Southern classic elevated.',leftover:'Use leftover grits as a savory breakfast bowl tomorrow — top with a fried egg and hot sauce.',recipe:{ingredients:['1 cup stone-ground grits','4 cups water or chicken broth','1 lb large shrimp, peeled & deveined','4 strips turkey bacon, chopped','3 tbsp butter','1 cup sharp cheddar, shredded','2 cloves garlic, minced','1 tsp Creole seasoning','Salt & pepper to taste','2 green onions, sliced'],steps:['Bring broth to a boil, whisk in grits. Reduce heat and cook 20–25 min stirring often.','Stir in 2 tbsp butter and cheddar into grits. Season with salt. Keep warm.','Cook turkey bacon in skillet over medium heat until crispy. Set aside.','In same pan, melt 1 tbsp butter. Add garlic, cook 30 sec.','Add shrimp and Creole seasoning. Cook 2–3 min per side until pink.','Serve shrimp and bacon over grits. Top with green onions.']}},
-  {title:'Sweet Potato Pancakes',chef:'Chef Carla Hall',type:'black',badge:'rb-black',desc:'Fluffy pancakes made with roasted sweet potato, warm spices, and topped with brown butter maple syrup. So good the kids will want some too.',leftover:'Extra pancakes freeze beautifully — pop them in the toaster for a quick weekday breakfast.',recipe:{ingredients:['1 cup mashed roasted sweet potato','1½ cups all-purpose flour','2 tsp baking powder','1 tsp cinnamon','½ tsp nutmeg','2 eggs','1 cup buttermilk','2 tbsp melted butter','2 tbsp brown sugar','4 tbsp butter (for brown butter syrup)','½ cup maple syrup'],steps:['Whisk flour, baking powder, cinnamon, nutmeg, and sugar together.','In another bowl, mix sweet potato, eggs, buttermilk, and melted butter.','Fold wet into dry — don\'t overmix. Lumps are fine.','Cook on greased griddle over medium heat until bubbles form, flip once.','For brown butter syrup: melt 4 tbsp butter in small pan until golden and nutty. Add maple syrup, swirl.','Serve pancakes topped with brown butter syrup.']}},
-  {title:'Huevos Rancheros',chef:'Chef Aaron Sanchez',type:'cultural',badge:'rb-cultural',desc:'Crispy corn tortillas with refried black beans, poached eggs, fresh salsa roja, queso fresco, and avocado slices.',leftover:'Use leftover salsa roja on scrambled eggs the next morning or as a dip.',recipe:{ingredients:['4 corn tortillas','4 eggs','1 can black beans, drained','3 Roma tomatoes','½ onion','2 jalapeños','2 cloves garlic','½ cup crumbled queso fresco','1 avocado, sliced','Oil for frying','Salt & cumin to taste'],steps:['Char tomatoes, jalapeños, onion and garlic under broiler 5 min.','Blend charred veggies with salt and cumin into salsa roja. Simmer 10 min.','Fry tortillas in oil until crispy. Drain on paper towels.','Warm black beans in pan, season with salt.','Poach eggs in simmering water 3–4 min.','Layer: tortilla → beans → egg → salsa → queso fresco → avocado.']}},
-  {title:'Jerk Chicken & Egg Fried Rice',chef:'Chef Kwame Onwuachi',type:'black',badge:'rb-black',desc:'Smoky jerk-spiced chicken thighs alongside fluffy jasmine fried rice with soft egg ribbons and scallions.',leftover:'The fried rice reheats perfectly — add a fried egg on top for tomorrow\'s lunch.',recipe:{ingredients:['2 chicken thighs, boneless','2 tbsp jerk seasoning','2 cups cooked day-old jasmine rice','3 eggs, beaten','3 green onions, sliced','2 tbsp soy sauce','1 tbsp sesame oil','2 cloves garlic, minced','1 tbsp vegetable oil'],steps:['Rub chicken with jerk seasoning. Let sit 15 min.','Grill or pan-sear chicken over medium-high heat 6–7 min per side. Rest 5 min, then slice.','Heat oil in wok or large skillet over high heat. Add garlic, stir 30 sec.','Add rice, break up clumps, stir-fry 3 min until slightly crispy.','Push rice to side. Pour eggs in, scramble until just set, then fold into rice.','Add soy sauce and sesame oil. Toss. Top with scallions and sliced chicken.']}},
-  {title:'Shakshuka with Feta',chef:'Chef Einat Admony',type:'cultural',badge:'rb-cultural',desc:'Eggs poached in a spiced tomato-pepper sauce, finished with creamy feta, fresh herbs, and served with crusty bread.',leftover:'Leftover sauce works as a pasta sauce — just warm and add pasta to the pan.',recipe:{ingredients:['6 eggs','1 can crushed tomatoes (28 oz)','2 bell peppers, diced','1 onion, diced','4 cloves garlic, minced','1 tsp cumin','1 tsp paprika','½ tsp cayenne','½ cup crumbled feta','Fresh parsley','Crusty bread to serve','2 tbsp olive oil'],steps:['Heat olive oil in large oven-safe skillet. Sauté onion and peppers 5–6 min.','Add garlic and spices, cook 1 min more.','Pour in tomatoes. Simmer 10–15 min until sauce thickens.','Make wells in sauce. Crack one egg into each well.','Cover and cook over low heat 5–8 min until whites are set, yolks still soft.','Top with feta and parsley. Serve straight from pan with crusty bread.']}},
-  {title:'Southern Biscuits & Gravy',chef:'Chef Nina Compton',type:'black',badge:'rb-black',desc:'Buttery hand-rolled biscuits smothered in rich spiced sausage cream gravy with fresh thyme.',leftover:'Crumble leftover biscuits into tomorrow\'s soup or stew for a hearty addition.',recipe:{ingredients:['2 cups all-purpose flour','1 tbsp baking powder','½ tsp salt','6 tbsp cold butter, cubed','¾ cup cold buttermilk','½ lb ground turkey sausage','2 tbsp flour (for gravy)','2 cups whole milk','Fresh thyme','Black pepper'],steps:['Preheat oven 425°F. Mix flour, baking powder, salt.','Cut in cold butter until pea-sized crumbles form.','Stir in buttermilk just until dough comes together.','Pat to ¾ inch thick, cut into rounds. Bake 12–14 min until golden.','Brown sausage in skillet. Sprinkle in 2 tbsp flour, stir 1 min.','Slowly pour in milk, whisking. Simmer until thick. Season with thyme and black pepper.','Pour gravy over warm biscuits and serve immediately.']}},
+  {title:'Cereal & Milk',chef:'Quick & easy',type:'',badge:'',desc:'Simple bowl',recipe:{ingredients:['Cereal of choice','Cold milk','Sliced banana'],steps:['Pour cereal','Add cold milk','Top with banana']}},
+  {title:'Oatmeal with Banana',chef:'Quick & easy',type:'',badge:'',desc:'Warm and filling',recipe:{ingredients:['1 cup quick oats','2 cups milk','1 banana, sliced','1 tbsp honey','Cinnamon to taste'],steps:['Heat milk','Stir in oats 3 min','Top with banana and honey']}},
+  {title:'Scrambled Eggs & Toast',chef:'Quick & easy',type:'',badge:'',desc:'Classic kids breakfast',recipe:{ingredients:['3 eggs','2 tbsp butter','2 slices bread','Salt & pepper'],steps:['Whisk eggs','Scramble in butter','Serve with toast']}},
+  {title:'Yogurt Parfait',chef:'No cook',type:'',badge:'',desc:'Fresh and quick',recipe:{ingredients:['1 cup yogurt','\u00BC cup granola','\u00BD cup berries','Honey to drizzle'],steps:['Layer yogurt','Add granola and berries','Drizzle honey']}},
+  {title:'Peanut Butter Banana Toast',chef:'No cook',type:'',badge:'',desc:'Quick and protein-packed',recipe:{ingredients:['2 slices bread','3 tbsp peanut butter','1 banana, sliced','Honey to drizzle'],steps:['Toast bread','Spread peanut butter','Top with banana and honey']}},
+  {title:'Fruit Smoothie',chef:'Quick & easy',type:'',badge:'',desc:'Blend and go',recipe:{ingredients:['1 cup frozen berries','1 banana','1 cup milk or yogurt','1 tbsp honey'],steps:['Add all to blender','Blend until smooth','Pour and serve']}},
+  {title:'Pancakes',chef:'Quick & easy',type:'',badge:'',desc:'Weekend favorite',recipe:{ingredients:['1 cup pancake mix','\u00BE cup milk','1 egg','Butter for cooking','Maple syrup'],steps:['Mix batter','Cook on buttered griddle','Serve with syrup']}},
 ];
 const lunches=[
   {title:'Blackened Catfish Po\'Boy',chef:'Chef Leah Chase',type:'black',badge:'rb-black',desc:'Crispy blackened catfish on a toasted French roll with Creole remoulade, shredded cabbage, tomato, and pickles.',leftover:'Leftover catfish flakes wonderfully into tomorrow\'s fish tacos or on top of a salad.',recipe:{ingredients:['2 catfish fillets','2 tbsp blackening seasoning','2 French rolls, split','1 cup shredded cabbage','1 tomato, sliced','Pickles','3 tbsp mayo','1 tbsp Creole mustard','1 tsp hot sauce','1 tsp lemon juice','2 tbsp butter'],steps:['Mix mayo, mustard, hot sauce, and lemon juice for remoulade. Chill.','Coat catfish in blackening seasoning on both sides.','Heat cast iron skillet very hot. Add butter, cook catfish 3–4 min per side.','Toast rolls cut-side down in same pan.','Spread remoulade on both sides of roll.','Layer: cabbage → catfish → tomato → pickles. Serve immediately.']}},
@@ -864,52 +865,80 @@ const _kidSafeL=['Mac & cheese','Grilled cheese sandwich','Turkey & cheese sandw
 const _kidSafeD=['Chicken nuggets & mac and cheese','Grilled cheese & tomato soup','Hot dogs & tater tots','Buttered pasta with parmesan','Mini cheese pizzas','Corn dogs & sweet corn','PB&J & apple slices'];
 function renderHomeMeals(){
   const el=$('home-meals');if(!el)return;
-  const day=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/864e5);
-  const meals=[
-    {label:'🌅 Breakfast',color:'var(--orange)',bg:'var(--orange-bg)',cat:'b',meal:breakfasts[day%breakfasts.length]},
-    {label:'☀️ Lunch',   color:'var(--lime)',  bg:'var(--lime-bg)',  cat:'l',meal:lunches[day%lunches.length]},
-    {label:'🌙 Dinner',  color:'var(--purple)',bg:'var(--purple-bg)',cat:'d',meal:dinners[day%dinners.length]},
-  ];
+  const today=_getMealPlanWeek()[0];
+  const doy=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/864e5);
   const chk=_getMealChecks();
-  el.innerHTML=meals.map(({label,color,bg,cat,meal})=>{
-    const ings=meal.recipe.ingredients;
-    if(!chk[cat].length)chk[cat]=ings.map(()=>false);
-    const done=chk[cat].filter(Boolean).length;
-    const total=ings.length;
-    const pct=Math.round(done/total*100);
-    return `<div style="background:${bg};border:2px solid ${color}33;border-radius:14px;padding:13px;margin-bottom:10px">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-    <div>
-      <div style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:${color};margin-bottom:2px">${label}</div>
-      <div style="font-size:14px;font-weight:800;color:var(--text)">${meal.title}</div>
-      <div style="font-size:11px;color:var(--text3);font-weight:600">${meal.chef}</div>
-    </div>
-    <div style="text-align:center;min-width:44px">
-      <div style="font-size:16px;font-weight:900;color:${color}">${done}/${total}</div>
-      <div style="font-size:9px;font-weight:800;color:var(--text3);text-transform:uppercase">items</div>
-    </div>
-  </div>
-  <div style="height:4px;background:var(--border);border-radius:4px;margin-bottom:10px;overflow:hidden">
-    <div style="height:100%;width:${pct}%;background:${color};border-radius:4px;transition:width .3s"></div>
-  </div>
-  <div style="display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.06);border:1.5px solid ${color}33;margin-bottom:9px">
-    <span style="font-size:15px">🧒🏾</span>
-    <div>
-      <div style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:1px">Kid-safe backup</div>
-      <div style="font-size:12px;font-weight:700;color:var(--text)">${cat==='b'?_kidSafeB[day%_kidSafeB.length]:cat==='l'?_kidSafeL[day%_kidSafeL.length]:_kidSafeD[day%_kidSafeD.length]}</div>
-    </div>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:5px">
-    ${ings.map((ing,i)=>`<div onclick="toggleMealIngredient('${cat}',${i})" style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:4px 2px">
-      <div style="width:18px;height:18px;border-radius:5px;border:2px solid ${chk[cat][i]?color:('var(--border2)')};background:${chk[cat][i]?color:'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s">
-        ${chk[cat][i]?'<svg width="10" height="8" viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg>':''}
-      </div>
-      <div style="font-size:12px;font-weight:600;color:var(--text);${chk[cat][i]?'text-decoration:line-through;opacity:.5':''};">${ing}</div>
-    </div>`).join('')}
-  </div>
-</div>`;
-  }).join('');
+  let html='';
+
+  // Kids' Breakfast — simple banner, no ingredient tracking
+  html+='<div style="background:var(--orange-bg);border:2px solid var(--orange)33;border-radius:14px;padding:11px 13px;margin-bottom:10px;display:flex;align-items:center;gap:11px">'
+    +'<div style="font-size:26px">\uD83E\uDDD2\uD83C\uDFFE</div>'
+    +'<div style="flex:1">'
+    +'<div style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--orange);margin-bottom:2px">\uD83C\uDF05 Kids\u2019 Breakfast</div>'
+    +'<div style="font-size:14px;font-weight:800;color:var(--text)">'+today.b.title+'</div>'
+    +'<div style="font-size:11px;color:var(--text3);font-weight:600">'+today.b.recipe.ingredients.join(' \u00B7 ')+'</div>'
+    +'</div>'
+    +'</div>';
+
+  // Lunch
+  if(today.l&&(today.l.eatOut||today.l.churchOut)){
+    const icon=today.l.churchOut?'\uD83D\uDE4F':'\uD83C\uDF55';
+    const sub=today.l.churchOut?'Lunch after/at church \u2014 no cooking needed!':'Enjoy the break! \uD83D\uDE0A';
+    html+=_renderEatOutCard('\u2600\uFE0F Lunch','var(--lime)','var(--lime-bg)',today.l.title,icon,sub);
+  } else if(today.l&&today.l.recipe){
+    html+=_renderMealCard('\u2600\uFE0F Lunch','var(--lime)','var(--lime-bg)','l',today.l,doy,chk);
+  }
+
+  // Dinner
+  if(today.d&&(today.d.eatOut||today.d.churchOut)){
+    const icon=today.d.churchOut?'\uD83D\uDE4F':'\uD83C\uDF55';
+    const sub='Enjoy the break! \uD83D\uDE0A';
+    html+=_renderEatOutCard('\uD83C\uDF19 Dinner','var(--purple)','var(--purple-bg)',today.d.title,icon,sub);
+  } else if(today.d&&today.d.recipe){
+    html+=_renderMealCard('\uD83C\uDF19 Dinner','var(--purple)','var(--purple-bg)','d',today.d,doy,chk);
+  }
+
+  el.innerHTML=html;
 }
+function _renderEatOutCard(label,color,bg,title,icon,sub){
+  return '<div style="background:'+bg+';border:2px dashed '+color+'55;border-radius:14px;padding:16px;margin-bottom:10px;text-align:center">'
+    +'<div style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:'+color+';margin-bottom:6px">'+label+'</div>'
+    +'<div style="font-size:28px;margin-bottom:4px">'+icon+'</div>'
+    +'<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px">'+title+'</div>'
+    +'<div style="font-size:12px;color:var(--text3);font-weight:600">'+sub+'</div>'
+    +'</div>';
+}
+function _renderMealCard(label,color,bg,cat,meal,doy,chk){
+  const ings=meal.recipe.ingredients;
+  if(!chk[cat].length)chk[cat]=ings.map(()=>false);
+  const done=chk[cat].filter(Boolean).length;
+  const total=ings.length;
+  const pct=Math.round(done/total*100);
+  let h='<div style="background:'+bg+';border:2px solid '+color+'33;border-radius:14px;padding:13px;margin-bottom:10px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+    +'<div>'
+    +'<div style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:'+color+';margin-bottom:2px">'+label+'</div>'
+    +'<div style="font-size:14px;font-weight:800;color:var(--text)">'+meal.title+'</div>'
+    +'<div style="font-size:11px;color:var(--text3);font-weight:600">'+(meal.chef||'')+'</div>'
+    +'</div>'
+    +'<div style="text-align:center;min-width:44px">'
+    +'<div style="font-size:16px;font-weight:900;color:'+color+'">'+done+'/'+total+'</div>'
+    +'<div style="font-size:9px;font-weight:800;color:var(--text3);text-transform:uppercase">items</div>'
+    +'</div></div>'
+    +'<div style="height:4px;background:var(--border);border-radius:4px;margin-bottom:10px;overflow:hidden">'
+    +'<div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:4px;transition:width .3s"></div></div>'
+    +'<div style="display:flex;flex-direction:column;gap:5px">';
+  ings.forEach((ing,idx)=>{
+    const checked=chk[cat][idx];
+    h+='<div onclick="toggleMealIngredient(\x27'+cat+'\x27,'+idx+')" style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:4px 2px">'
+      +'<div style="width:18px;height:18px;border-radius:5px;border:2px solid '+(checked?color:'var(--border2)')+';background:'+(checked?color:'transparent')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s">'+(checked?'<svg width="10" height="8" viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg>':'')+'</div>'
+      +'<div style="font-size:12px;font-weight:600;color:var(--text);'+(checked?'text-decoration:line-through;opacity:.5':'')+'">'+ing+'</div>'
+      +'</div>';
+  });
+  h+='</div></div>';
+  return h;
+}
+
 function renderHomeKids(){
   const el=$('home-kids-activity');if(!el)return;
   const scheduleColors={'kb-meal':'#ff9f43','kb-free':'#20bf6b','kb-gym':'#f953c6','kb-bed':'#54a0ff','kb-dance':'#a55eea','kb-bath':'#00d2d3'};
@@ -1383,12 +1412,25 @@ function _getMealPlanWeek(){
   const dayOfYear=d=>Math.floor((d-new Date(d.getFullYear(),0,0))/dayMs);
   const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const EAT_OUT={title:'Eat Out / Pizza Night \uD83C\uDF55',eatOut:true};
+  const CHURCH={title:'After Church \uD83D\uDE4F',churchOut:true};
   return Array.from({length:7},(_,i)=>{
     const d=new Date(now.getTime()+i*dayMs);
     const doy=dayOfYear(d);
-    return{label:(i===0?'Today':days[d.getDay()])+', '+months[d.getMonth()]+' '+d.getDate(),b:breakfasts[doy%breakfasts.length],l:lunches[doy%lunches.length],d:dinners[doy%dinners.length],offset:i};
+    const dow=d.getDay();
+    const isFriday=dow===5;
+    const isSunday=dow===0;
+    return{
+      label:(i===0?'Today':days[dow])+', '+months[d.getMonth()]+' '+d.getDate(),
+      b:breakfasts[doy%breakfasts.length],
+      l:isFriday?EAT_OUT:isSunday?CHURCH:lunches[doy%lunches.length],
+      d:isFriday?EAT_OUT:dinners[doy%dinners.length],
+      offset:i,
+      dow
+    };
   });
 }
+
 function _getMealPlanWeekKey(){
   const now=new Date();now.setHours(0,0,0,0);
   const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));
@@ -1470,7 +1512,12 @@ function renderGrocery(el){
       html+='<div style="font-size:11px;font-weight:900;color:var(--text2);padding:6px 0 3px;border-top:1px solid var(--border)">'+day.label+'</div>';
       ['b','l','d'].forEach(cat=>{
         const meal=day[cat];
-        if(!meal||!meal.recipe||!meal.recipe.ingredients)return;
+        if(!meal)return;
+        if(meal.eatOut||meal.churchOut){
+          if(cat!=='b')html+='<div style="font-size:10px;font-weight:700;color:var(--text3);margin:3px 0 5px;padding:3px 8px;border-radius:6px;background:var(--border);display:inline-block">'+catLabel[cat]+' \u2014 '+meal.title+'</div>';
+          return;
+        }
+        if(!meal.recipe||!meal.recipe.ingredients)return;
         html+='<div style="font-size:10px;font-weight:800;color:'+catColor[cat]+';margin:3px 0 2px;padding-left:4px">'+catLabel[cat]+' \u2014 '+meal.title+'</div>';
         meal.recipe.ingredients.forEach((ing,ii)=>{
           const key=cat+'_'+day.offset+'_'+ii;
