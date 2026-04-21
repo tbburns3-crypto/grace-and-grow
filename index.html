@@ -1364,7 +1364,7 @@ function renderGrocery(el){
 
   html+='<div style="background:linear-gradient(135deg,var(--purple-bg),rgba(29,209,161,.08));border:2px solid var(--purple)44;border-radius:14px;padding:13px;margin-bottom:12px">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
-    +'<div style="font-size:11px;font-weight:900;color:var(--purple);text-transform:uppercase;letter-spacing:.07em">📅 This Week's Meal Ingredients</div>'
+    +'<div style="font-size:11px;font-weight:900;color:var(--purple);text-transform:uppercase;letter-spacing:.07em">📅 This Week\u2019s Meal Ingredients</div>'
     +'<div style="font-size:11px;font-weight:800;color:var(--text3)">'+mealIngDone+'/'+mealIngTotal+' ✓</div>'
     +'</div>'
     +'<div style="height:4px;background:var(--border);border-radius:4px;margin-bottom:11px;overflow:hidden"><div style="height:100%;width:'+mealPct+'%;background:linear-gradient(90deg,var(--purple),var(--teal));border-radius:4px;transition:width .3s"></div></div>';
@@ -1378,7 +1378,7 @@ function renderGrocery(el){
       meal.recipe.ingredients.forEach((ing,ii)=>{
         const key=cat+'_'+day.offset+'_'+ii;
         const chk=!!mealPlanChecks[key];
-        html+='<div onclick="toggleMealPlanIngredient(''+key+'')" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:3px 0 3px 8px">'
+        html+='<div onclick="toggleMealPlanIngredient(\x27'+key+'\x27)" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:3px 0 3px 8px">'
           +'<div style="width:16px;height:16px;border-radius:4px;border:2px solid '+(chk?catColor[cat]:'var(--border2)')+';background:'+(chk?catColor[cat]:'transparent')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s">'+(chk?'<svg width="9" height="7" viewBox="0 0 9 7"><polyline points="1,3.5 3.5,6 8,1" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>':'')+'</div>'
           +'<div style="font-size:11px;font-weight:600;color:var(--text);'+(chk?'text-decoration:line-through;opacity:.45':'')+'">'+ing+'</div>'
           +'</div>';
@@ -1387,7 +1387,7 @@ function renderGrocery(el){
   });
   html+='</div>';
 
-  for(const [cat,items] of Object.entries(groceryList)){html+='<div style="font-size:12px;font-weight:900;color:var(--text2);padding:7px 0 3px">'+cat+'</div><div class="card" style="padding:4px 13px">'+items.map((item,i)=>'<div class="crow" onclick="toggleGrocery(''+cat+'','+i+')"><div class="cbox '+(item.done?'chk':'')+'">  '+(item.done?'✓':'')+'</div><div class="clbl '+(item.done?'done':'')+'">'+item.name+'</div></div>').join('')+'</div>';}
+  for(const [cat,items] of Object.entries(groceryList)){html+='<div style="font-size:12px;font-weight:900;color:var(--text2);padding:7px 0 3px">'+cat+'</div><div class="card" style="padding:4px 13px">'+items.map((item,i)=>'<div class="crow" onclick="toggleGrocery(\x27'+cat+'\x27,'+i+')"><div class="cbox '+(item.done?'chk':'')+'">  '+(item.done?'✓':'')+'</div><div class="clbl '+(item.done?'done':'')+'">'+item.name+'</div></div>').join('')+'</div>';}
   el.innerHTML=html;
 }
 function toggleGrocery(cat,i){groceryList[cat][i].done=!groceryList[cat][i].done;syncGrocery();if(mealTab==='grocery'){const el=$('meal-content');if(el)renderGrocery(el);}}
