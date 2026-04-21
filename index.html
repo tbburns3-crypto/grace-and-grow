@@ -2487,8 +2487,8 @@ function lockSubmit(){
   }
 })();
 initSync();
-renderHome();
-renderBible();
+try { renderHome(); } catch(e) { console.error('renderHome failed:', e); const el = document.getElementById('focus-zone'); if(el) el.innerHTML = '<div style="color:red;padding:10px;font-size:12px">Load error: '+e.message+'</div>'; }
+try { renderBible(); } catch(e) { console.error('renderBible failed:', e); }
 </script>
 </body>
 </html>
