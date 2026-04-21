@@ -940,7 +940,7 @@ function renderFocusZone(){
   const el=$('focus-zone');if(!el)return;
   if(mode==='you'){
     const step=cleanYou[currentCleanStep];
-    if(!step){el.innerHTML='<div style="text-align:center;padding:28px 0"><div style="font-size:48px;animation:pop .4s">🌟</div><div style="font-family:var(--serif);font-size:19px;color:var(--text);margin:8px 0 4px">You finished everything!</div><div style="font-size:13px;color:var(--text2);font-weight:600">Rest now. You earned it. 💜</div><button class="btn btn-purple btn-sm" style="margin-top:14px" onclick="currentCleanStep=0;renderHome()">Reset 🔄</button></div>';return;}
+    if(!step){el.innerHTML='<div style="text-align:center;padding:28px 0"><div style="font-size:48px;animation:pop .4s">🌟</div><div style="font-family:var(--serif);font-size:19px;color:var(--text);margin:8px 0 4px">You finished everything!</div><div style="font-size:13px;color:var(--text2);font-weight:600">Rest now. You earned it. 💜</div><button class="btn btn-purple btn-sm" style="margin-top:14px" onclick="resetCleanHome()">Reset 🔄</button></div>';return;}
     homeTimerSecs=step.dur;homeTimerFull=step.dur;homeTimerOn=false;
     el.innerHTML='<div class="sl" style="color:var(--purple)">Your one thing right now 💜</div><div class="card card-purple"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px"><div class="badge bher">One step at a time</div><div style="font-size:11px;font-weight:800;color:var(--text3)">'+(currentCleanStep+1)+' / '+cleanYou.length+'</div></div><div style="font-family:var(--serif);font-size:18px;color:var(--text);margin-bottom:5px;line-height:1.4;font-weight:700">'+step.t+'</div><div style="font-size:12px;color:var(--text2);margin-bottom:12px;font-weight:600">'+step.d+'</div><div class="ptrack"><div class="pfill" style="width:'+Math.round((currentCleanStep/cleanYou.length)*100)+'%"></div></div><div class="timer-block"><div class="tbig" id="htimer">'+fmtTime(step.dur)+'</div><div class="tctrl"><button class="btn btn-purple" id="hstart-btn" onclick="homeToggleTimer()">&#9658; Start '+step.time+'</button><button class="btn btn-mint" onclick="homeDone()">Done! ✓</button></div></div></div>';
   } else {
@@ -948,7 +948,7 @@ function renderFocusZone(){
   }
 }
 function homeToggleTimer(){const btn=$('hstart-btn');if(!btn)return;if(!homeTimerOn){homeTimerOn=true;btn.textContent='⏸ Pause';homeTimerInt=setInterval(()=>{homeTimerSecs--;const t=$('htimer');if(t)t.textContent=fmtTime(homeTimerSecs);if(homeTimerSecs<=0){clearInterval(homeTimerInt);homeTimerOn=false;btn.textContent='☕ Break time!';homeTimerSecs=homeTimerFull;}},1000);}else{homeTimerOn=false;clearInterval(homeTimerInt);btn.textContent='▶ Resume';}}
-function homeDone(){clearInterval(homeTimerInt);homeTimerOn=false;currentCleanStep=Math.min(currentCleanStep+1,cleanYou.length);renderHome();}
+function homeDone(){clearInterval(homeTimerInt);homeTimerOn=false;currentCleanStep=Math.min(currentCleanStep+1,cleanYou.length);syncClean();renderHome();}
 function toggleHimStep(row,i){const n=row.querySelector('.snum');n.classList.toggle('done');n.textContent=n.classList.contains('done')?'✓':(i+1);}
 function renderHomeBible(){
   ensureReadings();
@@ -1281,7 +1281,7 @@ function renderClean(){
   const el=$('clean-content');if(!el)return;
   if(mode==='you'){
     const step=cleanYou[currentCleanStep];
-    if(!step){el.innerHTML='<div style="text-align:center;padding:32px 16px"><div style="font-size:52px;animation:pop .4s">🌟</div><div style="font-family:var(--serif);font-size:20px;color:var(--text);margin:9px 0 5px">You did every single step!</div><div style="font-size:13px;color:var(--text2);font-weight:600">You are incredible. Rest now. 💜</div><button class="btn btn-purple" style="margin-top:14px" onclick="currentCleanStep=0;renderClean()">Reset 🔄</button></div>';return;}
+    if(!step){el.innerHTML='<div style="text-align:center;padding:32px 16px"><div style="font-size:52px;animation:pop .4s">🌟</div><div style="font-family:var(--serif);font-size:20px;color:var(--text);margin:9px 0 5px">You did every single step!</div><div style="font-size:13px;color:var(--text2);font-weight:600">You are incredible. Rest now. 💜</div><button class="btn btn-purple" style="margin-top:14px" onclick="resetClean()">Reset 🔄</button></div>';return;}
     cleanTimerSecs=step.dur;cleanTimerFull=step.dur;cleanTimerOn=false;
     el.innerHTML='<div class="sl" style="color:var(--purple)">Step '+(currentCleanStep+1)+' of '+cleanYou.length+' 💜</div><div class="card card-purple"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px"><div class="badge bher">One thing at a time</div><div style="font-size:11px;font-weight:800;color:var(--text3)">'+cleanYou.filter((_,j)=>j<currentCleanStep).length+' done ✓</div></div><div class="ptrack"><div class="pfill" style="width:'+Math.round((currentCleanStep/cleanYou.length)*100)+'%"></div></div><div style="font-family:var(--serif);font-size:20px;color:var(--text);margin:12px 0 5px;line-height:1.35;font-weight:700">'+step.t+'</div><div style="font-size:13px;color:var(--text2);margin-bottom:14px;font-style:italic;font-weight:600">'+step.d+'</div><div class="timer-block"><div class="tbig" id="ctimer">'+fmtTime(step.dur)+'</div><div class="ptrack"><div class="pfill" id="ctimer-prog" style="width:0%"></div></div><div class="tctrl"><button class="btn btn-purple" id="cstart-btn" onclick="cleanToggleTimer()">&#9658; Start '+step.time+'</button><button class="btn btn-mint" onclick="cleanDone()">Done! Next ✓</button></div></div></div>'+(currentCleanStep+1<cleanYou.length?'<div style="opacity:.45;margin-top:4px"><div class="sl" style="color:var(--text3)">Coming up next</div><div class="card"><div style="font-size:13px;font-weight:600;color:var(--text)">'+cleanYou[currentCleanStep+1].t+'</div><div style="font-size:11px;color:var(--text3);font-weight:600;margin-top:3px">'+cleanYou[currentCleanStep+1].time+' · rest first 💜</div></div></div>':'');
   } else {
@@ -1293,7 +1293,9 @@ function renderClean(){
   }
 }
 function cleanToggleTimer(){const btn=$('cstart-btn');if(!btn)return;if(!cleanTimerOn){cleanTimerOn=true;btn.textContent='⏸ Pause';cleanTimerInt=setInterval(()=>{cleanTimerSecs--;const t=$('ctimer');if(t)t.textContent=fmtTime(cleanTimerSecs);const p=$('ctimer-prog');if(p)p.style.width=Math.round((1-cleanTimerSecs/cleanTimerFull)*100)+'%';if(cleanTimerSecs<=0){clearInterval(cleanTimerInt);cleanTimerOn=false;btn.textContent='☕ Break time!';cleanTimerSecs=cleanTimerFull;}},1000);}else{cleanTimerOn=false;clearInterval(cleanTimerInt);btn.textContent='▶ Resume';}}
-function cleanDone(){clearInterval(cleanTimerInt);cleanTimerOn=false;currentCleanStep=Math.min(currentCleanStep+1,cleanYou.length);renderClean();}
+function cleanDone(){clearInterval(cleanTimerInt);cleanTimerOn=false;currentCleanStep=Math.min(currentCleanStep+1,cleanYou.length);syncClean();renderClean();}
+function resetClean(){currentCleanStep=0;syncClean();renderClean();}
+function resetCleanHome(){currentCleanStep=0;syncClean();renderHome();}
 function toggleDaily(i){const b=$('dcbox-'+i),l=$('dlbl-'+i);if(!b)return;b.classList.toggle('chk');b.textContent=b.classList.contains('chk')?'✓':'';l.classList.toggle('done');}
 function toggleMonthly(i){const b=$('mcbox-'+i),l=$('mlbl-'+i);if(!b)return;b.classList.toggle('chk');b.textContent=b.classList.contains('chk')?'✓':'';l.classList.toggle('done');}
 
@@ -2319,7 +2321,7 @@ function applySyncedValue(key, val) {
     memories:        v => { memories = v; },
     plannedDates:    v => { plannedDates = v; },
     dateIdeas:       v => { dateIdeas = v; },
-    cleanYou:        v => { const td=new Date().toLocaleDateString(); if(v&&v.date===td&&Array.isArray(v.tasks)){cleanYou=v.tasks;_cleanDate=td;}else{cleanYou=getTodayCleanTasks();_cleanDate=td;} },
+    cleanYou:        v => { const td=new Date().toLocaleDateString(); if(v&&v.date===td&&Array.isArray(v.tasks)){cleanYou=v.tasks;_cleanDate=td;if(typeof v.step==='number')currentCleanStep=v.step;}else{cleanYou=getTodayCleanTasks();_cleanDate=td;currentCleanStep=0;} },
     kidScheduleToday:v => { kidScheduleToday = v; },
     bibleReadings:   v => { const td=new Date().toLocaleDateString(); if(v&&v.date===td&&Array.isArray(v.readings)){if(_readingDate===td&&bibleReadings.length>0){bibleReadings=v.readings.map((r,i)=>Object.assign({},r,{chk:(bibleReadings[i]?bibleReadings[i].chk:false)||r.chk}));}else{bibleReadings=v.readings;_readingDate=td;} _lsSave('bibleReadings',{date:td,readings:bibleReadings});}else if(_readingDate!==td){bibleReadings=getBibleReadings();_readingDate=td;} },
     journalPins:     v => { journalPins = v; },
@@ -2387,7 +2389,7 @@ function syncKids()             { syncPush('kidScheduleToday', kidScheduleToday)
 function syncBibleReadings()    { const _d={date:new Date().toLocaleDateString(),readings:bibleReadings}; _lsSave('bibleReadings',_d); syncPush('bibleReadings', _d); }
 function syncStreak()           { const _s={streak:bibleStreak,lastDate:streakLastDate,devotDate:devotDoneDate}; _lsSave('bibleStreak',_s); syncPush('bibleStreak', _s); }
 function syncPins()             { syncPush('journalPins', journalPins); }
-function syncClean()            { const _c={date:new Date().toLocaleDateString(),tasks:cleanYou}; _lsSave('cleanYou',_c); syncPush('cleanYou', _c); }
+function syncClean()            { const _c={date:new Date().toLocaleDateString(),tasks:cleanYou,step:currentCleanStep}; _lsSave('cleanYou',_c); syncPush('cleanYou', _c); }
 // ═══════════════════════════════════════════════════════════════
 // END SYNC LAYER
 // ═══════════════════════════════════════════════════════════════
