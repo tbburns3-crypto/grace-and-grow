@@ -988,9 +988,35 @@ function renderHomeBible(){
   el.innerHTML='<div class="ct">📖 Today\'s readings</div>'+bibleReadings.map((r,i)=>'<div class="crow" onclick="toggleReading('+i+')"><div class="cbox '+(r.chk?'chk':'')+'">  '+(r.chk?'✓':'')+'</div><div style="flex:1"><div class="clbl '+(r.chk?'done':'')+'">'+r.l+'</div><div class="csub">'+r.t+'</div></div><div class="badge '+(r.p==='Both'?'bboth':r.p==='Her'?'bher':'bhis')+'">'+r.p+'</div></div>').join('');
 }
 function renderHomeBills(){const el=$('home-bills');if(!el)return;el.innerHTML='<div class="ct">📋 Upcoming</div>'+bills.filter(b=>b.status!=='paid').slice(0,3).map(b=>'<div class="bill-row"><div class="bill-icon" style="background:var(--s2)">'+b.icon+'</div><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">'+b.name+'</div><div style="font-size:11px;color:var(--text3);font-weight:600">Due '+b.due+'</div></div><div style="font-size:14px;font-weight:900;color:var(--text)">'+b.amount+'</div></div>').join('');}
-function toggleReading(i){ensureReadings();bibleReadings[i].chk=!bibleReadings[i].chk;syncBibleReadings();renderHomeBible();renderBible();tryIncrementStreak();}
+function toggleReading(i){
+  ensureReadings();
+  bibleReadings[i].chk=!bibleReadings[i].chk;
+  if(bibleReadings[i].chk){
+    const r=bibleReadings[i];
+    const today=new Date().toLocaleDateString();
+    const key=today+'|'+r.l+'|'+r.p;
+    if(!bibleHistory.find(h=>h.key===key)){
+      bibleHistory.unshift({key,date:today,passage:r.l,who:r.p,ts:Date.now()});
+      if(bibleHistory.length>200)bibleHistory=bibleHistory.slice(0,200);
+      syncBibleHistory();
+    }
+  }
+  syncBibleReadings();renderHomeBible();renderBible();tryIncrementStreak();
+}
 
 let bibleMainTab='plan';
+function jumpToReading(passageStr){
+  const clean=(passageStr||'').split('\u2014')[0].trim();
+  const parts=clean.split(' ');
+  const ch=parseInt(parts[parts.length-1])||1;
+  let book=parts.slice(0,-1).join(' ').trim();
+  if(book==='Psalm')book='Psalms';
+  const found=Object.keys(KJV_BOOKS).find(b=>b.toLowerCase()===book.toLowerCase());
+  readerBook=found||book;
+  readerChapter=ch;
+  window._readerInitDate=new Date().toLocaleDateString(); // prevent setBibleTab override
+  setBibleTab('read');
+}
 function setBibleTab(t){
   bibleMainTab=t;
   $('btab-plan').classList.toggle('active',t==='plan');
@@ -1022,12 +1048,66 @@ function renderBible(){
     +bibleReadings.map((r,i)=>'<div class="crow" onclick="toggleReading('+i+')">'
       +'<div class="cbox '+(r.chk?'chk':'')+'">  '+(r.chk?'✓':'')+'</div>'
       +'<div style="flex:1"><div class="clbl '+(r.chk?'done':'')+'">'+r.l+'</div><div class="csub">'+r.p+' · '+r.t+'</div></div>'
-      +'<button onclick="event.stopPropagation();readerPassage=\''+r.l.split(' \u2014')[0].trim()+'\';setBibleTab(\'read\')" style="padding:3px 9px;border-radius:8px;border:1.5px solid var(--border2);background:transparent;color:var(--purple);font-size:10px;font-weight:800;cursor:pointer;font-family:var(--sans)">Read</button>'
+      +'<button onclick="event.stopPropagation();jumpToReading(\x27'+r.l.split('\u2014')[0].trim()+'\x27)" style="padding:3px 9px;border-radius:8px;border:1.5px solid var(--border2);background:transparent;color:var(--purple);font-size:10px;font-weight:800;cursor:pointer;font-family:var(--sans)">Read</button>'
     +'</div>').join('');
   const dp=$('devot-prompt');if(dp)dp.textContent='"'+day.devotPrompt+'"';
   const ds=$('devot-source');if(ds)ds.textContent=day.devotSource+' \u00b7 '+readingPlan.length+'-day plan';
   const db=$('devot-btn');if(db){const devotToday=devotDoneDate===new Date().toLocaleDateString();db.textContent=devotToday?'Blessed together! \uD83D\uDE4F\uD83C\uDFFE\uD83D\uDC95':'We did this together \u2713';db.disabled=devotToday;db.style.background=devotToday?'linear-gradient(135deg,var(--mint),var(--teal))':'linear-gradient(135deg,var(--pink),var(--purple))';}
+  renderBibleLog();
 }
+function renderBibleLog(){
+  // Inject log container if not present
+  let logEl=$('bible-log');
+  if(!logEl){
+    const card=$('bible-card');
+    if(!card)return;
+    logEl=document.createElement('div');
+    logEl.id='bible-log';
+    card.parentNode.insertBefore(logEl,card.nextSibling);
+  }
+  if(!bibleHistory||!bibleHistory.length){
+    logEl.innerHTML='';
+    return;
+  }
+  // Group by date
+  const groups={};
+  bibleHistory.forEach(h=>{
+    if(!groups[h.date])groups[h.date]=[];
+    groups[h.date].push(h);
+  });
+  const today=new Date().toLocaleDateString();
+  const whoColor={Her:'var(--pink)',His:'var(--sky)',Both:'var(--purple)'};
+  const whoIcon={Her:'\uD83D\uDC9C',His:'\uD83D\uDC99',Both:'\uD83D\uDC9C\uD83D\uDC99'};
+  let html='<div style="margin-top:10px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
+  html+='<div style="font-size:11px;font-weight:900;color:var(--text2);text-transform:uppercase;letter-spacing:.07em">\uD83D\uDCDC Reading Log</div>';
+  html+='<div style="font-size:10px;font-weight:700;color:var(--text3)">'+bibleHistory.length+' entries</div>';
+  html+='</div>';
+  Object.keys(groups).forEach(date=>{
+    const isToday=date===today;
+    html+='<div style="margin-bottom:8px">';
+    html+='<div style="font-size:10px;font-weight:900;color:'+(isToday?'var(--purple)':'var(--text3)')+';text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">'+(isToday?'\uD83D\uDCCD Today':date)+'</div>';
+    html+='<div style="background:var(--card);border-radius:10px;overflow:hidden">';
+    groups[date].forEach((h,i)=>{
+      const color=whoColor[h.who]||'var(--purple)';
+      const icon=whoIcon[h.who]||'\uD83D\uDCDD';
+      const clean=h.passage.split('\u2014')[0].trim();
+      const title=h.passage.split('\u2014')[1]?h.passage.split('\u2014')[1].trim():'';
+      html+='<div onclick="jumpToReading(\x27'+clean+'\x27)" style="display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;'+(i>0?'border-top:1px solid var(--border)':'')+'">'
+        +'<div style="width:22px;height:22px;border-radius:6px;background:'+color+'22;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">'+icon+'</div>'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+clean+(title?'<span style="font-size:10px;color:var(--text3);font-weight:600"> \u2014 '+title+'</span>':'')+'</div>'
+        +'<div style="font-size:10px;color:var(--text3);font-weight:600">'+h.who+'</div>'
+        +'</div>'
+        +'<div style="font-size:10px;color:var(--purple);font-weight:800">\u25B6</div>'
+        +'</div>';
+    });
+    html+='</div></div>';
+  });
+  html+='</div>';
+  logEl.innerHTML=html;
+}
+
 
 function checkStreakReset(){
   if(!streakLastDate||!bibleStreak)return;
@@ -1104,6 +1184,7 @@ let readerBook = 'John';
 let readerChapter = 3;
 let readerPassage = 'John 3';
 let bibleNotes = {};
+let bibleHistory = []; // [{date,passage,who,ts}]
 let bibleHighlights = {};
 
 // Book list with chapter counts
@@ -2538,6 +2619,7 @@ function applySyncedValue(key, val) {
     journalPins:     v => { journalPins = v; },
     bibleStreak:    v => { if(v&&typeof v.streak==='number'){bibleStreak=v.streak;streakLastDate=v.lastDate||'';devotDoneDate=v.devotDate||''; _lsSave('bibleStreak',v);} },
     kidNames:        v => { window._kid1Name=v.name1; window._kid1Age=v.age1; window._kid2Name=v.name2; window._kid2Age=v.age2; },
+    bibleHistory:    v => { if(Array.isArray(v))bibleHistory=v; },
   };
   if (map[key]) map[key](val);
 }
@@ -2568,7 +2650,7 @@ function _lsLoad(key){ try{ const v=localStorage.getItem('gg_'+key); return v?JS
   const ALL_KEYS=['bills','budgetItems','savingsGoals','groceryList','tasks',
     'journalEntries','bibleNotes','spicySuggestions','memories','plannedDates',
     'dateIdeas','kidScheduleToday','kidNames','journalPins',
-    'bibleReadings','bibleStreak','cleanYou'];
+    'bibleReadings','bibleStreak','bibleHistory','cleanYou'];
   ALL_KEYS.forEach(key=>{
     const v=_lsLoad(key);
     if(v!==null) try{ applySyncedValue(key,v); }catch(e){}
@@ -2593,6 +2675,7 @@ function syncBudget()           { syncPush('budgetItems', budgetItems); syncPush
 function syncGrocery()          { syncPush('groceryList', groceryList); }
 function syncTasks()            { syncPush('tasks', tasks); }
 function syncJournal()          { syncPush('journalEntries', journalEntries); }
+function syncBibleHistory()     { syncPush('bibleHistory', bibleHistory); }
 function syncBibleNotes()       { syncPush('bibleNotes', bibleNotes); }
 function syncSuggestions()      { syncPush('spicySuggestions', spicySuggestions); }
 function syncMemories()         { syncPush('memories', memories); syncPush('plannedDates', plannedDates); syncPush('dateIdeas', dateIdeas); }
